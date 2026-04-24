@@ -16,20 +16,11 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // 1. Cek apakah user sudah login atau belum
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
-        // 2. Ambil role user yang sedang login
-        $role = Auth::user()->role;
-
-        // 3. Izinkan lewat jika rolenya 'admin' atau 'super_admin'
-        if ($role === 'admin' || $role === 'super_admin') {
-            return $next($request);
-        }
-
-        // 4. Jika bukan admin (alias user biasa), lempar ke dashboard user
-        return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses admin.');
+       
+    if (auth()->check() && (auth()->user()->role == 'admin' || auth()->user()->role == 'super_admin')) {
+        return $next($request);
+    }
+    
+    return redirect('/')->with('error', 'Akses ditolak!'); 
     }
 }
