@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes shine {
+    0% {
+        transform: translateY(100%);
+    }
+    100% {
+        transform: translateY(-100%);
+    }
+}
+.animate-shine {
+    animation: shine 2s infinite;
+}
+
+.neon-glow-teal {
+    box-shadow: 0 10px 50px rgba(20, 184, 166, 0.4);
+}

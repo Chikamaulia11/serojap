@@ -22,7 +22,16 @@
         <!-- PASSWORD -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
+<<<<<<< HEAD
             <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required />
+=======
+
+            <x-text-input id="password" class="block mt-1 w-full"
+                type="password"
+                name="password"
+                required autocomplete="current-password" />
+
+>>>>>>> 1bf7a89 (animasi tombol login)
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
@@ -37,11 +46,28 @@
 
         <!-- BUTTON -->
         <div class="flex items-center justify-end mt-4">
+<<<<<<< HEAD
             <x-primary-button class="ms-3">
                 Login
+=======
+            @if (Route::has('password.request'))
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+                {{ __('Forgot your password?') }}
+            </a>
+            @endif
+
+            <x-primary-button class="ms-4 relative overflow-hidden bg-teal-600 transition-all duration-300 shadow-[0_4px_6px_rgba(20,184,166,0.2)] hover:shadow-[0_0_15px_rgba(20,184,166,0.5)] hover:scale-105">
+
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-transparent animate-shine"></div>
+
+                <span class="relative">Log in</span>
+>>>>>>> 1bf7a89 (animasi tombol login)
             </x-primary-button>
         </div>
 
     </form>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1bf7a89 (animasi tombol login)
 </x-guest-layout>
