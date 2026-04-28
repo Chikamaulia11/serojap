@@ -8,45 +8,51 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\User;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Menampilkan halaman login untuk PELAPOR (User Biasa)
+     * Tampilan Login Pelapor
      */
-    public function create(): View
-    {
-        return view('auth.login');
+    public function create(): View 
+    { 
+        return view('auth.login'); 
     }
 
     /**
-     * Menampilkan halaman login untuk ADMIN & SUPER ADMIN
+     * Tampilan Login Admin
      */
-    public function createAdmin(): View
-    {
-        // Pastikan kamu sudah buat file: resources/views/auth/login-admin.blade.php
-        return view('auth.login-admin');
+    public function createAdmin(): View 
+    { 
+        return view('auth.login-admin'); 
     }
 
     /**
-     * Proses Login
+     * Proses Login (Satu Pintu untuk Semua)
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        if ($request->routeIs('login.admin.post')) {
+            $user = User::where('email', $request->email)->first();
+
+            if ($user && !in_array($user->role, ['admin', 'super_admin'])) {
+                return redirect()->route('login.admin')
+                    ->withErrors(['email' => 'Akses Ditolak! Akun Anda tidak terdaftar sebagai Administrator.']);
+            }
+        }
+
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        $user = $request->user();
+        $user = Auth::user();
 
-        // --- LOGIKA REDIRECT BERDASARKAN ROLE ---
         if ($user->role === 'admin' || $user->role === 'super_admin') {
-            return redirect()->intended(route('admin.dashboard', absolute: false));
+            return redirect()->route('admin.dashboard');
         }
-        // ----------------------------------------
-
-        // Jika user biasa/pelapor, lempar ke dashboard utama
-        return redirect()->intended(route('dashboard', absolute: false));
+        
+        return redirect()->route('dashboard');
     }
 
     /**
@@ -57,7 +63,6 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

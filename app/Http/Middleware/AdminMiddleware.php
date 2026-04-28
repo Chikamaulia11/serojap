@@ -9,18 +9,23 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
-    {
-       
-    if (auth()->check() && (auth()->user()->role == 'admin' || auth()->user()->role == 'super_admin')) {
+{
+    if (Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
         return $next($request);
     }
     
-    return redirect('/')->with('error', 'Akses ditolak!'); 
+    if (Auth::check()) {
+        $user = Auth::user();
+        $user->setRememberToken(null);
+        $user->save();
+        
+        Auth::guard('web')->logout();
     }
+
+    return redirect()->route('login.admin')->withErrors([
+        'email' => 'Sesi ditutup karena Anda bukan Administrator.'
+    ]);
+}
+
 }
