@@ -2,6 +2,15 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReportController;
+
+Route::get('/report', function () {
+    return view('pelapor.form');
+});
+
+Route::post('/report', [ReportController::class, 'store']);
+
+Route::get('/my-report', [ReportController::class, 'myReport']);
 
 Route::get('/', function () {
     return view('welcome');
