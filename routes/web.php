@@ -3,7 +3,22 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+<<<<<<< HEAD
 use App\Http\Controllers\Admin\LaporanController;
+=======
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\DashboardController;
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth');
+
+Route::get('/report', function () {
+    return view('pelapor.form');
+});
+
+Route::post('/report', [ReportController::class, 'store']);
+
+Route::get('/my-report', [ReportController::class, 'myReport']);
+>>>>>>> 43717ca (fix workspace clean)
 
 // Web Routes
 
