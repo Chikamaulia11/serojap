@@ -9,12 +9,19 @@ use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth');
+Route::get('/', function () {
+    return view('pelapor.dashboard');
+});
+
+Route::get('/dashboard', function () {
+    return view('pelapor.dashboard');
+});
 
 Route::get('/report', function () {
     return view('pelapor.form');
 });
 
+<<<<<<< HEAD
 Route::post('/report', [ReportController::class, 'store']);
 
 Route::get('/my-report', [ReportController::class, 'myReport']);
@@ -64,3 +71,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 require __DIR__.'/auth.php';
+=======
+Route::get('/my-report', function () {
+    return view('pelapor.riwayat');
+});
+>>>>>>> fba5a8a (save progress dashboard pelapor)
