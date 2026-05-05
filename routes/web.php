@@ -8,13 +8,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route Dashboard Pelapor
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-// Jalur Login Pelapor (User)
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 
 // Jalur Login Admin & Super Admin
 Route::get('/login/admin', [AuthenticatedSessionController::class, 'createAdmin'])->name('login.admin');
