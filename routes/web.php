@@ -25,7 +25,6 @@ Route::middleware('guest')->group(function () {
     // LOGIN PELAPOR
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
-
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
     // REGISTER
