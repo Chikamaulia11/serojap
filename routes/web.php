@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 <<<<<<< HEAD
+<<<<<<< HEAD
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 <<<<<<< HEAD
 use App\Http\Controllers\Admin\LaporanController;
@@ -10,6 +11,8 @@ use App\Http\Controllers\ReportController;
 =======
 use App\Http\Controllers\AuthController;
 >>>>>>> ed81696 (setup auth pelapor + middleware + dashboard final)
+=======
+>>>>>>> af1bf81 (setup final)
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 
@@ -20,50 +23,38 @@ use App\Http\Controllers\ReportController;
 */
 
 /* =========================
-   🔁 DEFAULT REDIRECT
+   DEFAULT REDIRECT
 ========================= */
 Route::get('/', function () {
-    return redirect('/login');
+    return redirect('/dashboard');
 });
 
 /* =========================
-   🔐 AUTH (GUEST ONLY)
+   AUTH BAWAAN LARAVEL
 ========================= */
-Route::middleware('guest')->group(function () {
-
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-
-    Route::get('/register', [AuthController::class, 'showRegister']);
-    Route::post('/register', [AuthController::class, 'register']);
-
-});
+require __DIR__.'/auth.php';
 
 /* =========================
-   🔒 AUTH + ROLE PELAPOR
+   AUTH + ROLE PELAPOR
 ========================= */
 Route::middleware(['auth', 'pelapor'])->group(function () {
 
-    /* DASHBOARD */
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    /* FORM LAPORAN */
     Route::get('/report', [ReportController::class, 'create']);
     Route::post('/report', [ReportController::class, 'store']);
 
-    /* RIWAYAT */
     Route::get('/my-report', [ReportController::class, 'index']);
 
-    /* FAQ (sementara view langsung) */
     Route::get('/faq', function () {
         return view('pelapor.faq');
     });
 
-    /* PROSEDUR */
     Route::get('/prosedur', function () {
         return view('pelapor.prosedur');
     });
 
+<<<<<<< HEAD
     /* LOGOUT */
     Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -126,3 +117,6 @@ Route::get('/my-report', function () {
 =======
 });
 >>>>>>> ed81696 (setup auth pelapor + middleware + dashboard final)
+=======
+});
+>>>>>>> af1bf81 (setup final)
