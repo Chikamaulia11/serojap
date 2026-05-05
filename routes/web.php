@@ -93,6 +93,7 @@ Route::get('/', function () {
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
+<<<<<<< HEAD
 // LOGIN ADMIN
 Route::get('/login/admin', [AuthenticatedSessionController::class, 'createAdmin'])->name('login.admin');
 Route::post('/login/admin', [AuthenticatedSessionController::class, 'store'])->name('login.admin.post');
@@ -101,6 +102,8 @@ Route::post('/login/admin', [AuthenticatedSessionController::class, 'store'])->n
 Route::get('/dashboard', function () {
     return view('pelapor.dashboard');
 })->middleware(['auth', 'verified', 'pelapor'])->name('dashboard');
+=======
+>>>>>>> 8ebda9f (pisahin login pelapor)
 
 // PROFILE
 Route::middleware('auth')->group(function () {
