@@ -2,54 +2,61 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @property string $role
+ */
 class User extends Authenticatable
 {
-    
-public function reports()
-{
-    return $this->hasMany(\App\Models\Report::class);
-}    
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    /* RELATION */
+    public function reports()
+    {
+        return $this->hasMany(\App\Models\Report::class);
+    }
+
+    /* FILLABLE */
     protected $fillable = [
         'name',
         'email',
         'password',
         'role',
+        'foto_profil',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    /* HIDDEN */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    /* CAST */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /* ROLE HELPER */
+    public function isPelapor()
+    {
+        return $this->role === 'pelapor';
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isSuperAdmin()
+    {
+        return $this->role === 'super_admin';
     }
 }
