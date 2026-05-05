@@ -16,17 +16,6 @@ Route::get('/dashboard', function () {
 // Jalur Login Pelapor (User)
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 
-// Jalur Login Admin & Super Admin
-Route::get('/login/admin', [AuthenticatedSessionController::class, 'createAdmin'])->name('login.admin');
-
-// Penjaga Pintu Dashboard Admin & Super Admin
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard'); 
-    })->name('admin.dashboard');
-    
-    // Tambahkan route admin lainnya di sini nanti
-});
 
 // Route Profile (Default Laravel Breeze)
 Route::middleware('auth')->group(function () {
