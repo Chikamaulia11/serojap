@@ -18,7 +18,7 @@ Route::get('/', function () {
 ========================= */
 Route::middleware('guest')->group(function () {
 
-    // LOGIN PELAPOR
+    // LOGIN
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 

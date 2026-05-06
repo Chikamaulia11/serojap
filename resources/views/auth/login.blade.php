@@ -22,7 +22,14 @@
         <!-- PASSWORD -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required />
+            <x-text-input 
+                id="password" 
+                class="block mt-1 w-full"
+                type="password"
+                name="password"
+                required
+                autocomplete="current-password"
+            />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
@@ -37,8 +44,13 @@
 
         <!-- BUTTON -->
         <div class="flex items-center justify-end mt-4">
-            <x-primary-button class="ms-3">
-                Login
+
+            <x-primary-button class="ms-4 relative overflow-hidden bg-teal-600 transition-all duration-300 shadow-[0_4px_6px_rgba(20,184,166,0.2)] hover:shadow-[0_0_15px_rgba(20,184,166,0.5)] hover:scale-105">
+
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-transparent animate-shine"></div>
+
+                <span class="relative">Log in</span>
+
             </x-primary-button>
         </div>
 
