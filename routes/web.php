@@ -3,31 +3,48 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
-
-/*
-|--------------------------------------------------------------------------
-| WEB ROUTES - SEROJAP
-|--------------------------------------------------------------------------
-*/
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 /* =========================
-   DEFAULT REDIRECT
+   LANDING PAGE
 ========================= */
 Route::get('/', function () {
-    return redirect('/dashboard');
+    return view('welcome');
 });
 
 /* =========================
-   AUTH BAWAAN LARAVEL
+   AUTH (GUEST)
 ========================= */
-require __DIR__.'/auth.php';
+Route::middleware('guest')->group(function () {
+
+    // LOGIN PELAPOR
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])
+        ->name('login');
+
+    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+
+    // REGISTER
+    Route::get('/register', [RegisteredUserController::class, 'create'])
+        ->name('register');
+
+    Route::post('/register', [RegisteredUserController::class, 'store']);
+});
 
 /* =========================
-   AUTH + ROLE PELAPOR
+   LOGOUT
+========================= */
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('logout');
+
+/* =========================
+   PROTECTED (PELAPOR)
 ========================= */
 Route::middleware(['auth', 'pelapor'])->group(function () {
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
     Route::get('/report', [ReportController::class, 'create']);
     Route::post('/report', [ReportController::class, 'store']);
@@ -41,5 +58,4 @@ Route::middleware(['auth', 'pelapor'])->group(function () {
     Route::get('/prosedur', function () {
         return view('pelapor.prosedur');
     });
-
 });

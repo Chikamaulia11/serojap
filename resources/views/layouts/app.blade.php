@@ -132,7 +132,6 @@
                 display: none;
             }
         }
-
     </style>
 </head>
 
@@ -157,10 +156,20 @@
 
     <!-- USER -->
     <div class="nav-right">
-        <img src="{{ $authUser && $authUser->foto_profil 
-            ? asset('storage/'.$authUser->foto_profil) 
-            : 'https://i.pravatar.cc/100' }}">
-        <span>{{ $authUser->name ?? 'Guest' }}</span>
+        @if(auth()->check())
+
+            <img src="{{ auth()->user()->foto_profil 
+                ? asset('storage/'.auth()->user()->foto_profil) 
+                : 'https://i.pravatar.cc/100' }}">
+
+            <span>{{ auth()->user()->name }}</span>
+
+        @else
+
+            <img src="https://i.pravatar.cc/100">
+            <span>Guest</span>
+
+        @endif
     </div>
 
 </div>
