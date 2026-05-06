@@ -58,8 +58,13 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
+<<<<<<< HEAD
             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:indigo-500" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
+=======
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+                {{ __('Sudah Punya Akun?') }}
+>>>>>>> b793b33 (backup sebelum merge)
             </a>
 
             <x-primary-button class="ms-4 bg-[#227474] hover:bg-[#1b5e5e] text-white">
