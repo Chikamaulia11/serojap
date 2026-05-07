@@ -22,7 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'foto_profil',
         'role',
+        'posisi',
     ];
 
     /**
@@ -46,5 +48,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Accessor agar kode lama yang pakai $user->nama tetap jalan
+    public function getNamaAttribute()
+    {
+        return $this->attributes['name'];
+    }
+
+    public function getFotoProfilAttribute($value)
+    {
+        return $value ?? 'default-avatar.png';
     }
 }
