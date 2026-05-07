@@ -99,7 +99,7 @@
             </div>
         </div>
         
-        <!-- Update Status + Ganti Laporan -->
+        <!-- Fitur Update Status + Ganti Laporan -->
         <div class="lg:col-span-1">
             <div class="space-y-6">
                 @isset($daftarLaporan)
@@ -154,7 +154,7 @@
             </div>
         </div>
 
-        <!-- Riwayat Status -->
+        <!-- Fitur Riwayat Status -->
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
                 <div class="px-6 py-4 border-b border-gray-100">
                     <h2 class="font-semibold text-gray-900 flex items-center gap-2">
@@ -206,7 +206,6 @@
                 </div>
             </div>
 
-        
     </div>
 </div>
 @endsection
