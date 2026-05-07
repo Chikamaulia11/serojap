@@ -23,7 +23,7 @@
                 <option value="selesai"  {{ request('status') == 'selesai'  ? 'selected' : '' }}>Selesai</option>
                 <option value="ditolak"  {{ request('status') == 'ditolak'  ? 'selected' : '' }}>Ditolak</option>
             </select>
-bg-[#1f4674] hover:bg-[#2657c1]
+            <button type="submit" class="bg-[#1f4674] hover:bg-[#2657c1] text-white font-medium rounded-lg text-sm px-5 py-2.5 transition">
                 Filter
             </button>
             <a href="{{ route('admin.laporan.riwayat-status') }}" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 transition">
@@ -32,9 +32,16 @@ bg-[#1f4674] hover:bg-[#2657c1]
         </form>
     </div>
 
-    {{-- Timeline --}}
-    <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {{-- KOLOM KIRI (seirama dengan layout detail) --}}
+        <div class="lg:col-span-2 space-y-6">
+            {{-- Timeline --}}
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h2 class="font-semibold text-gray-900">Riwayat Status</h2>
+                </div>
+                <div class="overflow-x-auto">
+
             <table class="w-full text-sm text-left">
                 <thead class="bg-gray-50 text-gray-500 uppercase text-xs font-semibold">
                     <tr>
@@ -69,7 +76,25 @@ bg-[#1f4674] hover:bg-[#2657c1]
                             </span>
                         </td>
                         <td class="px-6 py-4 text-gray-700 max-w-xs">
-                            {{ $item->keterangan ?: '-' }}
+                            <div class="space-y-2">
+                                <div>{{ $item->keterangan ?: '-' }}</div>
+
+                                @php
+                                    $fotoPerbaikan = $item->foto_perbaikan
+                                        ?? ($item->foto->foto_perbaikan ?? null)
+                                        ?? null;
+                                @endphp
+
+                                @if(!empty($fotoPerbaikan))
+                                    <div>
+                                        <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Foto Perbaikan</p>
+                                        <img
+                                            src="{{ asset('storage/' . $fotoPerbaikan) }}"
+                                            alt="Foto Perbaikan"
+                                            class="w-28 h-20 object-cover rounded-lg border border-gray-200">
+                                    </div>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-6 py-4">
                             <div class="font-medium text-gray-900 text-xs">{{ $item->admin->name ?? 'Admin' }}</div>
@@ -116,5 +141,21 @@ bg-[#1f4674] hover:bg-[#2657c1]
                 @endif
             </div>
         @endif
+            </div>
+
+        {{-- Penutup kolom kiri --}}
+        </div>
+
+        {{-- KOLOM KANAN placeholder agar layout match detail --}}
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm sticky top-6">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h2 class="font-semibold text-gray-900">Info</h2>
+                </div>
+                <div class="px-6 py-4 text-sm text-gray-500">
+                    Riwayat status tersedia di tabel.
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
