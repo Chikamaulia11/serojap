@@ -109,65 +109,9 @@
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Fitur Update Status + Ganti Laporan -->
-        <div class="lg:col-span-1">
-            <div class="space-y-6">
-                @isset($daftarLaporan)
-                    @include('admin.laporan.partials.pilih-laporan-dropdown', ['daftarLaporan' => $daftarLaporan, 'laporanSaatIni' => $laporan])
-                @endisset
 
-                <div class="lg:col-span-1">
-                    <div class="space-y-6">
-                        <h2 class="font-semibold text-gray-900 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                            Update Status Laporan
-                        </h2>
-                    </div>
-                <div class="px-6 py-4">
-                    <form action="{{ route('admin.laporan.update', $laporan->id_laporan) }}" method="POST" enctype="multipart/form-data">
-                        @csrf @method('PUT')
-
-                        <div class="mb-4">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Status Baru</label>
-                            <select name="status" required
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5">
-                                <option value="" disabled selected>-- Pilih Status --</option>
-                                <option value="diterima">✓ Diterima</option>
-                                <option value="proses">⚙ Diproses</option>
-                                <option value="selesai">★ Selesai</option>
-                                <option value="ditolak">✕ Ditolak</option>
-                            </select>
-                            @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Keterangan (Opsional)</label>
-                            <textarea name="keterangan" rows="4"
-                                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 resize-y"
-                                      placeholder="Contoh: Laporan telah diverifikasi dan akan ditindaklanjuti...">{{ old('keterangan') }}</textarea>
-                        </div>
-
-                        <div class="mb-5">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Foto Perbaikan (Opsional)</label>
-                            <input type="file" name="foto_perbaikan" accept="image/*"
-                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                            <p class="text-xs text-gray-400 mt-1">Format: JPG, PNG. Maks 2MB. Upload saat status Selesai.</p>
-                            @error('foto_perbaikan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                        </div>
-
-                        <button type="submit"
-                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm px-5 py-3 transition">
-                            Simpan Perubahan
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Fitur Riwayat Status -->
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+            {{-- Riwayat Status --}}
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
                 <div class="px-6 py-4 border-b border-gray-100">
                     <h2 class="font-semibold text-gray-900 flex items-center gap-2">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,7 +160,7 @@
                                         </div>
                                     @endif
 
-                                    {{-- ✅ Foto Perbaikan --}}
+                                    {{-- Foto Perbaikan --}}
                                     @if(!empty($s->foto_perbaikan))
                                         <div class="mt-3">
                                             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Foto Perbaikan</p>
@@ -238,7 +182,6 @@
                 </div>
             </div>
         </div>
-
         {{-- ===== KOLOM KANAN (Dropdown + Update Status) ===== --}}
         <div class="lg:col-span-1 space-y-6">
 
@@ -279,6 +222,31 @@
                             @enderror
                         </div>
 
+                        <div class="mb-4">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Keterangan (Opsional)</label>
+                            <textarea name="keterangan" rows="4"
+                                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 resize-y"
+                                      placeholder="Contoh: Laporan telah diverifikasi dan akan ditindaklanjuti...">{{ old('keterangan') }}</textarea>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Foto Perbaikan (Opsional)</label>
+                            <input type="file" name="foto_perbaikan" accept="image/*"
+                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                            <p class="text-xs text-gray-400 mt-1">Format: JPG, PNG. Maks 2MB. Upload saat status Selesai.</p>
+                            @error('foto_perbaikan')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <button type="submit"
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm px-5 py-3 transition">
+                            Simpan Perubahan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
