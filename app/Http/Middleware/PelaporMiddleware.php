@@ -29,4 +29,3 @@ class PelaporMiddleware
             ->withErrors(['email' => 'Anda tidak memiliki akses ke dashboard pelapor.']);
     }
 }
-

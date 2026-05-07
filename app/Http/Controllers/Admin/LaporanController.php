@@ -40,8 +40,38 @@ class LaporanController extends Controller
     public function show(string $id)
     {
         $laporan = TabelLaporan::with(['user', 'statuses'])->findOrFail($id);
-        
-        return view('admin.laporan.show', compact('laporan'));
+
+        // Untuk fitur "Ganti Laporan" (dropdown pilih laporan lain)
+        $daftarLaporan = TabelLaporan::select('id_laporan', 'kecamatan')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('admin.laporan.show', [
+            'laporan' => $laporan,
+            'daftarLaporan' => $daftarLaporan,
+        ]);
+    }
+
+    /**
+     * Legacy route: admin.laporan.update-status
+     */
+    public function updateStatusIndex(Request $request)
+    {
+        $laporanSaatIni = TabelLaporan::query()->latest('created_at')->first();
+
+        if (!$laporanSaatIni) {
+            return redirect()->route('admin.laporan.index')->with('error', 'Belum ada laporan.');
+        }
+
+        return redirect()->route('admin.laporan.show', $laporanSaatIni->id_laporan);
+    }
+
+    /**
+     * Legacy route: admin.laporan.riwayat-status
+     */
+    public function riwayatStatusIndex(Request $request)
+    {
+        return redirect()->route('admin.laporan.index');
     }
 
     /**

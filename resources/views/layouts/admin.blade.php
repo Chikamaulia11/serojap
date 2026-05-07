@@ -32,28 +32,34 @@
         </div>
             <nav class="flex-1 px-2 space-y-0.5">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.dashboard') ? 'bg-slate-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
-                <i class="mdi mdi-view-dashboard-outline text-lg w-5 text-center"></i> Dashboard
+                    <i class="mdi mdi-home-analytics text-lg w-5 text-center"></i> Dashboard
+
             </a>
         <div x-data="{ open: false }" class="relative">
             <button @click="open = !open"
             class="w-full flex items-center justify-between gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.laporan.index') ? 'bg-slate-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
                 <span class="flex items-center gap-2.5">
-                    <i class="mdi mdi-file-document-outline text-lg w-5 text-center"></i> Manajemen Laporan
+                    <i class="mdi mdi-format-list-bulleted-square-outline text-lg w-5 text-center"></i> Manajemen Laporan
                 </span>
                     <i class="mdi mdi-chevron-down text-lg transition-transform" :class="open ? 'rotate-180' : ''"></i>
                     </button>
             <div x-show="open" x-transition class="mt-1 ml-4 space-y-1">
                 <a href="{{ route('admin.laporan.index') }}"
-                    class="flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.laporan.index') ? 'bg-slate-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
+                    class="flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.laporan.*') ? 'bg-slate-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
+                    <i class="mdi mdi-file-document-outline text-lg w-5 text-center"></i> Semua Laporan
+                </a>
+
+                <a href="{{ route('admin.laporan.update-status') }}"
+                    class="flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.laporan.update-status') ? 'bg-slate-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
                     <i class="mdi mdi-list-box-outline text-lg w-5 text-center"></i> Update Status
                 </a>
             </div>
         </div>
             <a href="{{ route('admin.laporan.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.laporan.*') ? 'bg-slate-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
-                <i class="mdi mdi-file-document-outline text-lg w-5 text-center"></i> Manajemen FAQ
+                <i class="mdi mdi-information-outline text-lg w-5 text-center"></i> Manajemen FAQ
             </a>
             <a href="{{ route('admin.laporan.index') }}" class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.laporan.*') ? 'bg-slate-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
-                <i class="mdi mdi-file-document-outline text-lg w-5 text-center"></i> Grafik Statistik
+                    <i class="mdi mdi-chart-bar-stacked-outline text-lg w-5 text-center"></i> Grafik Statistik
             </a>
         </nav>
 

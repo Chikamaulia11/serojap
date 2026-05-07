@@ -41,6 +41,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // --- LAPORAN ---
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/update-status', [LaporanController::class, 'updateStatusIndex'])->name('laporan.update-status');
+    Route::get('/laporan/riwayat-status', [LaporanController::class, 'riwayatStatusIndex'])->name('laporan.riwayat-status');
     Route::get('/laporan/{id}', [LaporanController::class, 'show'])->name('laporan.show');
     Route::put('/laporan/{id}', [LaporanController::class, 'update'])->name('laporan.update');
 
