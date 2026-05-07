@@ -4,13 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TabelLaporan;
+use App\Models\TabelStatus;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = TabelLaporan::with(['user', 'statusTerbaru'])
@@ -34,27 +32,56 @@ class LaporanController extends Controller
         return view('admin.laporan.index', compact('laporan'));
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        $laporan = TabelLaporan::with(['user', 'statuses'])->findOrFail($id);
+        $laporan = TabelLaporan::with([
+            'user',
+            'statuses.admin',
+            'statusTerbaru',
+        ])->findOrFail($id);
 
-        // Untuk fitur "Ganti Laporan" (dropdown pilih laporan lain)
         $daftarLaporan = TabelLaporan::select('id_laporan', 'kecamatan')
             ->orderByDesc('created_at')
             ->get();
 
         return view('admin.laporan.show', [
-            'laporan' => $laporan,
+            'laporan'       => $laporan,
             'daftarLaporan' => $daftarLaporan,
         ]);
     }
 
-    /**
-     * Legacy route: admin.laporan.update-status
-     */
+    public function update(Request $request, string $id)
+    {
+        $request->validate([
+            'status'         => 'required|string|in:diterima,proses,selesai,ditolak',
+            'keterangan'     => 'nullable|string|max:1000',
+            // ✅ Validasi foto
+            'foto_perbaikan' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $laporan = TabelLaporan::findOrFail($id);
+
+        $data = [
+            'id_laporan'  => $laporan->id_laporan,
+            'status'      => $request->status,
+            'keterangan'  => $request->keterangan ?? null,
+            // ✅ Simpan admin yang melakukan update
+            'admin_id'    => auth()->id(),
+        ];
+
+        // ✅ Simpan foto jika ada
+        if ($request->hasFile('foto_perbaikan')) {
+            $data['foto_perbaikan'] = $request->file('foto_perbaikan')
+                                              ->store('perbaikan', 'public');
+        }
+
+        TabelStatus::create($data);
+
+        return redirect()
+            ->route('admin.laporan.show', $id)
+            ->with('success', 'Status laporan berhasil diperbarui!');
+    }
+
     public function updateStatusIndex(Request $request)
     {
         $laporanSaatIni = TabelLaporan::query()->latest('created_at')->first();
@@ -66,32 +93,8 @@ class LaporanController extends Controller
         return redirect()->route('admin.laporan.show', $laporanSaatIni->id_laporan);
     }
 
-    /**
-     * Legacy route: admin.laporan.riwayat-status
-     */
     public function riwayatStatusIndex(Request $request)
     {
         return redirect()->route('admin.laporan.index');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $request->validate([
-            'status' => 'required|string|in:diterima,proses,selesai,ditolak',
-        ]);
-
-        $laporan = TabelLaporan::findOrFail($id);
-
-        // Create new status entry
-        \App\Models\TabelStatus::create([
-            'id_laporan' => $laporan->id_laporan,
-            'status' => $request->status,
-            'keterangan' => $request->keterangan ?? 'Status diperbarui oleh admin',
-        ]);
-
-        return redirect()->route('admin.laporan.index')->with('success', 'Status laporan berhasil diperbarui!');
     }
 }
