@@ -16,29 +16,31 @@
             background-color: #ffffff;
         }
 
-        /* Memberi jarak atas agar tidak nempel */
+        /* Dibuat lebih naik (padding dikurangi dari 6rem ke 3rem) */
         .hero-section {
-            padding-top: 6rem !important; 
+            padding-top: 3rem !important; 
+            padding-bottom: 2rem !important;
             position: relative;
             z-index: 1;
+            min-height: 85vh; /* Memastikan konten tetap proposional */
+            display: flex;
+            align-items: center;
         }
 
-        /* Memperbaiki Gradasi Hijau agar muncul di latar belakang */
         .gradient-bg {
             position: absolute;
             top: -100px;
             left: -100px;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(34, 197, 94, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
-            z-index: -1; /* Di bawah konten */
+            background: radial-gradient(circle, rgba(34, 109, 113, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+            z-index: -1;
             pointer-events: none;
         }
 
-        /* Bingkai Foto (Card Style) seperti di awal */
         .img-frame {
             background-color: #ffffff;
-            padding: 15px; /* Ini yang bikin efek bingkai putih */
+            padding: 15px;
             border-radius: 50px;
             box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.15);
             border: 1px solid #f0f0f0;
@@ -53,18 +55,18 @@
             border-radius: 40px; 
         }
 
-        /* Styling Tombol */
         .btn-custom-action {
-            background-color: #f8f9fa !important;
+            background-color: #f1f5f5 !important;
             color: #4b5563 !important;
-            border: 1px solid #e5e7eb !important;
-            transition: all 0.2s ease !important;
+            border: 1px solid #d1dbdb !important;
+            transition: all 0.2s ease-in-out !important;
             padding: 1rem 2.5rem !important;
             font-weight: 700 !important;
             border-radius: 50px !important;
             width: 100%;
             text-align: center;
             text-decoration: none;
+            display: inline-block;
         }
 
         @media (min-width: 768px) {
@@ -73,20 +75,34 @@
             }
         }
         
-        .btn-custom-action:active {
-            background-color: #22c55e !important;
-            color: white !important;
-            border-color: #22c55e !important;
+        .btn-custom-action:hover {
+            background-color: #e2eaea !important;
+            border-color: #226d71 !important;
+            color: #226d71 !important;
         }
 
-        /* Titik Hijau */
+        .btn-custom-action:active {
+            background-color: #226d71 !important;
+            color: #ffffff !important;
+            border-color: #226d71 !important;
+            transform: scale(0.96);
+        }
+
         .dot-green {
             width: 10px;
             height: 10px;
-            background-color: #22c55e;
+            background-color: #226d71;
             border-radius: 50%;
             display: inline-block;
             margin-right: 10px;
+        }
+
+        .text-teal {
+            color: #226d71 !important;
+        }
+
+        .bg-teal-light {
+            background-color: rgba(34, 109, 113, 0.1) !important;
         }
     </style>
 </head>
@@ -100,18 +116,18 @@
             <div class="row align-items-center gy-5">
                 
                 <div class="col-lg-6">
-                    <div class="d-inline-flex align-items-center bg-success bg-opacity-10 text-success px-4 py-2 border border-success border-opacity-25 rounded-pill mb-4">
+                    <div class="d-inline-flex align-items-center bg-teal-light text-teal px-4 py-2 border border-teal-light border-opacity-25 rounded-pill mb-4">
                         <span class="dot-green"></span>
                         <small class="fw-bold text-uppercase tracking-wider" style="font-size: 10px;">Sistem Pelaporan Purwakarta</small>
                     </div>
 
                     <h1 class="display-3 fw-bold mb-3 text-dark" style="line-height: 1.2;">
                         Sistem Pelaporan <br>
-                        <span class="text-success italic">Jalan Rusak</span> <br>
+                        <span class="text-teal italic">Jalan Rusak</span> <br>
                         Purwakarta
                     </h1>
 
-                    <p class="lead text-muted mb-5" style="font-size: 1.15rem; max-width: 500px;">
+                    <p class="lead text-muted mb-4" style="font-size: 1.15rem; max-width: 500px;">
                         Satu platform terintegrasi untuk masyarakat melaporkan kerusakan jalan demi infrastruktur Purwakarta yang lebih baik.
                     </p>
 
@@ -137,7 +153,7 @@
         </div>
     </main>
 
-    <footer class="container py-5 mt-5 border-top border-light">
+    <footer class="container py-4 border-top border-light">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <p class="small text-muted mb-0">© 2026 Serojap Purwakarta</p>
             <p class="small text-muted mb-0">Indonesia University of Education Project</p>

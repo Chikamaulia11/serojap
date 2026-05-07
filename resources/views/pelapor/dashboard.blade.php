@@ -1,116 +1,115 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Pelapor - Serojap')
+@section('title', 'Dashboard Pelapor — Serojap')
 
 @section('content')
-<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-    <div class="mb-12">
-        <div class="bg-gradient-to-r from-[#2657c1] to-[#1e4ba8] text-white p-8 rounded-2xl shadow-2xl">
-            <h1 class="text-4xl font-bold mb-4">Dashboard Pelapor</h1>
-            <p class="text-xl">Halo, {{ auth()->user()->name }}! Pantau laporan aduan Anda di sini.</p>
-        </div>
-    </div>
-
-    {{-- Stat Cards --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
-            <div class="flex items-center">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m0 0h3m-6 0h6"/>
-                    </svg>
-                </div>
-                <div class="ml-6">
-                    <p class="text-sm font-medium text-gray-500">Total Laporan</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ $stats['total'] }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
-            <div class="flex items-center">
-                <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center text-white">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div class="ml-6">
-                    <p class="text-sm font-medium text-gray-500">Selesai</p>
-                    <p class="text-3xl font-bold text-gray-900">{{ $stats['selesai'] }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Laporan Table --}}
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <div class="flex items-center justify-between">
-                <h2 class="text-2xl font-bold text-gray-900">Laporan Saya</h2>
-                <a href="{{ route('pelapor.laporan.create') }}" class="bg-gradient-to-r from-[#2657c1] to-[#1e4ba8] text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
-                    + Laporan Baru
-                </a>
-            </div>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Lokasi</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Tanggal</th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($laporans as $laporan)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">#{{ $laporan->id_laporan }}</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">{{ $laporan->kecamatan }}</div>
-                                <div class="text-sm text-gray-500">{{ Str::limit($laporan->lokasi, 40) }}</div>
+<div class="py-12">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900">
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">Dashboard Pelapor</h1>
+                <p class="text-lg text-gray-600 mb-8">Selamat datang, {{ auth()->user()->name }}</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-8 rounded-xl shadow-lg">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-xl mr-4">
+                                <i class="mdi mdi-file-document-outline text-2xl"></i>
                             </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            @if($laporan->statusTerakhir)
-                                <span class="px-3 py-1 rounded-full text-xs font-medium
-                                    {{ $laporan->statusTerakhir->status == 'selesai' ? 'bg-emerald-100 text-emerald-800' : 
-                                       ($laporan->statusTerakhir->status == 'proses' ? 'bg-blue-100 text-blue-800' : 
-                                       ($laporan->statusTerakhir->status == 'diterima' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800')) }}">
-                                    {{ ucfirst($laporan->statusTerakhir->status) }}
-                                </span>
-                            @else
-                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Baru</span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {{ $laporan->created_at->format('d M Y') }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{{ route('pelapor.laporan.show', $laporan->id_laporan) }}" class="text-[#2657c1] hover:text-[#1e4ba8] font-semibold">Detail</a>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-                            <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            </svg>
-                            <p>Belum ada laporan. <a href="{{ route('pelapor.laporan.create') }}" class="text-[#2657c1] hover:underline font-semibold">Buat laporan pertama Anda</a></p>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            {{ $laporans->appends(request()->query())->links() }}
+                            <div>
+                                <p class="text-blue-100 text-sm font-medium">Total Laporan</p>
+                                <p class="text-3xl font-bold">@php
+                                    echo auth()->user()->laporan()->count();
+                                @endphp</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white p-8 rounded-xl shadow-lg">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-xl mr-4">
+                                <i class="mdi mdi-check-circle-outline text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-emerald-100 text-sm font-medium">Selesai</p>
+                                <p class="text-3xl font-bold">@php
+                                    echo auth()->user()->laporan()->whereHas('statuses', function($q){
+                                        $q->where('status', 'selesai');
+                                    })->count();
+                                @endphp</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-amber-500 to-amber-600 text-white p-8 rounded-xl shadow-lg">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-xl mr-4">
+                                <i class="mdi mdi-clock-outline text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-amber-100 text-sm font-medium">Diproses</p>
+                                <p class="text-3xl font-bold">@php
+                                    echo auth()->user()->laporan()->whereHas('statuses', function($q){
+                                        $q->where('status', 'proses');
+                                    })->count();
+                                @endphp</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Laporan Terakhir</h2>
+                        <a href="{{ route('laporan.create') }}" class="bg-[#2657c1] hover:bg-[#1e4ba8] text-white px-6 py-2.5 rounded-lg font-medium transition duration-200">
+                            Buat Laporan Baru
+                        </a>
+                    </div>
+                    @php $recent = auth()->user()->laporan()->latest()->take(5)->get(); @endphp
+                    @if($recent->count() > 0)
+                    <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($recent as $laporan)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900">{{ Str::limit($laporan->lokasi, 40) }}</div>
+                                            <div class="text-sm text-gray-500">{{ $laporan->kecamatan }}</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $laporan->statusTerbaru?->status == 'selesai' ? 'bg-green-100 text-green-800' : ($laporan->statusTerbaru?->status == 'proses' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800') }}">
+                                                {{ $laporan->statusTerbaru?->status ?? 'baru' }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ $laporan->created_at->format('d M Y') }}
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    @else
+                    <div class="text-center py-12">
+                        <i class="mdi mdi-file-document-outline text-6xl text-gray-400 mb-4 block"></i>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Belum ada laporan</h3>
+                        <p class="text-gray-500 mb-6">Mulai laporkan jalan rusak di sekitar Anda</p>
+                        <a href="{{ route('laporan.create') }}" class="bg-[#2657c1] hover:bg-[#1e4ba8] text-white px-8 py-3 rounded-xl font-semibold text-lg transition duration-200 inline-block">
+                            Buat Laporan Pertama
+                        </a>
+                    </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 </div>

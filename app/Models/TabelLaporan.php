@@ -6,10 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class TabelLaporan extends Model
 {
-    protected $table = 'Tabel_Laporan';
+    protected $table = 'tabel_laporan';
     protected $primaryKey = 'id_laporan';
-    public $timestamps = false;
-
+    
     protected $fillable = [
         'user_id',
         'lokasi',
@@ -25,19 +24,20 @@ class TabelLaporan extends Model
     // Relasi ke User (pelapor)
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
     // Relasi ke Tabel_Status (bisa banyak riwayat status)
     public function statuses()
     {
-        return $this->hasMany(TabelStatus::class, 'id_laporan', 'id_laporan');
+        return $this->hasMany(TabelStatus::class, 'id_laporan');
     }
 
-    // Ambil status terbaru saja
+    // Status terbaru
     public function statusTerbaru()
     {
-        return $this->hasOne(TabelStatus::class, 'id_laporan', 'id_laporan')
+        return $this->hasOne(TabelStatus::class, 'id_laporan')
                     ->latestOfMany('created_at');
     }
 }
+

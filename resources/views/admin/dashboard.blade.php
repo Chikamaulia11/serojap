@@ -6,7 +6,7 @@
 <div class="max-w-7xl mx-auto">
     <div class="mb-12">
         <div class="flex items-center gap-6 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
-            <img src="{{ asset('assets/pelapor/images/logo-serojap.jpeg') }}" alt="Serojap" class="w-24 h-24 rounded-xl shadow-lg object-cover border-4 border-[#2657c1]">
+            <img src="{{ asset('assets/pelapor/images/logo-serojap.png') }}" alt="Serojap" class="w-24 h-24 rounded-xl shadow-lg object-cover">
             <div>
                 <h1 class="text-4xl font-bold" style="color: #2657c1;">Dashboard Admin</h1>
                 <p class="text-xl mt-2" style="color: #226d71;">Selamat datang, {{ auth()->user()->name }}</p>
@@ -77,21 +77,49 @@
         </div>
     </div>
 
-    {{-- Quick Links --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-            <div class="flex items-center gap-6">
-                <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                </div>
-                <div>
-                    <h3 class="text-2xl font-bold" style="color: #2657c1;">Manajemen Laporan</h3>
-                    <p class="text-lg text-gray-600 mt-2">Kelola dan verifikasi semua laporan masuk</p>
-                    <p class="text-sm text-gray-500 mt-1">Update status & filter laporan</p>
-                </div>
+
+    {{-- Manajemen Laporan --}}
+    <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+        <div class="flex items-center gap-6">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             </div>
-        </a>
-    </div>
+            <div>
+                <h3 class="text-1xl font-bold" style="color: #2657c1;">Manajemen Laporan</h3>
+                <p class="text-lg text-gray-600 mt-2">Kelola dan verifikasi semua laporan masuk</p>
+                <p class="text-sm text-gray-500 mt-1">Update status & filter laporan</p>
+            </div>
+        </div>
+    </a>
+
+    {{-- Manajemen FAQ --}}
+    <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+        <div class="flex items-center gap-6">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+            <div>
+                <h3 class="text-2xl font-bold" style="color: #2657c1;">Manajemen FAQ</h3>
+                <p class="text-lg text-gray-600 mt-2">Kelola dan verifikasi FAQ</p>
+                <p class="text-sm text-gray-500 mt-1">Update FAQ</p>
+            </div>
+        </div>
+    </a>
+
+    {{-- Grafik Statistik --}}
+    <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+        <div class="flex items-center gap-6">
+            <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+            <div>
+                <h3 class="text-2xl font-bold" style="color: #2657c1;">Grafik Statistik</h3>
+                <p class="text-lg text-gray-600 mt-2">Melihat statistik pelaporan yang masuk</p>
+            </div>
+        </div>
+    </a>
+</div>
 </div>
 @endsection
 

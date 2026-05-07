@@ -40,7 +40,7 @@
                    value="{{ request('search') }}"
                    class="flex-1 min-w-[200px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 px-4 py-2.5">
             <select name="status"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 px-4 py-2.5">
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 px-4 py-2.5 pr-10">
                 <option value="">Semua Status</option>
                 <option value="baru"     {{ request('status') == 'baru'     ? 'selected' : '' }}>Baru</option>
                 <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>

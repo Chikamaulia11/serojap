@@ -6,148 +6,95 @@ use App\Http\Controllers\Controller;
 use App\Models\TabelLaporan;
 use App\Models\TabelStatus;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class LaporanController extends Controller
 {
-    /**
-     * Tampilkan daftar semua laporan masuk.
-     * URL: GET /admin/laporan
-     */
     public function index(Request $request)
     {
         $query = TabelLaporan::with(['user', 'statusTerbaru'])
-                             ->orderBy('created_at', 'desc');
-
-        // Filter berdasarkan status (opsional)
-        if ($request->filled('status')) {
-            $query->whereHas('statusTerbaru', function ($q) use ($request) {
-                $q->where('status', $request->status);
-            });
-        }
-
-        // Filter belum ada status (laporan baru masuk)
-        if ($request->status === 'baru') {
-            $query = TabelLaporan::with(['user', 'statusTerbaru'])
-                                 ->doesntHave('statuses')
-                                 ->orderBy('created_at', 'desc');
-        }
-
-        // Search berdasarkan kecamatan atau lokasi
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
+            ->when($request->search, function ($q) use ($request) {
                 $q->where('kecamatan', 'like', '%' . $request->search . '%')
                   ->orWhere('lokasi', 'like', '%' . $request->search . '%');
-            });
-        }
+            })
+            ->when($request->status, function ($q) use ($request) {
+                if ($request->status === 'baru') {
+                    $q->doesntHave('statuses');
+                } else {
+                    $q->whereHas('statuses', function ($sq) use ($request) {
+                        $sq->where('status', $request->status);
+                    });
+                }
+            })
+            ->orderBy('created_at', 'desc');
 
-        $laporan = $query->paginate(10)->withQueryString();
+        $laporan = $query->paginate(10);
 
         return view('admin.laporan.index', compact('laporan'));
     }
 
-    /**
-     * Tampilkan detail satu laporan.
-     * URL: GET /admin/laporan/{id}
-     */
-    public function show($id)
+    public function show(string $id)
     {
-        $laporan = TabelLaporan::with(['user', 'statuses.admin'])
-                               ->findOrFail($id);
+        $laporan = TabelLaporan::with([
+            'user',
+            'statuses.admin',
+            'statusTerbaru',
+        ])->findOrFail($id);
 
-        return view('admin.laporan.show', compact('laporan'));
+        $daftarLaporan = TabelLaporan::select('id_laporan', 'kecamatan')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('admin.laporan.show', [
+            'laporan'       => $laporan,
+            'daftarLaporan' => $daftarLaporan,
+        ]);
     }
 
-    /**
-     * Tampilkan halaman Update Status — daftar laporan dengan quick update.
-     * URL: GET /admin/laporan/update-status
-     */
-    public function updateStatusIndex(Request $request)
-    {
-        $query = TabelLaporan::with(['user', 'statusTerbaru'])
-                             ->orderBy('created_at', 'desc');
-
-        if ($request->filled('status')) {
-            $query->whereHas('statusTerbaru', function ($q) use ($request) {
-                $q->where('status', $request->status);
-            });
-        }
-
-        if ($request->status === 'baru') {
-            $query = TabelLaporan::with(['user', 'statusTerbaru'])
-                                 ->doesntHave('statuses')
-                                 ->orderBy('created_at', 'desc');
-        }
-
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('kecamatan', 'like', '%' . $request->search . '%')
-                  ->orWhere('lokasi', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        $laporan = $query->paginate(10)->withQueryString();
-
-        return view('admin.laporan.update-status', compact('laporan'));
-    }
-
-    /**
-     * Tampilkan halaman Riwayat Status — semua riwayat status.
-     * URL: GET /admin/laporan/riwayat-status
-     */
-    public function riwayatStatusIndex(Request $request)
-    {
-        $query = TabelStatus::with(['laporan.user', 'admin'])
-                            ->orderBy('created_at', 'desc');
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('search')) {
-            $query->whereHas('laporan', function ($q) use ($request) {
-                $q->where('kecamatan', 'like', '%' . $request->search . '%')
-                  ->orWhere('lokasi', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        $riwayat = $query->paginate(15)->withQueryString();
-
-        return view('admin.laporan.riwayat-status', compact('riwayat'));
-    }
-
-    /**
-     * Proses verifikasi / update status laporan.
-     * URL: PUT /admin/laporan/{id}
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, string $id)
     {
         $request->validate([
-            'status'      => 'required|in:diterima,ditolak,proses,selesai',
-            'keterangan'  => 'nullable|string|max:500',
+            'status'         => 'required|string|in:diterima,proses,selesai,ditolak',
+            'keterangan'     => 'nullable|string|max:1000',
+            // ✅ Validasi foto
             'foto_perbaikan' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $laporan = TabelLaporan::findOrFail($id);
 
-        // Upload foto perbaikan jika ada
-        $fotoPath = null;
+        $data = [
+            'id_laporan'  => $laporan->id_laporan,
+            'status'      => $request->status,
+            'keterangan'  => $request->keterangan ?? null,
+            // ✅ Simpan admin yang melakukan update
+            'admin_id'    => auth()->id(),
+        ];
+
+        // ✅ Simpan foto jika ada
         if ($request->hasFile('foto_perbaikan')) {
-            $fotoPath = $request->file('foto_perbaikan')
-                                ->store('foto_perbaikan', 'public');
+            $data['foto_perbaikan'] = $request->file('foto_perbaikan')
+                                              ->store('perbaikan', 'public');
         }
 
-        // Simpan status baru
-        TabelStatus::create([
-            'id_laporan'     => $laporan->id_laporan,
-            'user_id'        => Auth::id(), // admin yang login
-            'status'         => $request->status,
-            'keterangan'     => $request->keterangan,
-            'foto_perbaikan' => $fotoPath,
-        ]);
+        TabelStatus::create($data);
 
         return redirect()
             ->route('admin.laporan.show', $id)
-            ->with('success', 'Status laporan berhasil diperbarui.');
+            ->with('success', 'Status laporan berhasil diperbarui!');
+    }
+
+    public function updateStatusIndex(Request $request)
+    {
+        $laporanSaatIni = TabelLaporan::query()->latest('created_at')->first();
+
+        if (!$laporanSaatIni) {
+            return redirect()->route('admin.laporan.index')->with('error', 'Belum ada laporan.');
+        }
+
+        return redirect()->route('admin.laporan.show', $laporanSaatIni->id_laporan);
+    }
+
+    public function riwayatStatusIndex(Request $request)
+    {
+        return redirect()->route('admin.laporan.index');
     }
 }

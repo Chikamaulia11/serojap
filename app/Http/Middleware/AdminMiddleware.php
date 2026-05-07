@@ -9,27 +9,23 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
-    {
-        // 1. Cek apakah user sudah login atau belum
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
-        // 2. Ambil role user yang sedang login
-        $role = Auth::user()->role;
-
-        // 3. Izinkan lewat jika rolenya 'admin' atau 'super_admin'
-        if ($role === 'admin' || $role === 'super_admin') {
-            return $next($request);
-        }
-
-        // 4. Jika bukan admin (alias user biasa), lempar ke dashboard user
-        return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses admin.');
+{
+    if (Auth::check() && (Auth::user()->role == 'admin' || Auth::user()->role == 'super_admin')) {
+        return $next($request);
     }
+    
+    if (Auth::check()) {
+        $user = Auth::user();
+        $user->setRememberToken(null);
+        $user->save();
+        
+        Auth::guard('web')->logout();
+    }
+
+    return redirect()->route('login.admin')->withErrors([
+        'email' => 'Sesi ditutup karena Anda bukan Administrator.'
+    ]);
+}
+
 }
