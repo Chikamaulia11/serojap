@@ -110,7 +110,7 @@
                 </div>
             </div>
 
-            {{-- ✅ Riwayat Status — di kolom kiri, sejajar dengan Detail Laporan --}}
+            {{-- Riwayat Status --}}
             <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
                 <div class="px-6 py-4 border-b border-gray-100">
                     <h2 class="font-semibold text-gray-900 flex items-center gap-2">
@@ -160,7 +160,7 @@
                                         </div>
                                     @endif
 
-                                    {{-- ✅ Foto Perbaikan --}}
+                                    {{-- Foto Perbaikan --}}
                                     @if(!empty($s->foto_perbaikan))
                                         <div class="mt-3">
                                             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Foto Perbaikan</p>
@@ -181,11 +181,7 @@
                     @endif
                 </div>
             </div>
-
         </div>
-        {{-- ===== AKHIR KOLOM KIRI ===== --}}
-
-
         {{-- ===== KOLOM KANAN (Dropdown + Update Status) ===== --}}
         <div class="lg:col-span-1 space-y-6">
 
@@ -250,10 +246,7 @@
                     </form>
                 </div>
             </div>
-
         </div>
-        {{-- ===== AKHIR KOLOM KANAN ===== --}}
-
     </div>
 </div>
 @endsection
