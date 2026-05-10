@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tabel_faq', function (Blueprint $table) {
-            $table->integer('urutan')->default(0)->after('jawaban');
+        Schema::table('users', function (Blueprint $table) {
+            //
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tabel_faq', function (Blueprint $table) {
-            $table->dropColumn('urutan');
+        Schema::table('users', function (Blueprint $table) {
+            //
         });
     }
 };

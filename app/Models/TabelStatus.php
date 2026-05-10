@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class TabelStatus extends Model
 {
-    protected $table = 'Tabel_Status';
+    // Pastikan nama tabel sesuai database: `tabel_status`
+    protected $table = 'tabel_status';
     protected $primaryKey = 'id_status';
-    public $timestamps = false;
+    public $timestamps = true;
+
 
     protected $fillable = [
         'id_laporan',
@@ -27,6 +29,7 @@ class TabelStatus extends Model
     {
         return $this->belongsTo(TabelLaporan::class, 'id_laporan', 'id_laporan');
     }
+
 
     // Relasi ke User (admin yang update)
     public function admin()

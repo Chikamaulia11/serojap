@@ -1,18 +1,11 @@
 <x-guest-layout>
-
-    <!-- SUCCESS REGISTER -->
-    @if(session('success'))
-        <div style="color:green; margin-bottom:10px;">
-            {{ session('success') }}
-        </div>
-    @endif
-
+    <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- EMAIL -->
+        <!-- Email Address -->
         <div>
             <x-input-label for="email" :value="__('Email')" />
 
@@ -28,7 +21,7 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- PASSWORD -->
+        <!-- Password -->
         <div class="mt-4">
 
             <x-input-label for="password" :value="__('Password')" />
@@ -46,7 +39,7 @@
 
         </div>
 
-        <!-- REMEMBER ME -->
+        <!-- Remember Me -->
         <div class="block mt-4">
 
             <label for="remember_me" class="inline-flex items-center">
@@ -66,7 +59,6 @@
 
         </div>
 
-        <!-- BUTTON -->
         <div class="flex items-center justify-end mt-4">
 
             @if (Route::has('password.request'))
@@ -91,7 +83,6 @@
             </x-primary-button>
 
         </div>
-
     </form>
 
 </x-guest-layout>

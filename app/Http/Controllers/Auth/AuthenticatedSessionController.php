@@ -12,32 +12,52 @@ use App\Models\User;
 
 class AuthenticatedSessionController extends Controller
 {
+    /**
+     * Tampilan Login Pelapor
+     */
     public function create(): View 
     { 
         return view('auth.login'); 
     }
 
+    /**
+     * Tampilan Login Admin
+     */
     public function createAdmin(): View 
     { 
         return view('auth.login-admin'); 
     }
 
+    /**
+     * Proses Login (Satu Pintu untuk Semua)
+     */
     public function store(LoginRequest $request): RedirectResponse
     {
+        if ($request->routeIs('login.admin.post')) {
+            $user = User::where('email', $request->email)->first();
+
+            if ($user && !in_array($user->role, ['admin', 'super_admin'])) {
+                return redirect()->route('login.admin')
+                    ->withErrors(['email' => 'Akses Ditolak! Akun Anda tidak terdaftar sebagai Administrator.']);
+            }
+        }
+
         $request->authenticate();
+
         $request->session()->regenerate();
 
         $user = Auth::user();
 
-        // ADMIN
         if ($user->role === 'admin' || $user->role === 'super_admin') {
-            return redirect('/admin/dashboard');
+            return redirect()->route('admin.dashboard');
         }
-
-        // PELAPOR
+        
         return redirect()->route('dashboard');
     }
 
+    /**
+     * Proses Logout
+     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();

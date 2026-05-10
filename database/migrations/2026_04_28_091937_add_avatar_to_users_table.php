@@ -6,23 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
-            $table->string('foto_profil')->nullable()->after('password');
-            $table->enum('role', ['pelapor', 'admin', 'super_admin'])->default('pelapor')->after('foto_profil');
+
+            if (!Schema::hasColumn('users', 'avatar')) {
+                $table->string('avatar')->nullable()->after('email');
+            }
         });
     }
 
-    
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
-            // Menghapus kolom jika migration di-rollback
-            $table->dropColumn(['foto_profil', 'role']);
+            if (Schema::hasColumn('users', 'avatar')) {
+                $table->dropColumn('avatar');
+            }
         });
     }
 };
