@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\Admin\StatistikController;
 
 // Web Routes
 
@@ -45,6 +46,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/laporan/riwayat-status', [LaporanController::class, 'riwayatStatusIndex'])->name('laporan.riwayat-status');
     Route::get('/laporan/{id}', [LaporanController::class, 'show'])->name('laporan.show');
     Route::put('/laporan/{id}', [LaporanController::class, 'update'])->name('laporan.update');
+
+    // --- STATISTIK ---
+    Route::get('/statistik', [StatistikController::class, 'index'])->name('statistik.index');
 
 });
 
