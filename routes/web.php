@@ -61,12 +61,14 @@ Route::middleware(['auth', 'pelapor'])->group(function () {
     // REPORT
     Route::get('/report', function () {
         return view('pelapor.form');
-    });
+    })->name('laporan.create');
 
-    Route::post('/report', [ReportController::class, 'store']);
+    Route::post('/report', [ReportController::class, 'store'])
+        ->name('laporan.store');
 
     // MY REPORT
-    Route::get('/my-report', [ReportController::class, 'myReport']);
+    Route::get('/my-report', [ReportController::class, 'myReport'])
+        ->name('laporan.my-report');
 
     // PROFILE
     Route::middleware('auth')->group(function () {
