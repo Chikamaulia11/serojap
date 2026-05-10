@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Riwayat Laporan</title>
+@extends('layouts.app')
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/riwayat.css') }}">
-</head>
+@section('content')
 
-<body>
+<link rel="stylesheet" href="{{ asset('css/riwayat.css') }}">
 
 <h2 class="title">Riwayat Laporan</h2>
 
@@ -23,12 +18,15 @@
 
         <p><b>{{ $r->alamat }}</b></p>
         <p class="status">{{ $r->status }}</p>
+
+        <p style="font-size:12px; color:gray;">
+            {{ $r->created_at->format('d M Y, H:i') }}
+        </p>
     </div>
 @endforeach
 
 </div>
 
-<!-- POPUP -->
 <div id="popup" class="popup">
     <div class="popup-content">
         <h3>Detail Laporan</h3>
@@ -48,5 +46,4 @@
 
 <script src="{{ asset('js/riwayat.js') }}"></script>
 
-</body>
-</html>
+@endsection

@@ -4,9 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
+    // =========================
+    // FORM LAPORAN
+    // =========================
+    public function create()
+    {
+        return view('pelapor.form');
+    }
+
+    // =========================
+    // SIMPAN LAPORAN
+    // =========================
     public function store(Request $request)
     {
         $request->validate([
@@ -21,7 +33,7 @@ class ReportController extends Controller
         $foto = $request->file('foto')->store('reports', 'public');
 
         Report::create([
-            'user_id' => 1,
+            'user_id' => Auth::id(), // 🔥 FIX DI SINI
             'nama_pelapor' => $request->nama,
             'foto' => $foto,
             'alamat' => $request->alamat,
@@ -34,9 +46,15 @@ class ReportController extends Controller
         return back()->with('success', 'Laporan berhasil dikirim');
     }
 
-    public function myReport()
+    // =========================
+    // RIWAYAT LAPORAN USER
+    // =========================
+    public function index()
     {
-        $reports = Report::latest()->get();
+        $reports = Report::where('user_id', Auth::id())
+                    ->latest()
+                    ->get();
+
         return view('pelapor.riwayat', compact('reports'));
     }
 }

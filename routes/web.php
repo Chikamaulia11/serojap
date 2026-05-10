@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 
@@ -18,13 +19,11 @@ Route::get('/', function () {
 ========================= */
 Route::middleware('guest')->group(function () {
 
-    // LOGIN
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
-    // REGISTER
     Route::get('/register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
@@ -58,4 +57,9 @@ Route::middleware(['auth', 'pelapor'])->group(function () {
     Route::get('/prosedur', function () {
         return view('pelapor.prosedur');
     });
+
+    // 🔥 PROFILE (INI YANG KURANG TADI)
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
