@@ -15,6 +15,7 @@ use App\Http\Controllers\AuthController;
 >>>>>>> af1bf81 (setup final)
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 
@@ -30,13 +31,15 @@ Route::get('/', function () {
 ========================= */
 Route::middleware('guest')->group(function () {
 
+<<<<<<< HEAD
     // LOGIN PELAPOR
+=======
+>>>>>>> 0fb7ba8 (dashboard baru)
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
-    // REGISTER
     Route::get('/register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
@@ -70,6 +73,7 @@ Route::middleware(['auth', 'pelapor'])->group(function () {
     Route::get('/prosedur', function () {
         return view('pelapor.prosedur');
     });
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 <<<<<<< HEAD
@@ -144,3 +148,11 @@ Route::get('/my-report', function () {
 =======
 });
 >>>>>>> b793b33 (backup sebelum merge)
+=======
+
+    // 🔥 PROFILE (INI YANG KURANG TADI)
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+>>>>>>> 0fb7ba8 (dashboard baru)

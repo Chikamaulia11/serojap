@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>SEROJAP</title>
+@extends('layouts.app')
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/form.css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-</head>
+@section('content')
 
-<body>
+<link rel="stylesheet" href="{{ asset('css/form.css') }}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <!-- ERROR -->
 @if ($errors->any())
@@ -19,7 +14,6 @@
 </div>
 @endif
 
-<!-- POPUP -->
 @if(session('success'))
 <div class="popup">
     <div class="popup-content">
@@ -30,7 +24,6 @@
             <button class="btn-popup btn-selesai" onclick="goToRiwayat()">Selesai</button>
             <button class="btn-popup btn-kembali" onclick="resetForm()">Kembali</button>
         </div>
-
     </div>
 </div>
 @endif
@@ -47,11 +40,8 @@
             @csrf
 
             <div class="grid">
-
                 <input type="text" name="nama" placeholder="Nama Pelapor">
-
                 <input type="file" name="foto">
-
                 <input type="text" id="alamat" name="alamat" class="full" placeholder="Titik Kerusakan">
 
                 <button type="button" class="btn btn-alt full" onclick="toggleMap()">
@@ -68,9 +58,7 @@
                 <textarea name="keterangan" class="full" placeholder="Keterangan"></textarea>
 
                 <button class="btn btn-main full">Kirim Laporan</button>
-
             </div>
-
         </form>
 
     </div>
@@ -79,5 +67,4 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="{{ asset('js/form.js') }}"></script>
 
-</body>
-</html>
+@endsection
