@@ -2,12 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\TabelFaqController;
 
 /* =========================
    LANDING PAGE
@@ -58,31 +59,27 @@ Route::middleware(['auth', 'pelapor'])->group(function () {
         ->name('dashboard');
 
     // REPORT
-    Route::get('/report', [ReportController::class, 'create']);
+    Route::get('/report', function () {
+        return view('pelapor.form');
+    });
+
     Route::post('/report', [ReportController::class, 'store']);
 
     // MY REPORT
-    Route::get('/my-report', [ReportController::class, 'index']);
-
-    // FAQ
-    Route::get('/faq', function () {
-        return view('pelapor.faq');
-    });
-
-    // PROSEDUR
-    Route::get('/prosedur', function () {
-        return view('pelapor.prosedur');
-    });
+    Route::get('/my-report', [ReportController::class, 'myReport']);
 
     // PROFILE
-    Route::get('/profile', [ProfileController::class, 'edit'])
-        ->name('profile.edit');
+    Route::middleware('auth')->group(function () {
 
-    Route::patch('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
+        Route::get('/profile', [ProfileController::class, 'edit'])
+            ->name('profile.edit');
 
-    Route::delete('/profile', [ProfileController::class, 'destroy'])
-        ->name('profile.destroy');
+        Route::patch('/profile', [ProfileController::class, 'update'])
+            ->name('profile.update');
+
+        Route::delete('/profile', [ProfileController::class, 'destroy'])
+            ->name('profile.destroy');
+    });
 });
 
 /* =========================
@@ -113,6 +110,17 @@ Route::middleware(['auth', 'admin'])
 
         Route::put('/laporan/{id}', [LaporanController::class, 'update'])
             ->name('laporan.update');
+
+        // FAQ MANAGEMENT
+        Route::resource('manajemen-faq', TabelFaqController::class)->names([
+            'index'   => 'manajemen-faq.index',
+            'create'  => 'manajemen-faq.create',
+            'store'   => 'manajemen-faq.store',
+            'show'    => 'manajemen-faq.show',
+            'edit'    => 'manajemen-faq.edit',
+            'update'  => 'manajemen-faq.update',
+            'destroy' => 'manajemen-faq.destroy',
+        ]);
     });
 
 require __DIR__.'/auth.php';
