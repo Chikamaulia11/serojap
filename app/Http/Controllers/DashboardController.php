@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Report;
+use App\Models\TabelFaq; 
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -30,13 +31,16 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        $faqs = TabelFaq::orderBy('urutan', 'asc')->get();
+
         return view('pelapor.dashboard', compact(
             'user',
             'total',
             'diterima',
             'diproses',
             'selesai',
-            'reports'
+            'reports',
+            'faqs' 
         ));
     }
 }

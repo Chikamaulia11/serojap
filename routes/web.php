@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\TabelFaqController;
+use App\Http\Controllers\Pelapor\FaqController;
 
 /* =========================
    LANDING PAGE
@@ -124,5 +125,8 @@ Route::middleware(['auth', 'admin'])
             'destroy' => 'manajemen-faq.destroy',
         ]);
     });
+
+    //FAQ PELAPOR
+    Route::get('/pusat-bantuan', [FaqController::class, 'index'])->name('pelapor.faq');
 
 require __DIR__.'/auth.php';
