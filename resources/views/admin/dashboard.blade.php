@@ -80,45 +80,43 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     {{-- Manajemen Laporan --}}
-    <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-        <div class="flex items-center gap-6">
-            <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
-                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+            <div class="flex items-center gap-6">
+                <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold" style="color: #2657c1;">Manajemen Laporan</h3>
+                    <p class="text-lg text-gray-600 mt-2">Kelola dan verifikasi semua laporan masuk</p>
+                </div>
             </div>
-            <div>
-                <h3 class="text-1xl font-bold" style="color: #2657c1;">Manajemen Laporan</h3>
-                <p class="text-lg text-gray-600 mt-2">Kelola dan verifikasi semua laporan masuk</p>
-                <p class="text-sm text-gray-500 mt-1">Update status & filter laporan</p>
-            </div>
-        </div>
-    </a>
+        </a>
 
-    {{-- Manajemen FAQ --}}
-    <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-        <div class="flex items-center gap-6">
-            <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
-                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        {{-- Manajemen FAQ --}}
+        <a href="#" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+            <div class="flex items-center gap-6">
+                <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold" style="color: #2657c1;">Manajemen FAQ</h3>
+                    <p class="text-lg text-gray-600 mt-2">Kelola dan update data FAQ</p>
+                </div>
             </div>
-            <div>
-                <h3 class="text-2xl font-bold" style="color: #2657c1;">Manajemen FAQ</h3>
-                <p class="text-lg text-gray-600 mt-2">Kelola dan verifikasi FAQ</p>
-                <p class="text-sm text-gray-500 mt-1">Update FAQ</p>
-            </div>
-        </div>
-    </a>
+        </a>
 
-    {{-- Grafik Statistik --}}
-    <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-        <div class="flex items-center gap-6">
-            <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
-                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        {{-- Grafik Statistik --}}
+        <a href="#" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+            <div class="flex items-center gap-6">
+                <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold" style="color: #2657c1;">Grafik Statistik</h3>
+                    <p class="text-lg text-gray-600 mt-2">Melihat visualisasi data pelaporan</p>
+                </div>
             </div>
-            <div>
-                <h3 class="text-2xl font-bold" style="color: #2657c1;">Grafik Statistik</h3>
-                <p class="text-lg text-gray-600 mt-2">Melihat statistik pelaporan yang masuk</p>
-            </div>
-        </div>
-    </a>
+        </a>
 </div>
 </div>
 @endsection
