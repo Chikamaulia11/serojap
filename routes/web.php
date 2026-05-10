@@ -47,19 +47,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/laporan/riwayat-status', [LaporanController::class, 'riwayatStatusIndex'])->name('laporan.riwayat-status');
     Route::get('/laporan/{id}', [LaporanController::class, 'show'])->name('laporan.show');
     Route::put('/laporan/{id}', [LaporanController::class, 'update'])->name('laporan.update');
-    Route::resource('manajemen-faq', TabelFaqController::class);
-    // Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('manajemen-faq', TabelFaqController::class)->names([
+    'index'   => 'manajemen-faq.index',
+    'create'  => 'manajemen-faq.create',
+    'store'   => 'manajemen-faq.store',
+    'show'    => 'manajemen-faq.show',
+    'edit'    => 'manajemen-faq.edit',
+    'update'  => 'manajemen-faq.update',
+    'destroy' => 'manajemen-faq.destroy',
+    ]);
     
-    // Ini route punya kamu sendiri (Lanjut kerjakan yang ini)
-    
-    // INI ROUTE PANCINGAN (Biar nggak error pas dipanggil sidebar)
-    // Nanti kalau sudah di-merge, bagian ini tinggal dihapus
-    // Route::get('/laporan-pancingan', function() {
-        // return "Modul ini sedang dikerjakan tim lain dan belum di-merge.";
-    // })->name('laporan.index');
-
-    // Tambahkan pancingan lain jika ada error route lain
-    // Route::get('/dashboard', function () { return view('admin.dashboard'); })->name('dashboard');
 });
 
 require __DIR__.'/auth.php';

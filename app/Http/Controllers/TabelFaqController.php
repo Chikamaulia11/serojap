@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TabelFaq;
+
 use Illuminate\Http\Request;
 
 class TabelFaqController extends Controller
@@ -13,7 +14,7 @@ class TabelFaqController extends Controller
     public function index()
     {
         $faqs = TabelFaq::orderBy('urutan', 'asc')->get();
-        return view('admin.faq', compact('faqs'));
+        return view('admin.faq.index', compact('faqs'));
     }
 
     /**
@@ -29,21 +30,23 @@ class TabelFaqController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'pertanyaan' => 'required',
-            'jawaban' => 'required',
-        ]);
+       $request->validate([
+        'pertanyaan' => 'required|string|max:255',
+        'jawaban' => 'required|string',
+        'urutan' => 'nullable|integer',
+       ]);
 
-        TabelFaq::create([
-            'user_id' => auth()->id(),
+        $urutan = $request->urutan ?? ( \App\Models\TabelFaq::max('urutan') + 1 );
+
+        \App\Models\TabelFaq::create([
+            'user_id'    => auth()->id(), 
             'pertanyaan' => $request->pertanyaan,
-            'jawaban' => $request->jawaban,
-            'urutan' => $request->urutan ?? 0,
+            'jawaban'    => $request->jawaban,
+            'urutan'     => $urutan,
         ]);
 
-        return redirect()->back()->with('success', 'Data FAQ berhasil disimpan!');
+        return redirect()->back()->with('success', 'Pertanyaan FAQ berhasil ditambahkan!');
     }
-
     /**
      * Display the specified resource.
      */
@@ -55,9 +58,10 @@ class TabelFaqController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(TabelFaq $tabelFaq)
+    public function edit($id)
     {
-        //
+        $faq = TabelFaq::findOrFail($id);
+        return view('admin.faq.edit', compact('faq'));
     }
 
     /**
@@ -65,19 +69,21 @@ class TabelFaqController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'pertanyaan' => 'required',
-            'jawaban' => 'required',
+       $request->validate([
+            'pertanyaan' => 'required|string|max:255',
+            'jawaban' => 'required|string',
+            'urutan' => 'nullable|integer',
         ]);
 
         $faq = TabelFaq::findOrFail($id);
+        
         $faq->update([
             'pertanyaan' => $request->pertanyaan,
             'jawaban' => $request->jawaban,
-            'urutan' => $request->urutan ?? 0,
+            'urutan' => $request->urutan ?? $faq->urutan,
         ]);
 
-        return redirect()->back()->with('success', 'Data FAQ berhasil diperbarui!');
+        return redirect()->route('admin.manajemen-faq.index')->with('success', 'Data FAQ berhasil diperbarui!');
     }
 
     /**
