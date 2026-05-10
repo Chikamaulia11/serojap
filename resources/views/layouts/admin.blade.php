@@ -7,7 +7,7 @@
     <title>@yield('title', 'Serojap Admin')</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <style>
         body { font-family: 'Inter', 'Roboto', 'Poppins', 'Public Sans', sans-serif; }
         .font-serojap { font-family: 'Inter', sans-serif; font-weight: 700; }
@@ -76,7 +76,7 @@
             </div>
 
             {{-- Manajemen FAQ --}}
-            <a href="{{ route('admin.laporan.index') }}"
+            <a href="{{ route('admin.manajemen-faq.index') }}"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
                     {{ request()->routeIs('admin.faq.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
                 <i class="mdi mdi-frequently-asked-questions text-lg w-5 text-center"></i>

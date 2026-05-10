@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\TabelFaqController;
 use App\Http\Controllers\Admin\LaporanController;
 
 // Web Routes
@@ -31,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
 // ADMIN ROUTES (auth + admin middleware)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
@@ -45,7 +47,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/laporan/riwayat-status', [LaporanController::class, 'riwayatStatusIndex'])->name('laporan.riwayat-status');
     Route::get('/laporan/{id}', [LaporanController::class, 'show'])->name('laporan.show');
     Route::put('/laporan/{id}', [LaporanController::class, 'update'])->name('laporan.update');
-
+    Route::resource('manajemen-faq', TabelFaqController::class)->names([
+    'index'   => 'manajemen-faq.index',
+    'create'  => 'manajemen-faq.create',
+    'store'   => 'manajemen-faq.store',
+    'show'    => 'manajemen-faq.show',
+    'edit'    => 'manajemen-faq.edit',
+    'update'  => 'manajemen-faq.update',
+    'destroy' => 'manajemen-faq.destroy',
+    ]);
+    
 });
 
 require __DIR__.'/auth.php';

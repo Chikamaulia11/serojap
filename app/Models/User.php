@@ -23,7 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'foto_profil',
+        'foto_profil'
     ];
 
     public function laporan()
