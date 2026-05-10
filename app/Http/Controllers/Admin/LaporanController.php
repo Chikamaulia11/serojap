@@ -55,7 +55,7 @@ class LaporanController extends Controller
         $request->validate([
             'status'         => 'required|string|in:diterima,proses,selesai,ditolak',
             'keterangan'     => 'nullable|string|max:1000',
-            // ✅ Validasi foto
+            // Validasi foto
             'foto_perbaikan' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -65,11 +65,11 @@ class LaporanController extends Controller
             'id_laporan'  => $laporan->id_laporan,
             'status'      => $request->status,
             'keterangan'  => $request->keterangan ?? null,
-            // ✅ Simpan admin yang melakukan update
+            // Simpan admin yang melakukan update
             'admin_id'    => auth()->id(),
         ];
 
-        // ✅ Simpan foto jika ada
+        // Simpan foto jika ada
         if ($request->hasFile('foto_perbaikan')) {
             $data['foto_perbaikan'] = $request->file('foto_perbaikan')
                                               ->store('perbaikan', 'public');

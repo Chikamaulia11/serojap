@@ -223,14 +223,14 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Keterangan (Opsional)</label>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Keterangan</label>
                             <textarea name="keterangan" rows="4"
                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 resize-y"
                                       placeholder="Contoh: Laporan telah diverifikasi dan akan ditindaklanjuti...">{{ old('keterangan') }}</textarea>
                         </div>
 
                         <div class="mb-5">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Foto Perbaikan (Opsional)</label>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Foto Perbaikan</label>
                             <input type="file" name="foto_perbaikan" accept="image/*"
                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
                             <p class="text-xs text-gray-400 mt-1">Format: JPG, PNG. Maks 2MB. Upload saat status Selesai.</p>

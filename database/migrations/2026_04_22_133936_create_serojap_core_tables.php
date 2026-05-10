@@ -9,41 +9,35 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Tabel Laporan
-        if (!Schema::hasTable('tabel_laporan')) {
-            Schema::create('tabel_laporan', function (Blueprint $table) {
-                $table->id('id_laporan');
-                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-                $table->string('lokasi');
-                $table->string('kecamatan');
-                $table->text('deskripsi');
-                $table->string('foto')->nullable();
-                $table->timestamps();
-            });
-        }
+        Schema::create('tabel_laporan', function (Blueprint $table) {
+            $table->id('id_laporan');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('lokasi');
+            $table->string('kecamatan');
+            $table->text('deskripsi');
+            $table->string('foto')->nullable();
+            $table->timestamps();
+        });
 
         // 2. Tabel Status
-        if (!Schema::hasTable('tabel_status')) {
-            Schema::create('tabel_status', function (Blueprint $table) {
-                $table->id('id_status');
-                $table->foreignId('id_laporan')->constrained('tabel_laporan', 'id_laporan')->onDelete('cascade');
-                $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-                $table->enum('status', ['diterima', 'ditolak', 'proses', 'selesai'])->default('proses');
-                $table->text('keterangan')->nullable();
-                $table->string('foto_perbaikan')->nullable();
-                $table->timestamps();
-            });
-        }
+        Schema::create('tabel_status', function (Blueprint $table) {
+            $table->id('id_status');
+            $table->foreignId('id_laporan')->constrained('tabel_laporan', 'id_laporan')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->enum('status', ['diterima', 'ditolak', 'proses', 'selesai'])->default('proses');
+            $table->text('keterangan')->nullable();
+            $table->string('foto_perbaikan')->nullable();
+            $table->timestamps();
+        });
 
         // 3. Tabel FAQ
-        if (!Schema::hasTable('tabel_faq')) {
-            Schema::create('tabel_faq', function (Blueprint $table) {
-                $table->id('id_faq');
-                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-                $table->text('pertanyaan');
-                $table->text('jawaban')->nullable();
-                $table->timestamps();
-            });
-        }
+        Schema::create('tabel_faq', function (Blueprint $table) {
+            $table->id('id_faq');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->text('pertanyaan');
+            $table->text('jawaban')->nullable();
+            $table->timestamps();
+        });
     }
 
     public function down(): void
