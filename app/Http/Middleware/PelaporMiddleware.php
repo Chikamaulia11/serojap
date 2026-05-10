@@ -17,7 +17,7 @@ class PelaporMiddleware
         if (Auth::check() && Auth::user()->role === 'pelapor') {
             return $next($request);
         }
-        
+
         if (Auth::check()) {
             // Logout jika bukan pelapor
             Auth::logout();
@@ -26,6 +26,8 @@ class PelaporMiddleware
         }
 
         return redirect()->route('login')
-            ->withErrors(['email' => 'Anda tidak memiliki akses ke dashboard pelapor.']);
+            ->withErrors([
+                'email' => 'Anda tidak memiliki akses ke dashboard pelapor.'
+            ]);
     }
 }

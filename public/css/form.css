@@ -1,0 +1,193 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #eef2ff, #f8fafc);
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.header img {
+    width: 40px;
+}
+
+.header h2 {
+    color: #1f4674;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+}
+
+/* MAP */
+#mapContainer {
+    display: none;
+}
+
+#map {
+    height: 300px;
+    border-radius: 12px;
+}
+
+/* BUTTON */
+.btn {
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-main {
+    background: #1f4674;
+    color: white;
+}
+
+.btn-alt {
+    background: #226d71;
+    color: white;
+}
+
+/* ERROR */
+.error-box {
+    background: red;
+    color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* ===================== */
+/* 🔥 POPUP */
+/* ===================== */
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    backdrop-filter: blur(6px);
+    background: rgba(0,0,0,0.3);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    animation: fadeIn 0.4s ease;
+}
+
+.popup-content {
+    background: white;
+    padding: 35px;
+    border-radius: 18px;
+    text-align: center;
+
+    width: 90%;
+    max-width: 400px;
+
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+
+    animation: scaleUp 0.4s ease;
+}
+
+.checkmark {
+    font-size: 55px;
+    color: #226d71;
+    margin-bottom: 15px;
+    animation: pop 0.5s ease;
+}
+
+/* BUTTON GROUP */
+.popup-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* BUTTON */
+.btn-popup {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+}
+
+/* PRIMARY */
+.btn-selesai {
+    background: #1f4674;
+    color: white;
+}
+
+/* SECONDARY */
+.btn-kembali {
+    background: #e5e7eb;
+    color: #333;
+}
+
+/* HOVER */
+.btn-selesai:hover {
+    background: #16385e;
+}
+
+.btn-kembali:hover {
+    background: #d1d5db;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes pop {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
