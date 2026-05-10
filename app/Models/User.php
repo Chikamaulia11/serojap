@@ -26,6 +26,11 @@ class User extends Authenticatable
         'foto_profil'
     ];
 
+    public function laporan()
+    {
+        return $this->hasMany(\App\Models\TabelLaporan::class, 'user_id');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

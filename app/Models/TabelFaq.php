@@ -14,6 +14,6 @@ class TabelFaq extends Model
         'user_id',
         'pertanyaan',
         'jawaban',
-        'urutan' 
+        'urutan',
     ];
 }
