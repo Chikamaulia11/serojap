@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -13,11 +11,13 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    /* RELATION */
+    public function reports()
+    {
+        return $this->hasMany(\App\Models\Report::class, 'user_id');
+    }
+
+    /* FILLABLE */
     protected $fillable = [
         'name',
         'email',
@@ -26,16 +26,7 @@ class User extends Authenticatable
         'foto_profil',
     ];
 
-    public function laporan()
-    {
-        return $this->hasMany(\App\Models\TabelLaporan::class, 'user_id');
-    }
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    /* HIDDEN */
     protected $hidden = [
         'password',
         'remember_token',
