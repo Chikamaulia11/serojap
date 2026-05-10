@@ -11,16 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-<<<<<<< HEAD
-$middleware->alias([
-            'admin' => \App\Http\Middleware\AdminMiddleware::class,
-            'pelapor' => \App\Http\Middleware\PelaporMiddleware::class,
-=======
 
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
-            'pelapor' => \App\Http\Middleware\PelaporMiddleware::class, // 🔥 TAMBAHAN WAJIB
->>>>>>> b793b33 (backup sebelum merge)
+            'pelapor' => \App\Http\Middleware\PelaporMiddleware::class,
         ]);
 
     })

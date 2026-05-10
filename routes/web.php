@@ -1,23 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-<<<<<<< HEAD
-use App\Http\Controllers\Admin\LaporanController;
-=======
-use App\Http\Controllers\ReportController;
-=======
-use App\Http\Controllers\AuthController;
->>>>>>> ed81696 (setup auth pelapor + middleware + dashboard final)
-=======
->>>>>>> af1bf81 (setup final)
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Admin\LaporanController;
 
 /* =========================
    LANDING PAGE
@@ -31,19 +21,24 @@ Route::get('/', function () {
 ========================= */
 Route::middleware('guest')->group(function () {
 
-<<<<<<< HEAD
     // LOGIN PELAPOR
-=======
->>>>>>> 0fb7ba8 (dashboard baru)
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
+    // REGISTER
     Route::get('/register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
     Route::post('/register', [RegisteredUserController::class, 'store']);
+
+    // LOGIN ADMIN
+    Route::get('/login/admin', [AuthenticatedSessionController::class, 'createAdmin'])
+        ->name('login.admin');
+
+    Route::post('/login/admin', [AuthenticatedSessionController::class, 'store'])
+        ->name('login.admin.post');
 });
 
 /* =========================
@@ -58,101 +53,66 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
 ========================= */
 Route::middleware(['auth', 'pelapor'])->group(function () {
 
+    // DASHBOARD
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
+    // REPORT
     Route::get('/report', [ReportController::class, 'create']);
     Route::post('/report', [ReportController::class, 'store']);
 
+    // MY REPORT
     Route::get('/my-report', [ReportController::class, 'index']);
 
+    // FAQ
     Route::get('/faq', function () {
         return view('pelapor.faq');
     });
 
+    // PROSEDUR
     Route::get('/prosedur', function () {
         return view('pelapor.prosedur');
     });
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-<<<<<<< HEAD
-    /* LOGOUT */
-    Route::post('/logout', [AuthController::class, 'logout']);
+    // PROFILE
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-Route::post('/report', [ReportController::class, 'store']);
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
-Route::get('/my-report', [ReportController::class, 'myReport']);
->>>>>>> 43717ca (fix workspace clean)
-
-// Web Routes
-
-Route::get('/', function () {
-    return view('welcome');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
 });
 
-// LOGIN PELAPOR
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+/* =========================
+   ADMIN ROUTES
+========================= */
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-<<<<<<< HEAD
-// LOGIN ADMIN
-Route::get('/login/admin', [AuthenticatedSessionController::class, 'createAdmin'])->name('login.admin');
-Route::post('/login/admin', [AuthenticatedSessionController::class, 'store'])->name('login.admin.post');
+        // DASHBOARD ADMIN
+        Route::get('/dashboard', function () {
+            return view('admin.dashboard');
+        })->name('dashboard');
 
-// DASHBOARD PELAPOR
-Route::get('/dashboard', function () {
-    return view('pelapor.dashboard');
-})->middleware(['auth', 'verified', 'pelapor'])->name('dashboard');
-=======
->>>>>>> 8ebda9f (pisahin login pelapor)
+        // LAPORAN
+        Route::get('/laporan', [LaporanController::class, 'index'])
+            ->name('laporan.index');
 
-// PROFILE
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+        Route::get('/laporan/update-status', [LaporanController::class, 'updateStatusIndex'])
+            ->name('laporan.update-status');
 
-// ADMIN ROUTES (auth + admin middleware)
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/laporan/riwayat-status', [LaporanController::class, 'riwayatStatusIndex'])
+            ->name('laporan.riwayat-status');
 
-    // Dashboard Admin
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+        Route::get('/laporan/{id}', [LaporanController::class, 'show'])
+            ->name('laporan.show');
 
-    // --- LAPORAN ---
-    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-    Route::get('/laporan/update-status', [LaporanController::class, 'updateStatusIndex'])->name('laporan.update-status');
-    Route::get('/laporan/riwayat-status', [LaporanController::class, 'riwayatStatusIndex'])->name('laporan.riwayat-status');
-    Route::get('/laporan/{id}', [LaporanController::class, 'show'])->name('laporan.show');
-    Route::put('/laporan/{id}', [LaporanController::class, 'update'])->name('laporan.update');
-
-});
+        Route::put('/laporan/{id}', [LaporanController::class, 'update'])
+            ->name('laporan.update');
+    });
 
 require __DIR__.'/auth.php';
-=======
-Route::get('/my-report', function () {
-    return view('pelapor.riwayat');
-});
->>>>>>> fba5a8a (save progress dashboard pelapor)
-=======
-});
->>>>>>> ed81696 (setup auth pelapor + middleware + dashboard final)
-=======
-});
->>>>>>> af1bf81 (setup final)
-=======
-});
->>>>>>> b793b33 (backup sebelum merge)
-=======
-
-    // 🔥 PROFILE (INI YANG KURANG TADI)
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
->>>>>>> 0fb7ba8 (dashboard baru)

@@ -20,6 +20,11 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\Report::class);
     }
 
+    public function laporan()
+    {
+        return $this->hasMany(\App\Models\TabelLaporan::class, 'user_id');
+    }
+
     /* FILLABLE */
     protected $fillable = [
         'name',
@@ -29,20 +34,7 @@ class User extends Authenticatable
         'foto_profil',
     ];
 
-<<<<<<< HEAD
-    public function laporan()
-    {
-        return $this->hasMany(\App\Models\TabelLaporan::class, 'user_id');
-    }
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-=======
     /* HIDDEN */
->>>>>>> af1bf81 (setup final)
     protected $hidden = [
         'password',
         'remember_token',
