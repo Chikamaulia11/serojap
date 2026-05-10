@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\TabelFaqController;
+use App\Http\Controllers\Admin\TabelFaqController;
 use App\Http\Controllers\Admin\LaporanController;
 
 // Web Routes

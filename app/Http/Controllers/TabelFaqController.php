@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\TabelFaq;
 
@@ -36,9 +38,9 @@ class TabelFaqController extends Controller
         'urutan' => 'nullable|integer',
        ]);
 
-        $urutan = $request->urutan ?? ( \App\Models\TabelFaq::max('urutan') + 1 );
+        $urutan = $request->urutan ?? ( TabelFaq::max('urutan') + 1 );
 
-        \App\Models\TabelFaq::create([
+        TabelFaq::create([
             'user_id'    => auth()->id(), 
             'pertanyaan' => $request->pertanyaan,
             'jawaban'    => $request->jawaban,
