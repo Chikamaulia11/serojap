@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\TabelFaqController;
+use App\Http\Controllers\Admin\StatistikController;
 
 /* =========================
    LANDING PAGE
@@ -118,6 +119,9 @@ Route::middleware(['auth', 'admin'])
 
         Route::put('/laporan/{id}', [LaporanController::class, 'update'])
             ->name('laporan.update');
+
+        // --- STATISTIK ---
+        Route::get('/statistik', [StatistikController::class, 'index'])->name('statistik.index');
 
         // FAQ MANAGEMENT
         Route::resource('manajemen-faq', TabelFaqController::class)->names([
