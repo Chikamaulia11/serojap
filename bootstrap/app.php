@@ -14,7 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
-            'pelapor' => \App\Http\Middleware\PelaporMiddleware::class, // 🔥 TAMBAHAN WAJIB
+            'pelapor' => \App\Http\Middleware\PelaporMiddleware::class,
         ]);
 
     })

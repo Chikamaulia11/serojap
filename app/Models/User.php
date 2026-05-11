@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -17,7 +16,7 @@ class User extends Authenticatable
     /* RELATION */
     public function reports()
     {
-        return $this->hasMany(\App\Models\Report::class);
+        return $this->hasMany(\App\Models\Report::class, 'user_id');
     }
 
     /* FILLABLE */

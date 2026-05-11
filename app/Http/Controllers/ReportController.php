@@ -33,14 +33,14 @@ class ReportController extends Controller
         $foto = $request->file('foto')->store('reports', 'public');
 
         Report::create([
-            'user_id' => Auth::id(), // 🔥 FIX DI SINI
+            'user_id' => Auth::id(),
             'nama_pelapor' => $request->nama,
             'foto' => $foto,
             'alamat' => $request->alamat,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'keterangan' => $request->keterangan,
-            'status' => 'diterima'
+            'status' => 'diterima',
         ]);
 
         return back()->with('success', 'Laporan berhasil dikirim');
@@ -52,8 +52,20 @@ class ReportController extends Controller
     public function index()
     {
         $reports = Report::where('user_id', Auth::id())
-                    ->latest()
-                    ->get();
+            ->latest()
+            ->get();
+
+        return view('pelapor.riwayat', compact('reports'));
+    }
+
+    // =========================
+    // MY REPORT
+    // =========================
+    public function myReport()
+    {
+        $reports = Report::where('user_id', Auth::id())
+            ->latest()
+            ->get();
 
         return view('pelapor.riwayat', compact('reports'));
     }

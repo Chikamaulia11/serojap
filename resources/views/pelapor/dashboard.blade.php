@@ -80,7 +80,6 @@
 
     </section>
 
-
     <!-- ================= MENU ================= -->
     <section class="menu-grid reveal">
 
@@ -110,7 +109,6 @@
 
     </section>
 
-
     <!-- ================= PROSEDUR ================= -->
     <section id="prosedur" class="section reveal">
 
@@ -124,7 +122,6 @@
         </div>
 
     </section>
-
 
     <!-- ================= LAPORAN ================= -->
     <section id="laporan" class="section reveal">
@@ -217,7 +214,6 @@
         </div>
 
     </section>
-
 
     <!-- ================= RIWAYAT ================= -->
     <section id="riwayat" class="section reveal">
@@ -316,7 +312,6 @@
         </div>
 
     </section>
-
 
     <!-- ================= FAQ ================= -->
     <section id="faq" class="section reveal">
