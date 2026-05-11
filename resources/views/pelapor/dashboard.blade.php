@@ -236,6 +236,43 @@
                         mulai dari diterima hingga selesai.
                     </p>
 
+                    <div class="progress-group">
+
+                        <div class="progress-item">
+                            <div class="progress-top">
+                                <span>Diterima</span>
+                                <span>100%</span>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div class="progress-fill blue"></div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item">
+                            <div class="progress-top">
+                                <span>Diproses</span>
+                                <span>75%</span>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div class="progress-fill orange"></div>
+                            </div>
+                        </div>
+
+                        <div class="progress-item">
+                            <div class="progress-top">
+                                <span>Selesai</span>
+                                <span>55%</span>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div class="progress-fill green"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>

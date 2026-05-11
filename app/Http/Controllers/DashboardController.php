@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\Report;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,6 +26,7 @@ class DashboardController extends Controller
             ->where('status', 'selesai')
             ->count();
 
+        // DATA UNTUK DASHBOARD & SCROLL RIWAYAT
         $reports = Report::where('user_id', $user->id)
             ->latest()
             ->take(5)

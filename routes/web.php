@@ -25,6 +25,7 @@ Route::middleware('guest')->group(function () {
     // LOGIN PELAPOR
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
+
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
     // REGISTER
@@ -58,9 +59,8 @@ Route::middleware(['auth', 'pelapor'])->group(function () {
         ->name('dashboard');
 
     // REPORT
-    Route::get('/report', function () {
-        return view('pelapor.form');
-    })->name('laporan.create');
+    Route::get('/report', [ReportController::class, 'create'])
+        ->name('laporan.create');
 
     Route::post('/report', [ReportController::class, 'store'])
         ->name('laporan.store');
@@ -68,6 +68,16 @@ Route::middleware(['auth', 'pelapor'])->group(function () {
     // MY REPORT
     Route::get('/my-report', [ReportController::class, 'myReport'])
         ->name('laporan.my-report');
+
+    // FAQ
+    Route::get('/faq', function () {
+        return view('pelapor.faq');
+    });
+
+    // PROSEDUR
+    Route::get('/prosedur', function () {
+        return view('pelapor.prosedur');
+    });
 
     // PROFILE
     Route::get('/profile', [ProfileController::class, 'edit'])
