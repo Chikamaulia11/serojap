@@ -57,4 +57,16 @@ class ReportController extends Controller
 
         return view('pelapor.riwayat', compact('reports'));
     }
+
+    // =========================
+    // MY REPORT
+    // =========================
+    public function myReport()
+    {
+        $reports = Report::where('user_id', Auth::id())
+            ->latest()
+            ->get();
+
+        return view('pelapor.riwayat', compact('reports'));
+    }
 }
