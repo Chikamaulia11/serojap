@@ -25,7 +25,6 @@ Route::middleware('guest')->group(function () {
     // LOGIN PELAPOR
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
-
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
     // REGISTER
@@ -71,17 +70,14 @@ Route::middleware(['auth', 'pelapor'])->group(function () {
         ->name('laporan.my-report');
 
     // PROFILE
-    Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
 
-        Route::get('/profile', [ProfileController::class, 'edit'])
-            ->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
-        Route::patch('/profile', [ProfileController::class, 'update'])
-            ->name('profile.update');
-
-        Route::delete('/profile', [ProfileController::class, 'destroy'])
-            ->name('profile.destroy');
-    });
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
 });
 
 /* =========================
