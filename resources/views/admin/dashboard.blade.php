@@ -252,11 +252,12 @@
         </a>
 
         {{-- Grafik Statistik --}}
-        <div class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg">
+        <a href="{{ route('admin.statistik.index') }}"
+        class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
 
             <div class="flex items-center gap-6">
 
-                <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0">
+                <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
 
                     <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 
@@ -281,7 +282,7 @@
 
             </div>
 
-        </div>
+        </a>
 
     </div>
 </div>
