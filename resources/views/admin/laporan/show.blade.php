@@ -124,10 +124,22 @@
 
                     <div class="flex items-center gap-4">
 
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 text-white flex items-center justify-center font-bold text-lg">
+                        @php
+                            $fotoProfilUrl = !empty($laporan->user?->foto_profil)
+                                ? asset('storage/' . $laporan->user->foto_profil)
+                                : null;
+                        @endphp
 
-                            {{ strtoupper(substr($laporan->user->name ?? 'U', 0, 1)) }}
-
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-400 text-white flex items-center justify-center font-bold text-lg overflow-hidden">
+                            @if($fotoProfilUrl)
+                                <img
+                                    src="{{ $fotoProfilUrl }}"
+                                    alt="Foto Profil Pelapor"
+                                    class="w-full h-full object-cover"
+                                >
+                            @else
+                                {{ strtoupper(substr($laporan->user->name ?? 'U', 0, 1)) }}
+                            @endif
                         </div>
 
                         <div>
