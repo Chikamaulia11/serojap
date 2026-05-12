@@ -13,13 +13,9 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /* RELATION */
-    public function reports()
-    {
-        return $this->hasMany(\App\Models\Report::class, 'user_id');
-    }
-
-    /* FILLABLE */
+    // =========================
+    // FILLABLE
+    // =========================
     protected $fillable = [
         'name',
         'email',
@@ -28,22 +24,53 @@ class User extends Authenticatable
         'foto_profil',
     ];
 
-    /* HIDDEN */
+    // =========================
+    // HIDDEN
+    // =========================
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /* CAST */
+    // =========================
+    // CASTS
+    // =========================
     protected function casts(): array
     {
         return [
+
             'email_verified_at' => 'datetime',
+
             'password' => 'hashed',
+
         ];
     }
 
-    /* ROLE HELPER */
+    // =========================
+    // RELASI KE REPORT
+    // =========================
+    public function reports()
+    {
+        return $this->hasMany(
+            Report::class,
+            'user_id'
+        );
+    }
+
+    // =========================
+    // RELASI KE STATUS
+    // =========================
+    public function statuses()
+    {
+        return $this->hasMany(
+            TabelStatus::class,
+            'user_id'
+        );
+    }
+
+    // =========================
+    // ROLE HELPER
+    // =========================
     public function isPelapor()
     {
         return $this->role === 'pelapor';

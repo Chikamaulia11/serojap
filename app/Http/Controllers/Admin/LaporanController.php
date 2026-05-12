@@ -3,98 +3,229 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\TabelLaporan;
+use App\Models\Report;
 use App\Models\TabelStatus;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
 {
+    // =========================
+    // DAFTAR LAPORAN
+    // =========================
     public function index(Request $request)
     {
-        $query = TabelLaporan::with(['user', 'statusTerbaru'])
+        $query = Report::with([
+                'user',
+                'latestStatus'
+            ])
+
+            // =========================
+            // SEARCH
+            // =========================
             ->when($request->search, function ($q) use ($request) {
-                $q->where('kecamatan', 'like', '%' . $request->search . '%')
-                  ->orWhere('lokasi', 'like', '%' . $request->search . '%');
+
+                $q->where(function ($subQuery) use ($request) {
+
+                    $subQuery->where(
+                        'alamat',
+                        'like',
+                        '%' . $request->search . '%'
+                    )
+
+                    ->orWhere(
+                        'keterangan',
+                        'like',
+                        '%' . $request->search . '%'
+                    );
+
+                });
+
             })
+
+            // =========================
+            // FILTER STATUS
+            // =========================
             ->when($request->status, function ($q) use ($request) {
-                if ($request->status === 'baru') {
-                    $q->doesntHave('statuses');
-                } else {
-                    $q->whereHas('statuses', function ($sq) use ($request) {
-                        $sq->where('status', $request->status);
-                    });
-                }
+
+                $q->whereHas('latestStatus', function ($statusQuery) use ($request) {
+
+                    $statusQuery->where(
+                        'status',
+                        $request->status
+                    );
+
+                });
+
             })
-            ->orderBy('created_at', 'desc');
+
+            // =========================
+            // URUTAN TERBARU
+            // =========================
+            ->latest();
 
         $laporan = $query->paginate(10);
 
-        return view('admin.laporan.index', compact('laporan'));
+        return view(
+            'admin.laporan.index',
+            compact('laporan')
+        );
     }
 
+    // =========================
+    // DETAIL LAPORAN
+    // =========================
     public function show(string $id)
     {
-        $laporan = TabelLaporan::with([
-            'user',
-            'statuses.admin',
-            'statusTerbaru',
-        ])->findOrFail($id);
+        $laporan = Report::with([
 
-        $daftarLaporan = TabelLaporan::select('id_laporan', 'kecamatan')
-            ->orderByDesc('created_at')
+                'user',
+                'statuses.admin',
+                'latestStatus'
+
+            ])
+            ->findOrFail($id);
+
+        $daftarLaporan = Report::select(
+                'id',
+                'alamat'
+            )
+            ->latest()
             ->get();
 
         return view('admin.laporan.show', [
+
             'laporan'       => $laporan,
             'daftarLaporan' => $daftarLaporan,
+
         ]);
     }
 
+    // =========================
+    // UPDATE STATUS
+    // =========================
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'status'         => 'required|string|in:diterima,proses,selesai,ditolak',
-            'keterangan'     => 'nullable|string|max:1000',
-            // Validasi foto
-            'foto_perbaikan' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+            'status' => 'required|string|in:diterima,diproses,selesai,ditolak',
+
+            'keterangan' =>
+                'nullable|string|max:1000',
+
+            'foto_perbaikan' =>
+                'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
         ]);
 
-        $laporan = TabelLaporan::findOrFail($id);
+        $laporan = Report::findOrFail($id);
 
-        $data = [
-            'id_laporan'  => $laporan->id_laporan,
-            'status'      => $request->status,
-            'keterangan'  => $request->keterangan ?? null,
-            // Simpan admin yang melakukan update
-            'admin_id'    => auth()->id(),
-        ];
+        $fotoPerbaikan = null;
 
-        // Simpan foto jika ada
+        // =========================
+        // UPLOAD FOTO PERBAIKAN
+        // =========================
         if ($request->hasFile('foto_perbaikan')) {
-            $data['foto_perbaikan'] = $request->file('foto_perbaikan')
-                                              ->store('perbaikan', 'public');
+
+            $fotoPerbaikan = $request
+                ->file('foto_perbaikan')
+                ->store('perbaikan', 'public');
+
         }
 
-        TabelStatus::create($data);
+        // =========================
+        // SIMPAN RIWAYAT STATUS
+        // =========================
+        TabelStatus::create([
+
+            'report_id'      => $laporan->id,
+            'user_id'        => auth()->id(),
+            'status'         => $request->status,
+            'keterangan'     => $request->keterangan,
+            'foto_perbaikan' => $fotoPerbaikan,
+
+        ]);
 
         return redirect()
-            ->route('admin.laporan.show', $id)
-            ->with('success', 'Status laporan berhasil diperbarui!');
+
+            ->route(
+                'admin.laporan.show',
+                $laporan->id
+            )
+
+            ->with(
+                'success',
+                'Status laporan berhasil diperbarui'
+            );
     }
 
+    // =========================
+    // UPDATE STATUS PAGE
+    // =========================
     public function updateStatusIndex(Request $request)
     {
-        $laporanSaatIni = TabelLaporan::query()->latest('created_at')->first();
-
-        if (!$laporanSaatIni) {
-            return redirect()->route('admin.laporan.index')->with('error', 'Belum ada laporan.');
-        }
-
-        return redirect()->route('admin.laporan.show', $laporanSaatIni->id_laporan);
+        return $this->index($request);
     }
 
+    // =========================
+    // RIWAYAT STATUS
+    // =========================
     public function riwayatStatusIndex(Request $request)
     {
-        return redirect()->route('admin.laporan.index');
+        $riwayat = TabelStatus::with([
+
+                'laporan',
+                'admin'
+
+            ])
+
+            // =========================
+            // FILTER SEARCH
+            // =========================
+            ->when($request->search, function ($q) use ($request) {
+
+                $q->whereHas('laporan', function ($laporanQuery) use ($request) {
+
+                    $laporanQuery->where(
+                        'alamat',
+                        'like',
+                        '%' . $request->search . '%'
+                    )
+
+                    ->orWhere(
+                        'keterangan',
+                        'like',
+                        '%' . $request->search . '%'
+                    );
+
+                });
+
+            })
+
+            // =========================
+            // FILTER STATUS
+            // =========================
+            ->when($request->status, function ($q) use ($request) {
+
+                $q->where(
+                    'status',
+                    $request->status
+                );
+
+            })
+
+            // =========================
+            // TERBARU
+            // =========================
+            ->latest('created_at')
+
+            ->paginate(10);
+
+        return view(
+
+            'admin.laporan.riwayat-status',
+
+            compact('riwayat')
+
+        );
     }
 }

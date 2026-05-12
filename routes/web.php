@@ -14,7 +14,9 @@ use App\Http\Controllers\TabelFaqController;
    LANDING PAGE
 ========================= */
 Route::get('/', function () {
+
     return view('welcome');
+
 });
 
 /* =========================
@@ -22,105 +24,203 @@ Route::get('/', function () {
 ========================= */
 Route::middleware('guest')->group(function () {
 
+    // =========================
     // LOGIN PELAPOR
-    Route::get('/login', [AuthenticatedSessionController::class, 'create'])
-        ->name('login');
+    // =========================
+    Route::get(
+        '/login',
+        [AuthenticatedSessionController::class, 'create']
+    )->name('login');
 
-    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+    Route::post(
+        '/login',
+        [AuthenticatedSessionController::class, 'store']
+    );
 
+    // =========================
     // REGISTER
-    Route::get('/register', [RegisteredUserController::class, 'create'])
-        ->name('register');
+    // =========================
+    Route::get(
+        '/register',
+        [RegisteredUserController::class, 'create']
+    )->name('register');
 
-    Route::post('/register', [RegisteredUserController::class, 'store']);
+    Route::post(
+        '/register',
+        [RegisteredUserController::class, 'store']
+    );
 
+    // =========================
     // LOGIN ADMIN
-    Route::get('/login/admin', [AuthenticatedSessionController::class, 'createAdmin'])
-        ->name('login.admin');
+    // =========================
+    Route::get(
+        '/login/admin',
+        [AuthenticatedSessionController::class, 'createAdmin']
+    )->name('login.admin');
 
-    Route::post('/login/admin', [AuthenticatedSessionController::class, 'store'])
-        ->name('login.admin.post');
+    Route::post(
+        '/login/admin',
+        [AuthenticatedSessionController::class, 'store']
+    )->name('login.admin.post');
+
 });
 
 /* =========================
    LOGOUT
 ========================= */
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+Route::post(
+    '/logout',
+    [AuthenticatedSessionController::class, 'destroy']
+)
     ->middleware('auth')
     ->name('logout');
 
 /* =========================
    PROTECTED (PELAPOR)
 ========================= */
-Route::middleware(['auth', 'pelapor'])->group(function () {
+Route::middleware([
+    'auth',
+    'pelapor'
+])->group(function () {
 
+    // =========================
     // DASHBOARD
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+    // =========================
+    Route::get(
+        '/dashboard',
+        [DashboardController::class, 'index']
+    )->name('dashboard');
 
-    // REPORT
-    Route::get('/report', [ReportController::class, 'create'])
-        ->name('laporan.create');
+    // =========================
+    // FORM LAPORAN
+    // =========================
+    Route::get(
+        '/report',
+        [ReportController::class, 'create']
+    )->name('laporan.create');
 
-    Route::post('/report', [ReportController::class, 'store'])
-        ->name('laporan.store');
+    // =========================
+    // SIMPAN LAPORAN
+    // =========================
+    Route::post(
+        '/report',
+        [ReportController::class, 'store']
+    )->name('laporan.store');
 
-    // MY REPORT
-    Route::get('/my-report', [ReportController::class, 'myReport'])
-        ->name('laporan.my-report');
+    // =========================
+    // MY REPORT / RIWAYAT
+    // =========================
+    Route::get(
+        '/my-report',
+        [ReportController::class, 'myReport']
+    )->name('laporan.my-report');
 
+    // =========================
     // FAQ
+    // =========================
     Route::get('/faq', function () {
+
         return view('pelapor.faq');
-    });
 
+    })->name('faq');
+
+    // =========================
     // PROSEDUR
+    // =========================
     Route::get('/prosedur', function () {
+
         return view('pelapor.prosedur');
-    });
 
+    })->name('prosedur');
+
+    // =========================
     // PROFILE
-    Route::get('/profile', [ProfileController::class, 'edit'])
-        ->name('profile.edit');
+    // =========================
+    Route::get(
+        '/profile',
+        [ProfileController::class, 'edit']
+    )->name('profile.edit');
 
-    Route::patch('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
+    Route::patch(
+        '/profile',
+        [ProfileController::class, 'update']
+    )->name('profile.update');
 
-    Route::delete('/profile', [ProfileController::class, 'destroy'])
-        ->name('profile.destroy');
+    Route::delete(
+        '/profile',
+        [ProfileController::class, 'destroy']
+    )->name('profile.destroy');
+
 });
 
 /* =========================
    ADMIN ROUTES
 ========================= */
-Route::middleware(['auth', 'admin'])
+Route::middleware([
+    'auth',
+    'admin'
+])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
+        // =========================
         // DASHBOARD ADMIN
+        // =========================
         Route::get('/dashboard', function () {
+
             return view('admin.dashboard');
+
         })->name('dashboard');
 
-        // LAPORAN
-        Route::get('/laporan', [LaporanController::class, 'index'])
-            ->name('laporan.index');
+        // =========================
+        // DAFTAR LAPORAN
+        // =========================
+        Route::get(
+            '/laporan',
+            [LaporanController::class, 'index']
+        )->name('laporan.index');
 
-        Route::get('/laporan/update-status', [LaporanController::class, 'updateStatusIndex'])
-            ->name('laporan.update-status');
+        // =========================
+        // HALAMAN UPDATE STATUS
+        // =========================
+        Route::get(
+            '/laporan/update-status',
+            [LaporanController::class, 'updateStatusIndex']
+        )->name('laporan.update-status');
 
-        Route::get('/laporan/riwayat-status', [LaporanController::class, 'riwayatStatusIndex'])
-            ->name('laporan.riwayat-status');
+        // =========================
+        // RIWAYAT STATUS
+        // =========================
+        Route::get(
+            '/laporan/riwayat-status',
+            [LaporanController::class, 'riwayatStatusIndex']
+        )->name('laporan.riwayat-status');
 
-        Route::get('/laporan/{id}', [LaporanController::class, 'show'])
-            ->name('laporan.show');
+        // =========================
+        // DETAIL LAPORAN
+        // =========================
+        Route::get(
+            '/laporan/{id}',
+            [LaporanController::class, 'show']
+        )->name('laporan.show');
 
-        Route::put('/laporan/{id}', [LaporanController::class, 'update'])
-            ->name('laporan.update');
+        // =========================
+        // UPDATE STATUS LAPORAN
+        // =========================
+        Route::put(
+            '/laporan/{id}',
+            [LaporanController::class, 'update']
+        )->name('laporan.update');
 
+        // =========================
         // FAQ MANAGEMENT
-        Route::resource('manajemen-faq', TabelFaqController::class)->names([
+        // =========================
+        Route::resource(
+            'manajemen-faq',
+            TabelFaqController::class
+        )->names([
+
             'index'   => 'manajemen-faq.index',
             'create'  => 'manajemen-faq.create',
             'store'   => 'manajemen-faq.store',
@@ -128,7 +228,9 @@ Route::middleware(['auth', 'admin'])
             'edit'    => 'manajemen-faq.edit',
             'update'  => 'manajemen-faq.update',
             'destroy' => 'manajemen-faq.destroy',
+
         ]);
+
     });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

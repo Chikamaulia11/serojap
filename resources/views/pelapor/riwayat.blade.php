@@ -4,44 +4,132 @@
 
 <link rel="stylesheet" href="{{ asset('css/riwayat.css') }}">
 
-<h2 class="title">Riwayat Laporan</h2>
+<h2 class="title">
+    Riwayat Laporan
+</h2>
 
 <div class="list">
 
-@foreach($reports as $r)
-    <div class="card-report"
+@forelse($reports as $r)
+
+    @php
+
+        $status = $r->statusTerbaru->status ?? 'diterima';
+
+        $warnaStatus = [
+
+            'diterima' => '#10b981',
+            'diproses' => '#f59e0b',
+            'selesai'  => '#8b5cf6',
+            'ditolak'  => '#ef4444',
+
+        ][$status] ?? '#6b7280';
+
+        $keterangan = $r->statusTerbaru->keterangan
+            ?? 'Belum ada keterangan';
+
+    @endphp
+
+    <div
+        class="card-report"
         onclick="openPopup(
             '{{ $r->alamat }}',
-            '{{ $r->status }}',
-            `{{ $r->keterangan }}`
-        )">
+            '{{ ucfirst($status) }}',
+            `{{ $keterangan }}`,
+            '{{ $r->latitude }}',
+            '{{ $r->longitude }}',
+            '{{ $r->created_at->format('d M Y, H:i') }}'
+        )"
+    >
 
-        <p><b>{{ $r->alamat }}</b></p>
-        <p class="status">{{ $r->status }}</p>
+        <p>
+            <b>{{ $r->alamat }}</b>
+        </p>
 
-        <p style="font-size:12px; color:gray;">
+        <p
+            class="status"
+            style="color: {{ $warnaStatus }};"
+        >
+            {{ ucfirst($status) }}
+        </p>
+
+        <p
+            style="font-size:12px; color:gray;"
+        >
             {{ $r->created_at->format('d M Y, H:i') }}
         </p>
+
     </div>
-@endforeach
+
+@empty
+
+    <div class="card-report">
+
+        <p>
+            Belum ada laporan
+        </p>
+
+    </div>
+
+@endforelse
 
 </div>
 
 <div id="popup" class="popup">
-    <div class="popup-content">
-        <h3>Detail Laporan</h3>
 
-        <p><b>Alamat:</b></p>
+    <div class="popup-content">
+
+        <h3>
+            Detail Laporan
+        </h3>
+
+        <p>
+            <b>Alamat:</b>
+        </p>
+
         <p id="pop-alamat"></p>
 
-        <p><b>Status:</b></p>
+        <br>
+
+        <p>
+            <b>Status:</b>
+        </p>
+
         <p id="pop-status"></p>
 
-        <p><b>Keterangan:</b></p>
+        <br>
+
+        <p>
+            <b>Keterangan:</b>
+        </p>
+
         <p id="pop-keterangan"></p>
 
-        <button class="btn-close" onclick="closePopup()">Selesai</button>
+        <br>
+
+        <p>
+            <b>Koordinat:</b>
+        </p>
+
+        <p id="pop-koordinat"></p>
+
+        <br>
+
+        <p>
+            <b>Tanggal:</b>
+        </p>
+
+        <p id="pop-tanggal"></p>
+
+        <button
+            class="btn-close"
+            onclick="closePopup()"
+        >
+            Selesai
+        </button>
+
     </div>
+
 </div>
 
 <script src="{{ asset('js/riwayat.js') }}"></script>
