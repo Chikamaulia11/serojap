@@ -185,10 +185,12 @@ Route::middleware([
         // =========================
         // HALAMAN UPDATE STATUS
         // =========================
+        // Langsung menuju detail laporan terbaru
         Route::get(
             '/laporan/update-status',
             [LaporanController::class, 'updateStatusIndex']
         )->name('laporan.update-status');
+
 
         // =========================
         // RIWAYAT STATUS

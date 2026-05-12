@@ -29,159 +29,93 @@
 
         $total = \App\Models\Report::count();
 
-        $diterima = \App\Models\TabelStatus::where('status', 'diterima')
-            ->distinct('report_id')
-            ->count('report_id');
+        // Status terbaru per report (pakai relasi Report::latestStatus)
+        $latestStatuses = \App\Models\Report::with('latestStatus')
+            ->get()
+            ->pluck('latestStatus.status')
+            ->filter();
 
-        $diproses = \App\Models\TabelStatus::where('status', 'diproses')
-            ->distinct('report_id')
-            ->count('report_id');
-
-        $selesai = \App\Models\TabelStatus::where('status', 'selesai')
-            ->distinct('report_id')
-            ->count('report_id');
+        $diterima = $latestStatuses->where('diterima')->count();
+        $diproses  = $latestStatuses->where('diproses')->count();
+        $selesai   = $latestStatuses->where('selesai')->count();
 
     @endphp
+
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
 
         {{-- TOTAL --}}
-        <div class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-
+        <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
             <div class="flex items-center justify-between">
-
                 <div>
-                    <p class="text-sm font-medium text-gray-500">
-                        Total Laporan
-                    </p>
-
-                    <p class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-[#2657c1] transition">
-                        {{ $total }}
-                    </p>
-
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#eff6ff] text-[#2657c1]">
-                        Semua Status
-                    </span>
+                    <p class="text-sm font-medium text-gray-500">Total Laporan</p>
+                    <p class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-[#2657c1] transition">{{ $total }}</p>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#eff6ff] text-[#2657c1]">Semua Status</span>
                 </div>
-
                 <div class="w-16 h-16 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-all">
-
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h.01M12 7h.01M16 7h.01M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 3h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z"/>
                     </svg>
-
                 </div>
-
             </div>
-
-        </div>
+        </a>
 
         {{-- DITERIMA --}}
-        <div class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-
+        <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
             <div class="flex items-center justify-between">
-
                 <div>
-                    <p class="text-sm font-medium text-gray-500">
-                        Diterima
-                    </p>
-
-                    <p class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-[#2657c1] transition">
-                        {{ $diterima }}
-                    </p>
-
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600">
-                        Masuk
-                    </span>
+                    <p class="text-sm font-medium text-gray-500">Diterima</p>
+                    <p class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-[#2657c1] transition">{{ $diterima }}</p>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600">Masuk</span>
                 </div>
-
                 <div class="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-all">
-
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M5 13l4 4L19 7"/>
-
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 13h16"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 13l-1 6h18l-1-6"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 13V5h8v8"/>
                     </svg>
-
                 </div>
-
             </div>
-
-        </div>
+        </a>
 
         {{-- DIPROSES --}}
-        <div class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-
+        <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
             <div class="flex items-center justify-between">
-
                 <div>
-                    <p class="text-sm font-medium text-gray-500">
-                        Diproses
-                    </p>
-
-                    <p class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-[#2657c1] transition">
-                        {{ $diproses }}
-                    </p>
-
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
-                        Aktif
-                    </span>
+                    <p class="text-sm font-medium text-gray-500">Diproses</p>
+                    <p class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-[#2657c1] transition">{{ $diproses }}</p>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600">Aktif</span>
                 </div>
-
                 <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-all">
-
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0"/>
-
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 2a10 10 0 1010 10"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M22 2l-2 2-2-2"/>
                     </svg>
-
                 </div>
-
             </div>
-
-        </div>
+        </a>
 
         {{-- SELESAI --}}
-        <div class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-
+        <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
             <div class="flex items-center justify-between">
-
                 <div>
-                    <p class="text-sm font-medium text-gray-500">
-                        Selesai
-                    </p>
-
-                    <p class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-[#2657c1] transition">
-                        {{ $selesai }}
-                    </p>
-
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600">
-                        Sukses
-                    </span>
+                    <p class="text-sm font-medium text-gray-500">Selesai</p>
+                    <p class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-[#2657c1] transition">{{ $selesai }}</p>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600">Sukses</span>
                 </div>
-
                 <div class="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-all">
-
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4"/>
-
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/>
+                        <circle cx="12" cy="12" r="10" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-
                 </div>
-
             </div>
-
-        </div>
+        </a>
 
     </div>
+
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -193,11 +127,11 @@
 
                 <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
 
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12"/>
-
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5a2 2 0 002 2h2a2 2 0 002-2 2 2 0 00-2-2h-2a2 2 0 00-2 2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17h6"/>
                     </svg>
 
                 </div>
@@ -226,11 +160,10 @@
 
                 <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
 
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8.228 9c.549-1.165 2.03-2 3.772-2"/>
-
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 17h.01"/>
+                        <circle cx="12" cy="12" r="10"/>
                     </svg>
 
                 </div>
@@ -259,11 +192,9 @@
 
                 <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
 
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 19v-6"/>
-
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16v-4M11 16V8M15 16v-6M19 16v-9"/>
                     </svg>
 
                 </div>

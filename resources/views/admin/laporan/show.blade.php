@@ -55,10 +55,9 @@
 
     @endphp
 
-    <div class="flex items-start justify-between mb-6">
+    <div class="flex items-start justify-between mb-6 gap-6">
 
-        <div>
-
+        <div class="min-w-0">
             <h1 class="text-2xl font-bold text-gray-900">
                 Detail Laporan
             </h1>
@@ -67,16 +66,43 @@
                 ID #{{ $laporan->id }}
                 ·
                 Dikirim
-                {{ $laporan->created_at->diffForHumans() }}
+                {{ $laporan->created_at ? $laporan->created_at->diffForHumans() : '' }}
             </p>
-
         </div>
 
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $badgeClasses }}">
-            {{ ucfirst($statusNow) }}
-        </span>
+        <div class="flex flex-col items-end gap-3">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $badgeClasses }}">
+                {{ ucfirst($statusNow) }}
+            </span>
+
+            @if(isset($daftarLaporan) && $daftarLaporan->count())
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 w-auto min-w-[12rem]">
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Ganti Laporan
+                    </label>
+
+                    <form method="GET" action="{{ route('admin.laporan.show', ['id' => $laporan->id]) }}">
+                        <select
+                            name="id"
+                            onchange="window.location.href=this.value;"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2"
+                        >
+                            @foreach($daftarLaporan as $l)
+                                <option
+                                    value="{{ route('admin.laporan.show', ['id' => $l->id]) }}"
+                                    {{ (int)$l->id === (int)$laporan->id ? 'selected' : '' }}
+                                >
+                                    #{{ $l->id }} — {{ $l->alamat }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+            @endif
+        </div>
 
     </div>
+
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -137,11 +163,21 @@
 
                     @if($laporan->foto)
 
-                        <img
-                            src="{{ asset('storage/' . $laporan->foto) }}"
-                            alt="Foto Kerusakan"
-                            class="w-full h-64 object-cover rounded-lg border border-gray-200"
+                        @php
+                            $fotoKerusakanUrl = asset('storage/' . $laporan->foto);
+                        @endphp
+
+                        <button
+                            type="button"
+                            class="w-full"
+                            onclick="showImageModal('{{ $fotoKerusakanUrl }}', 'Foto Kerusakan')"
                         >
+                            <img
+                                src="{{ $fotoKerusakanUrl }}"
+                                alt="Foto Kerusakan"
+                                class="w-full h-64 object-cover rounded-lg border border-gray-200 hover:opacity-95 transition"
+                            >
+                        </button>
 
                     @else
 
@@ -282,11 +318,21 @@
                                                 Foto Perbaikan
                                             </p>
 
-                                            <img
-                                                src="{{ asset('storage/' . $s->foto_perbaikan) }}"
-                                                alt="Foto Perbaikan"
-                                                class="w-full h-48 object-cover rounded-lg border border-gray-200"
+                                            @php
+                                                $fotoPerbaikanUrl = asset('storage/' . $s->foto_perbaikan);
+                                            @endphp
+
+                                            <button
+                                                type="button"
+                                                class="w-full"
+                                                onclick="showImageModal('{{ $fotoPerbaikanUrl }}', 'Foto Perbaikan')"
                                             >
+                                                <img
+                                                    src="{{ $fotoPerbaikanUrl }}"
+                                                    alt="Foto Perbaikan"
+                                                    class="w-full h-48 object-cover rounded-lg border border-gray-200 hover:opacity-95 transition"
+                                                >
+                                            </button>
 
                                         </div>
 
@@ -420,6 +466,80 @@
 
     </div>
 
+{{-- =========================
+     IMAGE MODAL (LIGHTBOX)
+========================= --}}
+<div
+    id="imageModal"
+    class="fixed inset-0 z-50 hidden"
+    aria-hidden="true"
+>
+    <div
+        class="absolute inset-0 bg-black/60"
+        onclick="hideImageModal()"
+    ></div>
+
+    <div class="relative w-full h-full flex items-center justify-center p-4">
+        <div class="w-full max-w-5xl bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                <p id="imageModalTitle" class="text-sm font-semibold text-gray-900">
+                    —
+                </p>
+                <button
+                    type="button"
+                    class="text-gray-500 hover:text-gray-700"
+                    onclick="hideImageModal()"
+                    aria-label="Tutup"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <div class="p-4 bg-gray-50">
+                <img
+                    id="imageModalImg"
+                    src=""
+                    alt=""
+                    class="w-full max-h-[75vh] object-contain rounded-lg bg-white border border-gray-200"
+                >
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    function showImageModal(src, title) {
+        const modal = document.getElementById('imageModal');
+        const img = document.getElementById('imageModalImg');
+        const modalTitle = document.getElementById('imageModalTitle');
+
+        img.src = src;
+        modalTitle.textContent = title || '—';
+
+        modal.classList.remove('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function hideImageModal() {
+        const modal = document.getElementById('imageModal');
+        const img = document.getElementById('imageModalImg');
+
+        modal.classList.add('hidden');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('overflow-hidden');
+
+        // clear src to avoid broken-image on next open if any
+        img.src = img.src;
+    }
+
+    // close on ESC
+    document.addEventListener('keydown', function (e) {
+        const modal = document.getElementById('imageModal');
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            hideImageModal();
+        }
+    });
+</script>
 
 @endsection

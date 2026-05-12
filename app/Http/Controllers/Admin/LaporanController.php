@@ -163,8 +163,35 @@ class LaporanController extends Controller
     // =========================
     public function updateStatusIndex(Request $request)
     {
-        return $this->index($request);
+        // Redirect langsung ke detail laporan terbaru
+        $laporan = Report::with(['user', 'statuses.admin', 'latestStatus'])
+            ->latest()
+            ->first();
+
+        if (!$laporan) {
+            return redirect()
+                ->route('admin.laporan.index')
+                ->with('error', 'Belum ada laporan untuk diupdate.');
+        }
+
+        $daftarLaporan = Report::select('id', 'alamat')
+            ->latest()
+            ->get();
+
+        // Pastikan property yang dipakai di view memang ada
+        $daftarLaporan = $daftarLaporan->map(function ($item) {
+            $item->id_laporan = $item->id;
+            $item->kecamatan = $item->kecamatan ?? '—';
+            return $item;
+        });
+
+
+        return view('admin.laporan.show', [
+            'laporan' => $laporan,
+            'daftarLaporan' => $daftarLaporan,
+        ]);
     }
+
 
     // =========================
     // RIWAYAT STATUS
