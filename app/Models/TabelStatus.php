@@ -2,35 +2,71 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TabelStatus extends Model
 {
-    protected $table = 'Tabel_Status';
-    protected $primaryKey = 'id_status';
-    public $timestamps = false;
+    use HasFactory;
 
+    /* =========================
+       TABLE
+    ========================= */
+    protected $table = 'tabel_status';
+
+    /* =========================
+       FILLABLE
+    ========================= */
     protected $fillable = [
-        'id_laporan',
+
+        'report_id',
         'user_id',
         'status',
         'keterangan',
         'foto_perbaikan',
+
     ];
 
+    /* =========================
+       CAST
+    ========================= */
     protected $casts = [
+
         'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+
     ];
 
-    // Relasi ke Tabel_Laporan
+    /* =========================
+       RELASI KE REPORT
+    ========================= */
     public function laporan()
     {
-        return $this->belongsTo(TabelLaporan::class, 'id_laporan', 'id_laporan');
+        return $this->belongsTo(
+            Report::class,
+            'report_id'
+        );
     }
 
-    // Relasi ke User (admin yang update)
+    /* =========================
+       RELASI KE ADMIN
+    ========================= */
     public function admin()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(
+            User::class,
+            'user_id'
+        );
+    }
+
+    /* =========================
+       ALIAS USER
+    ========================= */
+    public function user()
+    {
+        return $this->belongsTo(
+            User::class,
+            'user_id'
+        );
     }
 }
