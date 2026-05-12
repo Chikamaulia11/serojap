@@ -84,7 +84,7 @@
             </a>
 
             {{-- Grafik Statistik --}}
-            <a href="{{ route('admin.laporan.index') }}"
+            <a href="{{ route('admin.statistik.index') }}"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
                     {{ request()->routeIs('admin.statistik.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
                 <i class="mdi mdi-chart-bar text-lg w-5 text-center"></i>
