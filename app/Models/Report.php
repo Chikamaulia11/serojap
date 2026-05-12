@@ -58,7 +58,7 @@ class Report extends Model
         return $this->hasMany(
             TabelStatus::class,
             'report_id'
-        )->latest();
+        )->latest('created_at');
     }
 
     /* =========================
@@ -69,12 +69,11 @@ class Report extends Model
         return $this->hasOne(
             TabelStatus::class,
             'report_id'
-        )->latestOfMany();
+        )->latest('created_at');
     }
 
     /* =========================
        ALIAS STATUS TERBARU
-       (BACKWARD COMPATIBLE)
     ========================= */
     public function statusTerbaru()
     {

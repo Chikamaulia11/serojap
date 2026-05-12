@@ -15,6 +15,21 @@ class TabelStatus extends Model
     protected $table = 'tabel_status';
 
     /* =========================
+       PRIMARY KEY
+    ========================= */
+    protected $primaryKey = 'id_status';
+
+    /* =========================
+       AUTO INCREMENT
+    ========================= */
+    public $incrementing = true;
+
+    /* =========================
+       KEY TYPE
+    ========================= */
+    protected $keyType = 'int';
+
+    /* =========================
        FILLABLE
     ========================= */
     protected $fillable = [
