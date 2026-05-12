@@ -47,13 +47,21 @@
                 </p>
 
                 <div class="hero-buttons">
-                    <button onclick="go('laporan')" class="btn-primary glow">
+
+                    <button
+                        onclick="go('laporan')"
+                        class="btn-primary glow"
+                    >
                         Buat Laporan
                     </button>
 
-                    <button onclick="go('riwayat')" class="btn-secondary">
+                    <button
+                        onclick="go('riwayat')"
+                        class="btn-secondary"
+                    >
                         Lihat Riwayat
                     </button>
+
                 </div>
 
             </div>
@@ -184,7 +192,7 @@
 
                     <div class="map-glow"></div>
 
-                    <img 
+                    <img
                         src="{{ asset('assets/pelapor/images/peta.png') }}"
                         alt="Peta Purwakarta"
                         class="map-image"
@@ -229,46 +237,97 @@
 
                 <div class="info-card">
 
-                    <h3>Monitoring Transparan</h3>
+                    <h3>
+                        Monitoring Transparan
+                    </h3>
 
                     <p>
                         Pantau progres laporan secara realtime
                         mulai dari diterima hingga selesai.
                     </p>
 
+                    @php
+
+                        $statusTerakhir = $reports->first()?->latestStatus?->status;
+
+                        $persenDiterima = $statusTerakhir == 'diterima' ? 100 : 0;
+
+                        $persenDiproses = $statusTerakhir == 'diproses' ? 100 : 0;
+
+                        $persenSelesai = $statusTerakhir == 'selesai' ? 100 : 0;
+
+                        $persenDitolak = $statusTerakhir == 'ditolak' ? 100 : 0;
+
+                    @endphp
+
                     <div class="progress-group">
 
+                        <!-- DITERIMA -->
                         <div class="progress-item">
+
                             <div class="progress-top">
                                 <span>Diterima</span>
-                                <span>100%</span>
+                                <span>{{ $persenDiterima }}%</span>
                             </div>
 
                             <div class="progress-bar">
-                                <div class="progress-fill blue"></div>
+                                <div
+                                    class="progress-fill blue"
+                                    style="width: {{ $persenDiterima }}%;"
+                                ></div>
                             </div>
+
                         </div>
 
+                        <!-- DIPROSES -->
                         <div class="progress-item">
+
                             <div class="progress-top">
                                 <span>Diproses</span>
-                                <span>75%</span>
+                                <span>{{ $persenDiproses }}%</span>
                             </div>
 
                             <div class="progress-bar">
-                                <div class="progress-fill orange"></div>
+                                <div
+                                    class="progress-fill orange"
+                                    style="width: {{ $persenDiproses }}%;"
+                                ></div>
                             </div>
+
                         </div>
 
+                        <!-- SELESAI -->
                         <div class="progress-item">
+
                             <div class="progress-top">
                                 <span>Selesai</span>
-                                <span>55%</span>
+                                <span>{{ $persenSelesai }}%</span>
                             </div>
 
                             <div class="progress-bar">
-                                <div class="progress-fill green"></div>
+                                <div
+                                    class="progress-fill green"
+                                    style="width: {{ $persenSelesai }}%;"
+                                ></div>
                             </div>
+
+                        </div>
+
+                        <!-- DITOLAK -->
+                        <div class="progress-item">
+
+                            <div class="progress-top">
+                                <span>Ditolak</span>
+                                <span>{{ $persenDitolak }}%</span>
+                            </div>
+
+                            <div class="progress-bar">
+                                <div
+                                    class="progress-fill red"
+                                    style="width: {{ $persenDitolak }}%;"
+                                ></div>
+                            </div>
+
                         </div>
 
                     </div>
@@ -279,29 +338,59 @@
 
             <div class="riwayat-preview reveal">
 
-                @foreach($reports as $r)
+                @forelse($reports as $r)
 
-                <div class="riwayat-item">
+                    @php
 
-                    <div class="riwayat-top">
+                        $status = $r->statusTerbaru->status ?? 'diterima';
 
-                        <div>
-                            <b>{{ $r->alamat }}</b>
+                    @endphp
 
-                            <small>
-                                {{ $r->created_at->format('d M Y') }}
-                            </small>
-                        </div>
+                    <div class="riwayat-item">
 
-                        <div class="status {{ strtolower($r->status) }}">
-                            {{ $r->status }}
+                        <div class="riwayat-top">
+
+                            <div>
+
+                                <b>
+                                    {{ $r->alamat }}
+                                </b>
+
+                                <small>
+                                    {{ $r->created_at->format('d M Y') }}
+                                </small>
+
+                            </div>
+
+                            <div class="status {{ strtolower($status) }}">
+
+                                {{ ucfirst($status) }}
+
+                            </div>
+
                         </div>
 
                     </div>
 
-                </div>
+                @empty
 
-                @endforeach
+                    <div class="riwayat-item">
+
+                        <div class="riwayat-top">
+
+                            <div>
+
+                                <b>
+                                    Belum ada laporan
+                                </b>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                @endforelse
 
                 <a href="/my-report" class="btn-primary">
                     Lihat Semua Riwayat

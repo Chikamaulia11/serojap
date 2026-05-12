@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Report;
+use App\Models\TabelStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,28 +23,41 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
-            'foto' => 'required|image',
-            'alamat' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'keterangan' => 'required',
+            'nama'        => 'required',
+            'foto'        => 'required|image',
+            'alamat'      => 'required',
+            'latitude'    => 'required',
+            'longitude'   => 'required',
+            'keterangan'  => 'required',
         ]);
 
-        $foto = $request->file('foto')->store('reports', 'public');
+        // upload foto
+        $foto = $request->file('foto')
+            ->store('reports', 'public');
 
-        Report::create([
-            'user_id' => Auth::id(),
-            'nama_pelapor' => $request->nama,
-            'foto' => $foto,
-            'alamat' => $request->alamat,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'keterangan' => $request->keterangan,
-            'status' => 'diterima',
+        // simpan laporan utama
+        $report = Report::create([
+            'user_id'       => Auth::id(),
+            'nama_pelapor'  => $request->nama,
+            'foto'          => $foto,
+            'alamat'        => $request->alamat,
+            'latitude'      => $request->latitude,
+            'longitude'     => $request->longitude,
+            'keterangan'    => $request->keterangan,
         ]);
 
-        return back()->with('success', 'Laporan berhasil dikirim');
+        // status pertama otomatis
+        TabelStatus::create([
+            'report_id'   => $report->id,
+            'user_id'     => Auth::id(),
+            'status'      => 'diterima',
+            'keterangan'  => 'Laporan berhasil dikirim',
+        ]);
+
+        return back()->with(
+            'success',
+            'Laporan berhasil dikirim'
+        );
     }
 
     // =========================
@@ -51,11 +65,15 @@ class ReportController extends Controller
     // =========================
     public function index()
     {
-        $reports = Report::where('user_id', Auth::id())
+        $reports = Report::with('statusTerbaru')
+            ->where('user_id', Auth::id())
             ->latest()
             ->get();
 
-        return view('pelapor.riwayat', compact('reports'));
+        return view(
+            'pelapor.riwayat',
+            compact('reports')
+        );
     }
 
     // =========================
@@ -63,10 +81,14 @@ class ReportController extends Controller
     // =========================
     public function myReport()
     {
-        $reports = Report::where('user_id', Auth::id())
+        $reports = Report::with('statusTerbaru')
+            ->where('user_id', Auth::id())
             ->latest()
             ->get();
 
-        return view('pelapor.riwayat', compact('reports'));
+        return view(
+            'pelapor.riwayat',
+            compact('reports')
+        );
     }
 }

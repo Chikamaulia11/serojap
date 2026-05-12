@@ -12,33 +12,121 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        $total = Report::where('user_id', $user->id)->count();
+        // =========================
+        // TOTAL LAPORAN
+        // =========================
+        $total = Report::where(
+            'user_id',
+            $user->id
+        )->count();
 
-        $diterima = Report::where('user_id', $user->id)
-            ->where('status', 'diterima')
+        // =========================
+        // STATUS DITERIMA
+        // =========================
+        $diterima = Report::where(
+                'user_id',
+                $user->id
+            )
+
+            ->whereHas('latestStatus', function ($query) {
+
+                $query->where(
+                    'status',
+                    'diterima'
+                );
+
+            })
+
             ->count();
 
-        $diproses = Report::where('user_id', $user->id)
-            ->where('status', 'diproses')
+        // =========================
+        // STATUS DIPROSES
+        // =========================
+        $diproses = Report::where(
+                'user_id',
+                $user->id
+            )
+
+            ->whereHas('latestStatus', function ($query) {
+
+                $query->where(
+                    'status',
+                    'diproses'
+                );
+
+            })
+
             ->count();
 
-        $selesai = Report::where('user_id', $user->id)
-            ->where('status', 'selesai')
+        // =========================
+        // STATUS SELESAI
+        // =========================
+        $selesai = Report::where(
+                'user_id',
+                $user->id
+            )
+
+            ->whereHas('latestStatus', function ($query) {
+
+                $query->where(
+                    'status',
+                    'selesai'
+                );
+
+            })
+
             ->count();
 
-        // DATA UNTUK DASHBOARD & SCROLL RIWAYAT
-        $reports = Report::where('user_id', $user->id)
+        // =========================
+        // STATUS DITOLAK
+        // =========================
+        $ditolak = Report::where(
+                'user_id',
+                $user->id
+            )
+
+            ->whereHas('latestStatus', function ($query) {
+
+                $query->where(
+                    'status',
+                    'ditolak'
+                );
+
+            })
+
+            ->count();
+
+        // =========================
+        // DATA RIWAYAT DASHBOARD
+        // =========================
+        $reports = Report::with(
+                'latestStatus'
+            )
+
+            ->where(
+                'user_id',
+                $user->id
+            )
+
             ->latest()
+
             ->take(5)
+
             ->get();
 
-        return view('pelapor.dashboard', compact(
-            'user',
-            'total',
-            'diterima',
-            'diproses',
-            'selesai',
-            'reports'
-        ));
+        return view(
+            'pelapor.dashboard',
+            compact(
+
+                'user',
+                'total',
+                'diterima',
+                'diproses',
+                'selesai',
+                'ditolak',
+                'reports'
+
+            )
+        );
     }
 }
