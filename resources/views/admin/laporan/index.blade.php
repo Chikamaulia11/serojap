@@ -141,6 +141,7 @@
 
             <table class="w-full text-sm text-left">
 
+
                 <thead class="bg-gray-50 text-gray-500 uppercase text-xs font-semibold">
 
                     <tr>
@@ -156,9 +157,18 @@
 
                 <tbody class="divide-y divide-gray-100">
 
-                    @forelse($laporan as $item)
+                    @php
+                        $showLimit = 5;
+                    @endphp
+
+                    @forelse($laporan as $idx => $item)
+
+                        @php
+                            $isHidden = ($idx >= $showLimit);
+                        @endphp
 
                     @php
+
 
                         $status = $item->statusTerbaru?->status ?? 'diterima';
 
@@ -173,7 +183,8 @@
 
                     @endphp
 
-                    <tr class="hover:bg-gray-50 transition">
+                    <tr class="hover:bg-gray-50 transition {{ $isHidden ? 'hidden' : '' }}" data-row>
+
 
                         <td class="px-6 py-4">
 
@@ -268,6 +279,34 @@
 
             </table>
 
+            <div class="px-6 py-4 border-t border-gray-200 bg-white flex items-center justify-between">
+
+    {{-- Progress + count label --}}
+    <div class="flex items-center gap-3">
+        <span class="text-xs text-gray-400" id="countLabel">
+            Menampilkan {{ min($showLimit, $laporan->count()) }} dari {{ $laporan->count() }} laporan
+        </span>
+        <div class="w-20 h-1 bg-gray-200 rounded-full overflow-hidden">
+            <div
+                id="progressBar"
+                class="h-full bg-blue-500 rounded-full transition-all duration-400"
+                style="width: {{ $laporan->count() > 0 ? round((min($showLimit, $laporan->count()) / $laporan->count()) * 100) : 0 }}%"
+            ></div>
+        </div>
+    </div>
+
+    {{-- View more button --}}
+            <button
+                type="button"
+                id="viewMoreBtn"
+                class="hidden inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition">
+                <svg id="btnChevron" class="w-3.5 h-3.5 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                <span id="btnLabel">Tampilkan lainnya</span>
+                <span id="remainCount" class="text-gray-400"></span>
+            </button>
+
+        </div>
+
         </div>
 
         {{-- Pagination --}}
@@ -296,4 +335,53 @@
     </div>
 
 </div>
+
+<script>
+(function () {
+    const btn       = document.getElementById('viewMoreBtn');
+    const bar       = document.getElementById('progressBar');
+    const label     = document.getElementById('countLabel');
+    const remain    = document.getElementById('remainCount');
+    const chevron   = document.getElementById('btnChevron');
+    if (!btn) return;
+
+    const hidden = [...document.querySelectorAll('tr[data-row].hidden')];
+    const total  = document.querySelectorAll('tr[data-row]').length;
+    let shown    = total - hidden.length;
+
+    if (hidden.length === 0) return;
+
+    remain.textContent = '(+' + hidden.length + ')';
+    btn.classList.remove('hidden');
+
+    btn.addEventListener('click', function () {
+        btn.disabled = true;
+        chevron.style.transform = 'rotate(180deg)';
+
+        let i = 0;
+        const tick = setInterval(function () {
+            if (i >= hidden.length) {
+                clearInterval(tick);
+                bar.style.width = '100%';
+                label.textContent = 'Menampilkan ' + total + ' dari ' + total + ' laporan';
+                btn.remove();
+                return;
+            }
+            const row = hidden[i];
+            row.classList.remove('hidden');
+            row.style.opacity = '0';
+            row.style.transform = 'translateY(6px)';
+            row.style.transition = 'opacity 250ms ease, transform 250ms ease';
+            requestAnimationFrame(() => {
+                row.style.opacity = '1';
+                row.style.transform = 'translateY(0)';
+            });
+            shown++;
+            i++;
+            label.textContent = 'Menampilkan ' + shown + ' dari ' + total + ' laporan';
+            bar.style.width = Math.round((shown / total) * 100) + '%';
+            }, 120);
+        });
+    })();
+</script>
 @endsection
