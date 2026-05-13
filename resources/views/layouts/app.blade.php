@@ -52,15 +52,15 @@
             <div class="hamburger" onclick="toggleMenu()">☰</div>
 
             @if(auth()->check())
-                <a href="{{ route('profile.edit') }}" class="nav-profile">
+            <a href="{{ route('profile.edit') }}" class="nav-profile">
 
-                    <img src="{{ auth()->user()->foto_profil
+                <img src="{{ auth()->user()->foto_profil
                         ? asset('storage/' . auth()->user()->foto_profil)
                         : 'https://i.pravatar.cc/100' }}">
 
-                    <span>{{ auth()->user()->name }}</span>
+                <span>{{ auth()->user()->name }}</span>
 
-                </a>
+            </a>
             @endif
 
         </div>
@@ -83,7 +83,7 @@
 
     <!-- Navbar JS -->
     <script src="{{ asset('js/navbar.js') }}"></script>
-
+    @stack('scripts')
 </body>
 
 </html>

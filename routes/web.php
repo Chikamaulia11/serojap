@@ -240,6 +240,9 @@ Route::middleware([
 
         ]);
 
+        //FAQ PELAPOR
+        Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
+
     });
 
 require __DIR__ . '/auth.php';

@@ -9,8 +9,8 @@ use Illuminate\Http\Request;
 class FaqController extends Controller
 {
     public function index()
-    {
-        $faqs = TabelFaq::orderBy('urutan', 'asc')->get();
-        return view('pelapor.faq', compact('faqs'));
-    }
+{
+    $faqs = TabelFaq::latest()->get();
+    return view('pelapor.faq', compact('faqs'));
 }
+    }

@@ -57,7 +57,7 @@ class Report extends Model
     {
         return $this->hasMany(
             TabelStatus::class,
-            'report_id'
+            'id_laporan'
         )->latest('created_at');
     }
 
@@ -68,7 +68,7 @@ class Report extends Model
     {
         return $this->hasOne(
             TabelStatus::class,
-            'report_id'
+            'id_laporan'
         )->latest('created_at');
     }
 

@@ -50,15 +50,13 @@
 
                     <button
                         onclick="go('laporan')"
-                        class="btn-primary glow"
-                    >
+                        class="btn-primary glow">
                         Buat Laporan
                     </button>
 
                     <button
                         onclick="go('riwayat')"
-                        class="btn-secondary"
-                    >
+                        class="btn-secondary">
                         Lihat Riwayat
                     </button>
 
@@ -247,15 +245,15 @@
 
                     @php
 
-                        $statusTerakhir = $reports->first()?->latestStatus?->status;
+                    $statusTerakhir = $reports->first()?->latestStatus?->status;
 
-                        $persenDiterima = $statusTerakhir == 'diterima' ? 100 : 0;
+                    $persenDiterima = $statusTerakhir == 'diterima' ? 100 : 0;
 
-                        $persenDiproses = $statusTerakhir == 'diproses' ? 100 : 0;
+                    $persenDiproses = $statusTerakhir == 'diproses' ? 100 : 0;
 
-                        $persenSelesai = $statusTerakhir == 'selesai' ? 100 : 0;
+                    $persenSelesai = $statusTerakhir == 'selesai' ? 100 : 0;
 
-                        $persenDitolak = $statusTerakhir == 'ditolak' ? 100 : 0;
+                    $persenDitolak = $statusTerakhir == 'ditolak' ? 100 : 0;
 
                     @endphp
 
@@ -272,8 +270,7 @@
                             <div class="progress-bar">
                                 <div
                                     class="progress-fill blue"
-                                    style="width: {{ $persenDiterima }}%;"
-                                ></div>
+                                    style="width: {{ $persenDiterima }}%;"></div>
                             </div>
 
                         </div>
@@ -289,8 +286,7 @@
                             <div class="progress-bar">
                                 <div
                                     class="progress-fill orange"
-                                    style="width: {{ $persenDiproses }}%;"
-                                ></div>
+                                    style="width: {{ $persenDiproses }}%;"></div>
                             </div>
 
                         </div>
@@ -306,8 +302,7 @@
                             <div class="progress-bar">
                                 <div
                                     class="progress-fill green"
-                                    style="width: {{ $persenSelesai }}%;"
-                                ></div>
+                                    style="width: {{ $persenSelesai }}%;"></div>
                             </div>
 
                         </div>
@@ -323,8 +318,7 @@
                             <div class="progress-bar">
                                 <div
                                     class="progress-fill red"
-                                    style="width: {{ $persenDitolak }}%;"
-                                ></div>
+                                    style="width: {{ $persenDitolak }}%;"></div>
                             </div>
 
                         </div>
@@ -339,55 +333,55 @@
 
                 @forelse($reports as $r)
 
-                    @php
+                @php
 
-                        $status = $r->statusTerbaru->status ?? 'diterima';
+                $status = $r->statusTerbaru->status ?? 'diterima';
 
-                    @endphp
+                @endphp
 
-                    <div class="riwayat-item">
+                <div class="riwayat-item">
 
-                        <div class="riwayat-top">
+                    <div class="riwayat-top">
 
-                            <div>
+                        <div>
 
-                                <b>
-                                    {{ $r->alamat }}
-                                </b>
+                            <b>
+                                {{ $r->alamat }}
+                            </b>
 
-                                <small>
-                                    {{ $r->created_at->format('d M Y') }}
-                                </small>
+                            <small>
+                                {{ $r->created_at->format('d M Y') }}
+                            </small>
 
-                            </div>
+                        </div>
 
-                            <div class="status {{ strtolower($status) }}">
+                        <div class="status {{ strtolower($status) }}">
 
-                                {{ ucfirst($status) }}
-
-                            </div>
+                            {{ ucfirst($status) }}
 
                         </div>
 
                     </div>
+
+                </div>
 
                 @empty
 
-                    <div class="riwayat-item">
+                <div class="riwayat-item">
 
-                        <div class="riwayat-top">
+                    <div class="riwayat-top">
 
-                            <div>
+                        <div>
 
-                                <b>
-                                    Belum ada laporan
-                                </b>
-
-                            </div>
+                            <b>
+                                Belum ada laporan
+                            </b>
 
                         </div>
 
                     </div>
+
+                </div>
 
                 @endforelse
 
@@ -438,7 +432,7 @@
 
             .google-search-box input {
                 flex: 1;
-                background-color: transparent;
+                background: transparent;
                 border: none !important;
                 outline: none !important;
                 box-shadow: none !important;
@@ -452,49 +446,151 @@
                 display: flex;
                 align-items: center;
             }
+
+            .faq-card {
+                background: #fff;
+                border-radius: 20px;
+                padding: 28px 24px;
+                cursor: pointer;
+                border: 1.5px solid #e8ecf0;
+                transition: all 0.3s ease;
+                height: 100%;
+            }
+
+            .faq-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 28px rgba(0, 0, 0, 0.07);
+                border-color: #6366f1;
+            }
+
+            .faq-card .faq-question {
+                font-size: 0.95rem;
+                font-weight: 700;
+                color: #1e293b;
+                line-height: 1.5;
+                text-align: center;
+                margin: 0;
+            }
+
+            .faq-card .faq-answer {
+                font-size: 0.85rem;
+                color: #64748b;
+                line-height: 1.7;
+                text-align: center;
+                margin-top: 14px;
+                padding-top: 14px;
+                border-top: 1px solid #f1f5f9;
+                display: none;
+            }
+
+            .faq-card.open .faq-answer {
+                display: block;
+            }
+
+            .faq-card.open {
+                border-color: #6366f1;
+                box-shadow: 0 8px 24px rgba(99, 102, 241, 0.1);
+            }
+
+            .btn-lihat-lainnya {
+                background: white;
+                border: 1.5px solid #e2e8f0;
+                padding: 12px 40px;
+                border-radius: 12px;
+                font-weight: 600;
+                color: #1e293b;
+                font-size: 0.9rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: inline-block;
+                margin-top: 40px;
+            }
+
+            .btn-lihat-lainnya:hover {
+                background: #1e293b;
+                color: white;
+            }
         </style>
 
         <div class="faq-search-google-wrapper">
             <div class="google-search-box">
                 <div class="search-icon-left">
-                    <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#9aa0a6">
-                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+                    <svg focusable="false" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24" width="20" height="20" fill="#9aa0a6">
+                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5
+                        6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59
+                        4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6
+                        0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14
+                        9.5 11.99 14 9.5 14z" />
                     </svg>
                 </div>
-                <input type="text" id="faqSearch" placeholder="Cari pertanyaan atau jawaban..." autocomplete="off">
+                <input type="text" id="faqSearch"
+                    placeholder="Cari pertanyaan atau jawaban..."
+                    autocomplete="off">
             </div>
         </div>
 
-        <div class="row g-4" id="faqGrid">
-            @forelse($faqs as $f)
-            <div class="col-md-6 col-lg-4 faq-item">
-                <div class="card h-100 white-card shadow-sm border-0"
-                    style="background: #fff; border-radius: 20px; cursor: pointer; transition: all 0.3s ease;"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#ans{{ $f->id_faq }}">
-
-                    <div class="card-body text-center p-4">
-                        <h6 class="fw-bold mb-0" style="color: #1e293b; line-height: 1.5;">
-                            {{ $f->pertanyaan }}
-                        </h6>
-
-                        <div id="ans{{ $f->id_faq }}" class="collapse mt-3 text-start">
-                            <hr style="opacity: 0.1; margin: 15px 0;">
-                            <p class="small text-muted mb-0" style="line-height: 1.6;">
-                                {{ $f->jawaban }}
-                            </p>
-                        </div>
-                    </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; margin: 0;" id="faqGrid">
+            @forelse($faqs as $index => $f)
+            <div class="faq-item {{ $index >= 6 ? 'extra-faq' : '' }}"
+                style="{{ $index >= 6 ? 'display:none;' : '' }} width: calc(33.333% - 14px); min-width: 260px;">
+                <div class="faq-card" onclick="toggleFaq(this)">
+                    <p class="faq-question">{{ $f->pertanyaan }}</p>
+                    <div class="faq-answer">{{ $f->jawaban }}</div>
                 </div>
             </div>
             @empty
-            <div class="col-12 text-center text-muted italic py-5">
+            <div style="width:100%; text-align:center; color:#94a3b8; padding: 40px 0; font-style:italic;">
                 Belum ada pertanyaan FAQ yang ditambahkan.
             </div>
             @endforelse
         </div>
 
+        @if($faqs->count() > 3)
+        <div class="text-center">
+            <button class="btn-lihat-lainnya" id="btnMore" onclick="lihatLainnya()">
+                Lihat Pertanyaan Lainnya
+            </button>
+        </div>
+        @endif
+
     </section>
+
+    @push('scripts')
+    <script>
+        // Toggle buka/tutup jawaban
+        function toggleFaq(card) {
+            card.classList.toggle('open');
+        }
+
+        // Tampilkan semua FAQ tersembunyi
+        function lihatLainnya() {
+            document.querySelectorAll('.extra-faq').forEach(el => {
+                el.style.display = '';
+            });
+            document.getElementById('btnMore').style.display = 'none';
+        }
+
+        // Search FAQ
+        document.getElementById('faqSearch').addEventListener('keyup', function() {
+            const filter = this.value.toLowerCase();
+
+            // Tampilkan semua dulu kalau sedang search
+            document.querySelectorAll('.extra-faq').forEach(el => {
+                el.style.display = filter ? '' : 'none';
+            });
+            if (filter) {
+                document.getElementById('btnMore') &&
+                    (document.getElementById('btnMore').style.display = 'none');
+            }
+
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.style.display =
+                    item.innerText.toLowerCase().includes(filter) ? '' : 'none';
+            });
+        });
+    </script>
+    @endpush
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
