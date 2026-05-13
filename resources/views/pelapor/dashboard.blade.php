@@ -5,10 +5,10 @@
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 
 <script>
-    function go(id){
+    function go(id) {
         document.getElementById(id).scrollIntoView({
-            behavior:'smooth',
-            block:'start'
+            behavior: 'smooth',
+            block: 'start'
         });
     }
 </script>
@@ -195,8 +195,7 @@
                     <img
                         src="{{ asset('assets/pelapor/images/peta.png') }}"
                         alt="Peta Purwakarta"
-                        class="map-image"
-                    >
+                        class="map-image">
 
                     <div class="map-card">
 
@@ -410,11 +409,125 @@
             <h2>Pertanyaan Umum</h2>
         </div>
 
-        <div class="placeholder-box">
-            <p>Section FAQ akan diisi oleh divisi terkait.</p>
+        <style>
+            .faq-search-google-wrapper {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 40px;
+                padding: 0 20px;
+            }
+
+            .google-search-box {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                max-width: 584px;
+                height: 48px;
+                background: #fff;
+                border: 1px solid #dfe1e5;
+                border-radius: 24px;
+                padding: 0 20px;
+                transition: box-shadow 0.2s;
+            }
+
+            .google-search-box:hover,
+            .google-search-box:focus-within {
+                box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+                border-color: rgba(223, 225, 229, 0);
+            }
+
+            .google-search-box input {
+                flex: 1;
+                background-color: transparent;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+                padding: 10px 0;
+                font-size: 16px;
+                color: #202124;
+            }
+
+            .search-icon-left {
+                margin-right: 12px;
+                display: flex;
+                align-items: center;
+            }
+        </style>
+
+        <div class="faq-search-google-wrapper">
+            <div class="google-search-box">
+                <div class="search-icon-left">
+                    <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#9aa0a6">
+                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+                    </svg>
+                </div>
+                <input type="text" id="faqSearch" placeholder="Cari pertanyaan atau jawaban..." autocomplete="off">
+            </div>
+        </div>
+
+        <div class="row g-4" id="faqGrid">
+            @forelse($faqs as $f)
+            <div class="col-md-6 col-lg-4 faq-item">
+                <div class="card h-100 white-card shadow-sm border-0"
+                    style="background: #fff; border-radius: 20px; cursor: pointer; transition: all 0.3s ease;"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#ans{{ $f->id_faq }}">
+
+                    <div class="card-body text-center p-4">
+                        <h6 class="fw-bold mb-0" style="color: #1e293b; line-height: 1.5;">
+                            {{ $f->pertanyaan }}
+                        </h6>
+
+                        <div id="ans{{ $f->id_faq }}" class="collapse mt-3 text-start">
+                            <hr style="opacity: 0.1; margin: 15px 0;">
+                            <p class="small text-muted mb-0" style="line-height: 1.6;">
+                                {{ $f->jawaban }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="col-12 text-center text-muted italic py-5">
+                Belum ada pertanyaan FAQ yang ditambahkan.
+            </div>
+            @endforelse
         </div>
 
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('faqSearch');
+
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function() {
+                    let filter = this.value.toLowerCase();
+                    let items = document.querySelectorAll('.faq-item');
+
+                    items.forEach(item => {
+                        let text = item.innerText.toLowerCase();
+                        item.style.display = text.includes(filter) ? "" : "none";
+                    });
+                });
+            }
+        });
+    </script>
+
+    <style>
+        .white-card:hover,
+        .white-card:has(.collapse.show) {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(38, 87, 193, 0.15) !important;
+            outline: 2px solid #2657c1;
+        }
+
+        #faqSearch:focus {
+            border-color: #2657c1 !important;
+            box-shadow: 0 0 0 4px rgba(38, 87, 193, 0.1) !important;
+            outline: none;
+        }
+    </style>
 
 </div>
 

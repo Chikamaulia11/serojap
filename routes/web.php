@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\TabelFaqController;
+use App\Http\Controllers\Pelapor\FaqController;
 use App\Http\Controllers\Admin\StatistikController;
 
 /* =========================
@@ -119,11 +120,10 @@ Route::middleware([
     // =========================
     // FAQ
     // =========================
-    Route::get('/faq', function () {
-
-        return view('pelapor.faq');
-
-    })->name('faq');
+    Route::get(
+        '/pusat-bantuan',
+        [FaqController::class, 'index']
+    )->name('pelapor.faq');
 
     // =========================
     // PROSEDUR
@@ -185,12 +185,10 @@ Route::middleware([
         // =========================
         // HALAMAN UPDATE STATUS
         // =========================
-        // Langsung menuju detail laporan terbaru
         Route::get(
             '/laporan/update-status',
             [LaporanController::class, 'updateStatusIndex']
         )->name('laporan.update-status');
-
 
         // =========================
         // RIWAYAT STATUS
@@ -216,8 +214,13 @@ Route::middleware([
             [LaporanController::class, 'update']
         )->name('laporan.update');
 
-        // --- STATISTIK ---
-        Route::get('/statistik', [StatistikController::class, 'index'])->name('statistik.index');
+        // =========================
+        // STATISTIK
+        // =========================
+        Route::get(
+            '/statistik',
+            [StatistikController::class, 'index']
+        )->name('statistik.index');
 
         // =========================
         // FAQ MANAGEMENT
