@@ -6,21 +6,110 @@
 
 <div class="max-w-7xl mx-auto">
 
+{{-- SweetAlert2 --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+@if(session('success') || session('error'))
     @if(session('success'))
-
-        <div class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm">
-            {{ session('success') }}
-        </div>
-
+        <div id="swal-success" data-message="{{ session('success') }}" class="hidden"></div>
     @endif
-
     @if(session('error'))
-
-        <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-            {{ session('error') }}
-        </div>
-
+        <div id="swal-error" data-message="{{ session('error') }}" class="hidden"></div>
     @endif
+
+    <style>
+        .swal2-popup-custom {
+            border-radius: 20px !important;
+            padding: 2rem !important;
+            font-family: inherit !important;
+        }
+        .swal2-icon-custom {
+            border: none !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .swal2-title-custom {
+            font-size: 1.4rem !important;
+            font-weight: 700 !important;
+            color: #111827 !important;
+        }
+        .swal2-text-custom {
+            font-size: 0.95rem !important;
+            color: #6b7280 !important;
+        }
+        .swal2-confirm-custom {
+            border-radius: 12px !important;
+            padding: 0.6rem 2rem !important;
+            font-weight: 600 !important;
+            font-size: 0.95rem !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+        .swal2-confirm-success {
+            background-color: #4f46e5 !important;
+            color: #fff !important;
+        }
+        .swal2-confirm-error {
+            background-color: #dc2626 !important;
+            color: #fff !important;
+        }
+        .swal2-backdrop-custom {
+            backdrop-filter: blur(4px) !important;
+            background: rgba(0, 0, 0, 0.35) !important;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const successEl = document.getElementById('swal-success');
+            const errorEl   = document.getElementById('swal-error');
+
+            if (successEl) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Disimpan!',
+                    text: successEl.dataset.message,
+                    confirmButtonText: 'Oke, Tutup',
+                    showConfirmButton: true,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    backdrop: true,
+                    allowOutsideClick: true,
+                    customClass: {
+                        popup:          'swal2-popup-custom',
+                        icon:           'swal2-icon-custom',
+                        title:          'swal2-title-custom',
+                        htmlContainer:  'swal2-text-custom',
+                        confirmButton:  'swal2-confirm-custom swal2-confirm-success',
+                        backdrop:       'swal2-backdrop-custom',
+                    }
+                });
+            }
+
+            if (errorEl) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Menyimpan',
+                    text: errorEl.dataset.message,
+                    confirmButtonText: 'Coba Lagi',
+                    showConfirmButton: true,
+                    timer: 5000,
+                    timerProgressBar: true,
+                    backdrop: true,
+                    allowOutsideClick: true,
+                    customClass: {
+                        popup:          'swal2-popup-custom',
+                        icon:           'swal2-icon-custom',
+                        title:          'swal2-title-custom',
+                        htmlContainer:  'swal2-text-custom',
+                        confirmButton:  'swal2-confirm-custom swal2-confirm-error',
+                        backdrop:       'swal2-backdrop-custom',
+                    }
+                });
+            }
+        });
+    </script>
+@endif
 
     <a
         href="{{ route('admin.laporan.index') }}"
@@ -440,6 +529,7 @@
                             <textarea
                                 name="keterangan"
                                 rows="4"
+                                required
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 resize-y"
                                 placeholder="Masukkan keterangan..."
                             ></textarea>
@@ -463,8 +553,8 @@
 
                         <button
                             type="submit"
-                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm px-5 py-3 transition"
-                        >
+                            onclick="return validateForm(event)"
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm px-5 py-3 transition">
                             Simpan Perubahan
                         </button>
 
@@ -520,6 +610,7 @@
 </div>
 
 <script>
+    {{-- Image Modal --}}
     function showImageModal(src, title) {
         const modal = document.getElementById('imageModal');
         const img = document.getElementById('imageModalImg');
@@ -541,17 +632,80 @@
         modal.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('overflow-hidden');
 
-        // clear src to avoid broken-image on next open if any
         img.src = img.src;
     }
 
-    // close on ESC
     document.addEventListener('keydown', function (e) {
         const modal = document.getElementById('imageModal');
         if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
             hideImageModal();
         }
     });
+
+    {{-- Validasi Form Update Status --}}
+    function validateForm(e) {
+        const status     = document.querySelector('select[name="status"]').value;
+        const keterangan = document.querySelector('textarea[name="keterangan"]').value.trim();
+
+        if (!status) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Status belum dipilih',
+                text: 'Silakan pilih status laporan terlebih dahulu.',
+                confirmButtonText: 'Oke',
+                confirmButtonColor: '#4f46e5',
+                customClass: {
+                    popup:         'swal2-popup-custom',
+                    title:         'swal2-title-custom',
+                    htmlContainer: 'swal2-text-custom',
+                    confirmButton: 'swal2-confirm-custom swal2-confirm-success',
+                    backdrop:      'swal2-backdrop-custom',
+                }
+            });
+            return false;
+        }
+
+        if (!keterangan) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Keterangan wajib diisi',
+                text: 'Mohon isi keterangan sebelum menyimpan perubahan status.',
+                confirmButtonText: 'Oke, isi dulu',
+                confirmButtonColor: '#4f46e5',
+                customClass: {
+                    popup:         'swal2-popup-custom',
+                    title:         'swal2-title-custom',
+                    htmlContainer: 'swal2-text-custom',
+                    confirmButton: 'swal2-confirm-custom swal2-confirm-success',
+                    backdrop:      'swal2-backdrop-custom',
+                }
+            });
+            return false;
+        }
+
+        if (keterangan.length < 5) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Keterangan terlalu pendek',
+                text: 'Keterangan minimal 5 karakter.',
+                confirmButtonText: 'Oke, lengkapi dulu',
+                confirmButtonColor: '#4f46e5',
+                customClass: {
+                    popup:         'swal2-popup-custom',
+                    title:         'swal2-title-custom',
+                    htmlContainer: 'swal2-text-custom',
+                    confirmButton: 'swal2-confirm-custom swal2-confirm-success',
+                    backdrop:      'swal2-backdrop-custom',
+                }
+            });
+            return false;
+        }
+
+        return true;
+    }
 </script>
 
 @endsection

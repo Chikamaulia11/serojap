@@ -106,16 +106,10 @@ class LaporanController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-
-            'status' => 'required|string|in:diterima,diproses,selesai,ditolak',
-
-            'keterangan' =>
-                'nullable|string|max:1000',
-
-            'foto_perbaikan' =>
-                'nullable|image|mimes:jpg,jpeg,png|max:2048',
-
-        ]);
+            'status'     => 'required|in:diterima,diproses,selesai,ditolak',
+            'keterangan' => 'required|string|min:5',
+            'foto_perbaikan' => 'nullable|image|max:2048',
+]);
 
         $laporan = Report::findOrFail($id);
 
