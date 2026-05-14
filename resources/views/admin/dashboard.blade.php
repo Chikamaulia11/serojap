@@ -25,23 +25,6 @@
     </div>
 
     {{-- Stat Cards --}}
-    @php
-
-        $total = \App\Models\Report::count();
-
-        // Status terbaru per report (pakai relasi Report::latestStatus)
-        $latestStatuses = \App\Models\Report::with('latestStatus')
-            ->get()
-            ->pluck('latestStatus.status')
-            ->filter();
-
-        $diterima = $latestStatuses->where('diterima')->count();
-        $diproses  = $latestStatuses->where('diproses')->count();
-        $selesai   = $latestStatuses->where('selesai')->count();
-
-    @endphp
-
-
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
 
         {{-- TOTAL --}}
@@ -62,7 +45,7 @@
         </a>
 
         {{-- DITERIMA --}}
-        <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+        <a href="{{ route('admin.laporan.index', ['status' => 'diterima']) }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-500">Diterima</p>
@@ -80,7 +63,7 @@
         </a>
 
         {{-- DIPROSES --}}
-        <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+        <a href="{{ route('admin.laporan.index', ['status' => 'diproses']) }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-500">Diproses</p>
@@ -98,7 +81,7 @@
         </a>
 
         {{-- SELESAI --}}
-        <a href="{{ route('admin.laporan.index') }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+        <a href="{{ route('admin.laporan.index', ['status' => 'selesai']) }}" class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-500">Selesai</p>

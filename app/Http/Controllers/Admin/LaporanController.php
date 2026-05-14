@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Report;
 use App\Models\TabelStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
@@ -65,9 +66,32 @@ class LaporanController extends Controller
 
         $laporan = $query->paginate(10);
 
+        // =========================
+        // STATS: hitung berdasarkan id_status terbaru per laporan
+        // MAX(id_status) lebih aman dari MAX(created_at) karena id pasti unik
+        // =========================
+        $latestIds = DB::table('tabel_status')
+            ->select(DB::raw('MAX(id_status) as id_status'))
+            ->groupBy('report_id');
+
+        $countByStatus = function (string $status) use ($latestIds): int {
+            return DB::table('tabel_status')
+                ->joinSub($latestIds, 'latest', 'tabel_status.id_status', '=', 'latest.id_status')
+                ->where('tabel_status.status', $status)
+                ->count();
+        };
+
+        $stats = [
+            'total'    => Report::count(),
+            'diterima' => $countByStatus('diterima'),
+            'diproses' => $countByStatus('diproses'),
+            'selesai'  => $countByStatus('selesai'),
+            'ditolak'  => $countByStatus('ditolak'),
+        ];
+
         return view(
             'admin.laporan.index',
-            compact('laporan')
+            compact('laporan', 'stats')
         );
     }
 
@@ -106,10 +130,10 @@ class LaporanController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'status'     => 'required|in:diterima,diproses,selesai,ditolak',
-            'keterangan' => 'required|string|min:5',
+            'status'         => 'required|in:diterima,diproses,selesai,ditolak',
+            'keterangan'     => 'required|string|min:5',
             'foto_perbaikan' => 'nullable|image|max:2048',
-]);
+        ]);
 
         $laporan = Report::findOrFail($id);
 
@@ -157,7 +181,6 @@ class LaporanController extends Controller
     // =========================
     public function updateStatusIndex(Request $request)
     {
-        // Redirect langsung ke detail laporan terbaru
         $laporan = Report::with(['user', 'statuses.admin', 'latestStatus'])
             ->latest()
             ->first();
@@ -172,20 +195,17 @@ class LaporanController extends Controller
             ->latest()
             ->get();
 
-        // Pastikan property yang dipakai di view memang ada
         $daftarLaporan = $daftarLaporan->map(function ($item) {
             $item->id_laporan = $item->id;
-            $item->kecamatan = $item->kecamatan ?? '—';
+            $item->kecamatan  = $item->kecamatan ?? '—';
             return $item;
         });
 
-
         return view('admin.laporan.show', [
-            'laporan' => $laporan,
+            'laporan'       => $laporan,
             'daftarLaporan' => $daftarLaporan,
         ]);
     }
-
 
     // =========================
     // RIWAYAT STATUS

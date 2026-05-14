@@ -4,53 +4,39 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Report;
-
-use App\Models\TabelStatus;
 use Illuminate\Support\Facades\DB;
 
 class StatistikController extends Controller
 {
     public function index()
     {
-        // Total laporan
+        // TOTAL SEMUA LAPORAN
         $total = Report::count();
 
-
-        // Laporan belum ada status (baru)
+        // BARU: laporan yang belum punya status sama sekali
         $baru = Report::doesntHave('statuses')->count();
 
+        // SUBQUERY: ambil id_status terbaru (MAX) per report_id
+        $latestIds = DB::table('tabel_status')
+            ->select(DB::raw('MAX(id_status) as id_status'))
+            ->groupBy('report_id');
 
-        // Cari status terbaru per laporan (berdasarkan created_at).
-        // Pada relasi Report::latestStatus(), TabelStatus diurutkan dengan created_at terbaru.
-        $perStatusRows = TabelStatus::query()
-            ->select('report_id', 'status', DB::raw('MAX(id_status) as latestId'))
-            ->groupBy('report_id', 'status')
-            ->get();
+        $countByStatus = function (string $status) use ($latestIds): int {
+            return DB::table('tabel_status')
+                ->joinSub($latestIds, 'latest', 'tabel_status.id_status', '=', 'latest.id_status')
+                ->where('tabel_status.status', $status)
+                ->count();
+        };
 
-        // Cara aman: pakai relasi latestStatus() di Collection (lebih lambat, tapi mencegah error relasi/kolom).
-        // Kalau datanya besar nanti bisa dioptimasi.
-        $reports = Report::select('id')->get();
-        $latestPerReport = $reports->map(function ($report) {
-            return $report->latestStatus?->status;
-        })->filter();
+        $diterima = $countByStatus('diterima');
+        $proses   = $countByStatus('diproses');
+        $selesai  = $countByStatus('selesai');
+        $ditolak  = $countByStatus('ditolak');
 
-        $perStatus = $latestPerReport->countBy()->toArray();
-
-        $diterima = $perStatus['diterima'] ?? 0;
-        $proses   = $perStatus['proses']   ?? 0;
-        $selesai  = $perStatus['selesai']  ?? 0;
-        $ditolak  = $perStatus['ditolak']  ?? 0;
-
-
-        // Laporan per bulan
-        // Pada beberapa environment, kolom `created_at` di `tabel_laporan` bisa tidak ada.
-        // Gunakan `id_laporan` untuk mengurutkan kemunculan, lalu hitung per bulan
-        // dari `created_at` jika tersedia.
-        // Jika `created_at` tidak ada, fallback: tampilkan 12 slot 0.
+        // LAPORAN PER BULAN (chart bar)
         $perBulan = collect();
         try {
             $perBulan = Report::select(
-
                     DB::raw('MONTH(created_at) as bulan'),
                     DB::raw('YEAR(created_at) as tahun'),
                     DB::raw('COUNT(*) as jumlah')
@@ -63,21 +49,20 @@ class StatistikController extends Controller
             $perBulan = collect();
         }
 
-
-        // Siapkan data untuk chart bulanan (12 slot)
         $labelBulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
         $dataBulan  = array_fill(0, 12, 0);
         foreach ($perBulan as $row) {
             $dataBulan[$row->bulan - 1] = $row->jumlah;
         }
 
-        // Laporan per kecamatan (top 5)
-        // Kolom kecamatan tidak selalu ada di tabel `reports` (tergantung migrasi).
-        // Jika tidak ada, fallback ke kosong agar tidak error.
+        // TOP KECAMATAN (top 5)
         $perKecamatan = collect();
         try {
-            if (Schema::hasColumn('reports', 'kecamatan')) {
+            $columns = DB::getSchemaBuilder()->getColumnListing('reports');
+            if (in_array('kecamatan', $columns)) {
                 $perKecamatan = Report::select('kecamatan', DB::raw('COUNT(*) as jumlah'))
+                    ->whereNotNull('kecamatan')
+                    ->where('kecamatan', '!=', '')
                     ->groupBy('kecamatan')
                     ->orderByDesc('jumlah')
                     ->limit(5)
@@ -86,7 +71,6 @@ class StatistikController extends Controller
         } catch (\Throwable $e) {
             $perKecamatan = collect();
         }
-
 
         return view('admin.statistik.index', compact(
             'total', 'baru', 'diterima', 'proses', 'selesai', 'ditolak',
