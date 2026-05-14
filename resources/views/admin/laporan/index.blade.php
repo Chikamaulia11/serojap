@@ -24,7 +24,7 @@
             </p>
 
             <p class="text-2xl font-bold text-gray-900 mt-1">
-                {{ $laporan->total() }}
+                {{ $stats['total'] }}
             </p>
         </div>
 
@@ -34,7 +34,7 @@
             </p>
 
             <p class="text-2xl font-bold text-emerald-600 mt-1">
-                {{ \App\Models\TabelStatus::where('status','diterima')->distinct('report_id')->count('report_id') }}
+                {{ $stats['diterima'] }}
             </p>
         </div>
 
@@ -44,7 +44,7 @@
             </p>
 
             <p class="text-2xl font-bold text-blue-600 mt-1">
-                {{ \App\Models\TabelStatus::where('status','diproses')->distinct('report_id')->count('report_id') }}
+                {{ $stats['diproses'] }}
             </p>
         </div>
 
@@ -54,7 +54,7 @@
             </p>
 
             <p class="text-2xl font-bold text-emerald-600 mt-1">
-                {{ \App\Models\TabelStatus::where('status','selesai')->distinct('report_id')->count('report_id') }}
+                {{ $stats['selesai'] }}
             </p>
         </div>
 
@@ -64,7 +64,7 @@
             </p>
 
             <p class="text-2xl font-bold text-red-600 mt-1">
-                {{ \App\Models\TabelStatus::where('status','ditolak')->distinct('report_id')->count('report_id') }}
+                {{ $stats['ditolak'] }}
             </p>
         </div>
 
@@ -141,7 +141,6 @@
 
             <table class="w-full text-sm text-left">
 
-
                 <thead class="bg-gray-50 text-gray-500 uppercase text-xs font-semibold">
 
                     <tr>
@@ -165,113 +164,105 @@
 
                         @php
                             $isHidden = ($idx >= $showLimit);
+
+                            $status = $item->statusTerbaru?->status ?? 'diterima';
+
+                            $badgeClasses = [
+                                'diterima' => 'bg-emerald-100 text-emerald-700',
+                                'diproses' => 'bg-amber-100 text-amber-700',
+                                'selesai'  => 'bg-purple-100 text-purple-700',
+                                'ditolak'  => 'bg-red-100 text-red-700',
+                            ][$status] ?? 'bg-gray-100 text-gray-700';
                         @endphp
 
-                    @php
+                        <tr class="hover:bg-gray-50 transition {{ $isHidden ? 'hidden' : '' }}" data-row>
 
+                            <td class="px-6 py-4">
 
-                        $status = $item->statusTerbaru?->status ?? 'diterima';
+                                @if($item->foto)
 
-                        $badgeClasses = [
+                                    <img
+                                        src="{{ asset('storage/' . $item->foto) }}"
+                                        alt="foto"
+                                        class="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                                    >
 
-                            'diterima' => 'bg-emerald-100 text-emerald-700',
-                            'diproses' => 'bg-amber-100 text-amber-700',
-                            'selesai'  => 'bg-purple-100 text-purple-700',
-                            'ditolak'  => 'bg-red-100 text-red-700',
+                                @else
 
-                        ][$status] ?? 'bg-gray-100 text-gray-700';
+                                    <div class="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400">
+                                        -
+                                    </div>
 
-                    @endphp
+                                @endif
 
-                    <tr class="hover:bg-gray-50 transition {{ $isHidden ? 'hidden' : '' }}" data-row>
+                            </td>
 
+                            <td class="px-6 py-4">
 
-                        <td class="px-6 py-4">
-
-                            @if($item->foto)
-
-                                <img
-                                    src="{{ asset('storage/' . $item->foto) }}"
-                                    alt="foto"
-                                    class="w-12 h-12 rounded-lg object-cover border border-gray-200"
-                                >
-
-                            @else
-
-                                <div class="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400">
-                                    -
+                                <div class="font-medium text-gray-900">
+                                    {{ $item->user->name ?? $item->nama_pelapor }}
                                 </div>
 
-                            @endif
+                                <div class="text-gray-500 text-xs">
+                                    {{ $item->user->email ?? '-' }}
+                                </div>
 
-                        </td>
+                            </td>
 
-                        <td class="px-6 py-4">
+                            <td class="px-6 py-4">
 
-                            <div class="font-medium text-gray-900">
-                                {{ $item->user->name ?? $item->nama_pelapor }}
-                            </div>
+                                <div class="font-medium text-gray-900">
+                                    {{ $item->alamat }}
+                                </div>
 
-                            <div class="text-gray-500 text-xs">
-                                {{ $item->user->email ?? '-' }}
-                            </div>
+                                <div class="text-gray-500 text-xs truncate max-w-[180px]">
+                                    {{ $item->latitude }}, {{ $item->longitude }}
+                                </div>
 
-                        </td>
+                            </td>
 
-                        <td class="px-6 py-4">
+                            <td class="px-6 py-4 text-gray-500">
+                                {{ $item->created_at->format('d M Y') }}
+                            </td>
 
-                            <div class="font-medium text-gray-900">
-                                {{ $item->alamat }}
-                            </div>
+                            <td class="px-6 py-4">
 
-                            <div class="text-gray-500 text-xs truncate max-w-[180px]">
-                                {{ $item->latitude }}, {{ $item->longitude }}
-                            </div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badgeClasses }}">
+                                    {{ ucfirst($status) }}
+                                </span>
 
-                        </td>
+                            </td>
 
-                        <td class="px-6 py-4 text-gray-500">
-                            {{ $item->created_at->format('d M Y') }}
-                        </td>
+                            <td class="px-6 py-4 text-right">
 
-                        <td class="px-6 py-4">
+                                <a
+                                    href="{{ route('admin.laporan.show', $item->id) }}"
+                                    class="inline-flex items-center gap-1 bg-primary-50 hover:bg-primary-500 text-primary-700 hover:text-white text-xs font-medium px-3 py-1.5 rounded-lg transition"
+                                >
+                                    Detail
+                                </a>
 
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badgeClasses }}">
-                                {{ ucfirst($status) }}
-                            </span>
+                            </td>
 
-                        </td>
-
-                        <td class="px-6 py-4 text-right">
-
-                            <a
-                                href="{{ route('admin.laporan.show', $item->id) }}"
-                                class="inline-flex items-center gap-1 bg-primary-50 hover:bg-primary-500 text-primary-700 hover:text-white text-xs font-medium px-3 py-1.5 rounded-lg transition"
-                            >
-                                Detail
-                            </a>
-
-                        </td>
-
-                    </tr>
+                        </tr>
 
                     @empty
 
-                    <tr>
+                        <tr>
 
-                        <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="6" class="px-6 py-12 text-center">
 
-                            <p class="text-gray-900 font-medium">
-                                Belum ada laporan
-                            </p>
+                                <p class="text-gray-900 font-medium">
+                                    Belum ada laporan
+                                </p>
 
-                            <p class="text-gray-500 text-sm">
-                                Laporan yang masuk akan muncul di sini
-                            </p>
+                                <p class="text-gray-500 text-sm">
+                                    Laporan yang masuk akan muncul di sini
+                                </p>
 
-                        </td>
+                            </td>
 
-                    </tr>
+                        </tr>
 
                     @endforelse
 
@@ -281,54 +272,54 @@
 
             <div class="px-6 py-4 border-t border-gray-200 bg-white flex items-center justify-between">
 
-    {{-- Progress + count label --}}
-    <div class="flex items-center gap-3">
-        <span class="text-xs text-gray-400" id="countLabel">
-            Menampilkan {{ min($showLimit, $laporan->count()) }} dari {{ $laporan->count() }} laporan
-        </span>
-        <div class="w-20 h-1 bg-gray-200 rounded-full overflow-hidden">
-            <div
-                id="progressBar"
-                class="h-full bg-blue-500 rounded-full transition-all duration-400"
-                style="width: {{ $laporan->count() > 0 ? round((min($showLimit, $laporan->count()) / $laporan->count()) * 100) : 0 }}%"
-            ></div>
-        </div>
-    </div>
+                {{-- Progress + count label --}}
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-gray-400" id="countLabel">
+                        Menampilkan {{ min($showLimit, $laporan->count()) }} dari {{ $laporan->count() }} laporan
+                    </span>
+                    <div class="w-20 h-1 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                            id="progressBar"
+                            class="h-full bg-blue-500 rounded-full transition-all duration-400"
+                            style="width: {{ $laporan->count() > 0 ? round((min($showLimit, $laporan->count()) / $laporan->count()) * 100) : 0 }}%"
+                        ></div>
+                    </div>
+                </div>
 
-    {{-- View more button --}}
-            <button
-                type="button"
-                id="viewMoreBtn"
-                class="hidden inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition">
-                <svg id="btnChevron" class="w-3.5 h-3.5 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-                <span id="btnLabel">Tampilkan lainnya</span>
-                <span id="remainCount" class="text-gray-400"></span>
-            </button>
+                {{-- View more button --}}
+                <button
+                    type="button"
+                    id="viewMoreBtn"
+                    class="hidden inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 transition">
+                    <svg id="btnChevron" class="w-3.5 h-3.5 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    <span id="btnLabel">Tampilkan lainnya</span>
+                    <span id="remainCount" class="text-gray-400"></span>
+                </button>
 
-        </div>
+            </div>
 
         </div>
 
         {{-- Pagination --}}
         @if($laporan->hasPages())
 
-        <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
 
-            <span class="text-sm text-gray-500">
-                Menampilkan
-                {{ $laporan->firstItem() }}
-                –
-                {{ $laporan->lastItem() }}
-                dari
-                {{ $laporan->total() }}
-                laporan
-            </span>
+                <span class="text-sm text-gray-500">
+                    Menampilkan
+                    {{ $laporan->firstItem() }}
+                    –
+                    {{ $laporan->lastItem() }}
+                    dari
+                    {{ $laporan->total() }}
+                    laporan
+                </span>
 
-            <div>
-                {{ $laporan->links() }}
+                <div>
+                    {{ $laporan->links() }}
+                </div>
+
             </div>
-
-        </div>
 
         @endif
 
@@ -380,8 +371,8 @@
             i++;
             label.textContent = 'Menampilkan ' + shown + ' dari ' + total + ' laporan';
             bar.style.width = Math.round((shown / total) * 100) + '%';
-            }, 120);
-        });
-    })();
+        }, 120);
+    });
+})();
 </script>
 @endsection

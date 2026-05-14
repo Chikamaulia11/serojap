@@ -66,10 +66,8 @@ class Report extends Model
     ========================= */
     public function latestStatus()
     {
-        return $this->hasOne(
-            TabelStatus::class,
-            'report_id'
-        )->latest('created_at');
+        return $this->hasOne(TabelStatus::class, 'report_id')
+                    ->ofMany('id_status', 'max'); // pakai id terbesar = status terbaru
     }
 
     /* =========================

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\TabelFaqController;
 use App\Http\Controllers\Pelapor\FaqController;
 use App\Http\Controllers\Admin\StatistikController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 
 /* =========================
    LANDING PAGE
@@ -168,11 +169,10 @@ Route::middleware([
         // =========================
         // DASHBOARD ADMIN
         // =========================
-        Route::get('/dashboard', function () {
-
-            return view('admin.dashboard');
-
-        })->name('dashboard');
+        Route::get(
+            '/dashboard',
+            [AdminDashboardController::class, 'index']
+        )->name('dashboard');
 
         // =========================
         // DAFTAR LAPORAN
