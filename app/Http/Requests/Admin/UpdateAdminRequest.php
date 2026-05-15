@@ -18,20 +18,29 @@ class UpdateAdminRequest extends FormRequest
     {
         $adminId = $this->route('admin');
 
-        return [
-            'nama' => ['required', 'string', 'min:3', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                'ends_with:@gmail.com',
-                Rule::unique('users', 'email')->ignore($adminId),
-            ],
-            'posisi' => ['required', 'string', 'min:2', 'max:255'],
-            'password' => ['required', 'string', 'size:8', 'confirmed'],
+        $type = $this->input('type');
 
-        ];
+        // type:
+        // - profile: update nama/email/posisi
+        // - password: update password saja
+        return match ($type) {
+            'password' => [
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'password_confirmation' => ['required', 'string', 'min:8'],
+            ],
+            default => [
+                'nama' => ['required', 'string', 'min:3', 'max:255'],
+                'email' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
+                    'ends_with:@gmail.com',
+                    Rule::unique('users', 'email')->ignore($adminId),
+                ],
+                'posisi' => ['required', 'string', 'min:2', 'max:255'],
+            ],
+        };
     }
 }
 

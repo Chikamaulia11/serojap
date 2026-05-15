@@ -28,65 +28,88 @@
 
     <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
         <div class="p-6">
-            <form action="{{ route('admin.admin-accounts.update', $admin->id) }}" method="POST">
-                @csrf
-                @method('PUT')
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- FORM PROFILE: Nama/Email/Posisi --}}
+                <div class="rounded-lg border border-gray-200 p-4">
+                    <h2 class="text-sm font-semibold text-gray-700 mb-4">Edit Profil Admin</h2>
 
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nama</label>
-                    <input type="text" name="nama" value="{{ old('nama', $admin->name) }}"
-                        class="w-full bg-gray-50 border @error('nama') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
-                    @error('nama')
-                        <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
-                    @enderror
+                    <form action="{{ route('admin.admin-accounts.update', $admin->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="type" value="profile">
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nama</label>
+                            <input type="text" name="nama" value="{{ old('nama', $admin->name) }}"
+                                class="w-full bg-gray-50 border @error('nama') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
+                            @error('nama')
+                                <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Email</label>
+                            <input type="email" name="email" value="{{ old('email', $admin->email) }}"
+                                class="w-full bg-gray-50 border @error('email') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
+                            <p class="text-[11px] text-gray-500 mt-1">Harus menggunakan email @gmail.com</p>
+                            @error('email')
+                                <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Posisi</label>
+                            <input type="text" name="posisi" value="{{ old('posisi', $admin->posisi) }}"
+                                class="w-full bg-gray-50 border @error('posisi') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
+                                <p class="text-[11px] text-gray-500 mt-1">Contoh: Admin Tim Operasional</p>
+                            @error('posisi')
+                                <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]">
+                            Simpan Profil
+                        </button>
+                    </form>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Email</label>
-                    <input type="email" name="email" value="{{ old('email', $admin->email) }}"
-                        class="w-full bg-gray-50 border @error('email') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
-                    <p class="text-[11px] text-gray-500 mt-1">Harus menggunakan email @gmail.com</p>
-                    @error('email')
-                        <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                {{-- FORM PASSWORD: Password saja --}}
+                <div class="rounded-lg border border-gray-200 p-4">
+                    <h2 class="text-sm font-semibold text-gray-700 mb-4">Ubah Password</h2>
 
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password</label>
-                    <input type="password" name="password"
-                        class="w-full bg-gray-50 border @error('password') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
-                    <p class="text-[11px] text-gray-500 mt-1">Password minimal 8 karakter</p>
-                    @error('password')
-                        <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <form action="{{ route('admin.admin-accounts.update', $admin->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="type" value="password">
 
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Konfirmasi Password</label>
-                    <input type="password" name="password_confirmation"
-                        class="w-full bg-gray-50 border @error('password_confirmation') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
-                        <p class="text-[11px] text-gray-500 mt-1">Password minimal 8 karakter</p>
-                    @error('password_confirmation')
-                        <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password Baru</label>
+                            <input type="password" name="password"
+                                class="w-full bg-gray-50 border @error('password') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
+                            <p class="text-[11px] text-gray-500 mt-1">Password minimal 8 karakter</p>
+                            @error('password')
+                                <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                <div class="mb-6">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Posisi</label>
-                    <input type="text" name="posisi" value="{{ old('posisi', $admin->posisi) }}"
-                        class="w-full bg-gray-50 border @error('posisi') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
-                    @error('posisi')
-                        <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Konfirmasi Password</label>
+                            <input type="password" name="password_confirmation"
+                                class="w-full bg-gray-50 border @error('password_confirmation') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
+                            <p class="text-[11px] text-gray-500 mt-1">Password minimal 8 karakter</p>
+                            @error('password_confirmation')
+                                <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                <button type="submit" class="w-full bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]">
-                    Simpan Perubahan
-                </button>
-            </form>
+                        <button type="submit" class="w-full bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]">
+                            Simpan Password
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
 </div>
 @endsection
-

@@ -58,16 +58,31 @@ class AdminAccountController extends Controller
             abort(404);
         }
 
+        $type = $request->input('type');
+
+        // type:
+        // - profile: update nama/email/posisi (password tidak wajib)
+        // - password: update password saja
+        if ($type === 'password') {
+            $admin->update([
+                'password' => Hash::make($request->input('password')),
+            ]);
+
+            return redirect()
+                ->route('admin.admin-accounts.index')
+                ->with('success', 'Password admin berhasil diperbarui.');
+        }
+
+        // default: profile
         $admin->update([
             'name' => $request->input('nama'),
             'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
             'posisi' => $request->input('posisi'),
         ]);
 
         return redirect()
             ->route('admin.admin-accounts.index')
-            ->with('success', 'Admin berhasil diperbarui.');
+            ->with('success', 'Profil admin berhasil diperbarui.');
     }
 
     public function destroy(User $admin)
