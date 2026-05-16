@@ -9,7 +9,7 @@
         <p class="text-gray-500 mt-1">Kelola pertanyaan dan jawaban untuk pelapor Serojap</p>
     </div>
 
-    {{-- SweetAlert2 CDN — harus paling atas --}}
+    {{-- SweetAlert2 CDN --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
