@@ -67,9 +67,12 @@
                             @enderror
                         </div>
 
-                        <button type="submit" class="w-full bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]">
+                        <button type="button" onclick="confirmUpdateAdminProfil()" class="w-full bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]">
                             Simpan Profil
                         </button>
+
+                        <input type="hidden" name="_confirm_submit" value="0">
+                        <button type="submit" id="confirmSubmitAdminProfileBtn" class="hidden"></button>
                     </form>
                 </div>
 
@@ -102,9 +105,12 @@
                             @enderror
                         </div>
 
-                        <button type="submit" class="w-full bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]">
+                        <button type="button" onclick="confirmUpdateAdminPassword()" class="w-full bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]">
                             Simpan Password
                         </button>
+
+                        <input type="hidden" name="_confirm_submit_password" value="0">
+                        <button type="submit" id="confirmSubmitAdminPasswordBtn" class="hidden"></button>
                     </form>
                 </div>
             </div>
@@ -112,4 +118,79 @@
     </div>
 
 </div>
+{{-- SweetAlert2 CDN --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+<script>
+function confirmUpdateAdminProfil() {
+    
+    // (password confirm function will be appended below)
+        if (typeof Swal === 'undefined' || typeof Swal.fire !== 'function') {
+            alert('SweetAlert2 belum termuat. Coba refresh halaman.');
+            return;
+        }
+
+        const nama = document.querySelector('input[name="nama"]').value;
+        const email = document.querySelector('input[name="email"]').value;
+        const posisi = document.querySelector('input[name="posisi"]').value;
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Konfirmasi update admin',
+            html: `Apakah data admin berikut benar?<br><br>
+                <b>Nama</b>: ${nama}<br>
+                <b>Email</b>: ${email}<br>
+                <b>Posisi</b>: ${posisi}`,
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            backdrop: true,
+            allowOutsideClick: false,
+            allowEscapeKey: true,
+            customClass: {
+                popup: 'swal2-popup-custom',
+                confirmButton: 'swal2-confirm-custom',
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.querySelector('input[name="_confirm_submit"]').value = '1';
+                document.getElementById('confirmSubmitAdminProfileBtn').click();
+            }
+        });
+    }
+</script>
+
+<script>
+    function confirmUpdateAdminPassword() {
+        if (typeof Swal === 'undefined' || typeof Swal.fire !== 'function') {
+            alert('SweetAlert2 belum termuat. Coba refresh halaman.');
+            return;
+        }
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Konfirmasi update password',
+            html: `Apakah yakin ingin mengganti password admin ini?`,
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Simpan Password',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            backdrop: true,
+            allowOutsideClick: false,
+            allowEscapeKey: true,
+            customClass: {
+                popup: 'swal2-popup-custom',
+                confirmButton: 'swal2-confirm-custom',
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.querySelector('input[name="_confirm_submit_password"]').value = '1';
+                document.getElementById('confirmSubmitAdminPasswordBtn').click();
+            }
+        });
+    }
+</script>
+
 @endsection

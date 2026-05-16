@@ -9,145 +9,144 @@
         <p class="text-gray-500 mt-1">Tambah, edit, dan hapus akun admin (khusus super admin).</p>
     </div>
 
-    {{-- SweetAlert2 --}}
+    {{-- SweetAlert2 CDN — harus paling atas --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
-@if(session('success') || session('error'))
-        @if(session('success'))
-            <div id="swal-success" data-message="{{ session('success') }}" class="hidden"></div>
-        @endif
-        @if(session('error'))
-            <div id="swal-error" data-message="{{ session('error') }}" class="hidden"></div>
-        @endif
+    {{-- Session data untuk SweetAlert --}}
+    @if(session('success'))
+        <div id="swal-success" data-message="{{ session('success') }}" class="hidden"></div>
+    @endif
+    @if(session('error'))
+        <div id="swal-error" data-message="{{ session('error') }}" class="hidden"></div>
+    @endif
 
-        <style>
-            .swal2-popup-custom {
-                border-radius: 20px !important;
-                padding: 2rem !important;
-                font-family: inherit !important;
-            }
-            .swal2-icon-custom {
-                border: none !important;
-                margin-bottom: 0.5rem !important;
-            }
-            .swal2-title-custom {
-                font-size: 1.4rem !important;
-                font-weight: 700 !important;
-                color: #111827 !important;
-            }
-            .swal2-text-custom {
-                font-size: 0.95rem !important;
-                color: #6b7280 !important;
-            }
-            .swal2-confirm-custom {
-                border-radius: 12px !important;
-                padding: 0.6rem 2rem !important;
-                font-weight: 600 !important;
-                font-size: 0.95rem !important;
-                box-shadow: none !important;
-                border: none !important;
-            }
-            .swal2-confirm-success {
-                background-color: #4f46e5 !important;
-                color: #fff !important;
-            }
-            .swal2-confirm-error {
-                background-color: #dc2626 !important;
-                color: #fff !important;
-            }
-            .swal2-backdrop-custom {
-                backdrop-filter: blur(4px) !important;
-                background: rgba(0, 0, 0, 0.35) !important;
-            }
-        </style>
+    {{-- Style SweetAlert2 — SELALU dimuat, tidak boleh di dalam @if --}}
+    <style>
+        .swal2-popup-custom {
+            border-radius: 20px !important;
+            padding: 2rem !important;
+            font-family: inherit !important;
+        }
+        .swal2-icon-custom {
+            border: none !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .swal2-title-custom {
+            font-size: 1.4rem !important;
+            font-weight: 700 !important;
+            color: #111827 !important;
+        }
+        .swal2-text-custom {
+            font-size: 0.95rem !important;
+            color: #6b7280 !important;
+        }
+        .swal2-confirm-custom {
+            border-radius: 12px !important;
+            padding: 0.6rem 2rem !important;
+            font-weight: 600 !important;
+            font-size: 0.95rem !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+        .swal2-confirm-success {
+            background-color: #2657c1 !important;
+            color: #fff !important;
+        }
+        .swal2-confirm-error {
+            background-color: #dc2626 !important;
+            color: #fff !important;
+        }
+        .swal2-backdrop-custom {
+            backdrop-filter: blur(4px) !important;
+            background: rgba(0, 0, 0, 0.35) !important;
+        }
+    </style>
 
-        <script>
-            function confirmDelete(event, formEl) {
-                event.preventDefault();
+    {{-- Script SweetAlert2 — SELALU dimuat, tidak boleh di dalam @if --}}
+    <script>
+        function confirmDelete(event, formEl) {
+            event.preventDefault();
 
+            Swal.fire({
+                icon: 'warning',
+                title: 'Yakin ingin menghapus?',
+                text: 'Akun admin ini akan dihapus permanen.',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                backdrop: true,
+                allowOutsideClick: false,
+                allowEscapeKey: true,
+                customClass: {
+                    popup:         'swal2-popup-custom',
+                    title:         'swal2-title-custom',
+                    htmlContainer: 'swal2-text-custom',
+                    confirmButton: 'swal2-confirm-custom swal2-confirm-error',
+                    cancelButton:  'swal2-confirm-custom',
+                    backdrop:      'swal2-backdrop-custom',
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    formEl.submit();
+                }
+            });
+
+            return false;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const successEl = document.getElementById('swal-success');
+            const errorEl   = document.getElementById('swal-error');
+
+            if (successEl) {
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'Yakin ingin menghapus?',
-                    text: 'Akun admin ini akan dihapus permanen.',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Hapus',
-                    cancelButtonText: 'Batal',
-                    reverseButtons: true,
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: successEl.dataset.message,
+                    confirmButtonText: 'Oke, Tutup',
+                    showConfirmButton: true,
+                    timer: 4000,
+                    timerProgressBar: true,
                     backdrop: true,
                     allowOutsideClick: true,
                     customClass: {
-                        popup: 'swal2-popup-custom',
-                        title: 'swal2-title-custom',
+                        popup:         'swal2-popup-custom',
+                        icon:          'swal2-icon-custom',
+                        title:         'swal2-title-custom',
                         htmlContainer: 'swal2-text-custom',
-                        confirmButton: 'swal2-confirm-custom swal2-confirm-error',
-                        cancelButton: 'swal2-confirm-custom',
-                        backdrop: 'swal2-backdrop-custom',
-                    },
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        formEl.submit();
+                        confirmButton: 'swal2-confirm-custom swal2-confirm-success',
+                        backdrop:      'swal2-backdrop-custom',
                     }
                 });
-
-                return false;
             }
 
-            document.addEventListener('DOMContentLoaded', function () {
-                const successEl = document.getElementById('swal-success');
-                const errorEl = document.getElementById('swal-error');
-
-                if (successEl) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil Disimpan!',
-                        text: successEl.dataset.message,
-                        confirmButtonText: 'Oke, Tutup',
-                        showConfirmButton: true,
-                        timer: 4000,
-                        timerProgressBar: true,
-                        backdrop: true,
-                        allowOutsideClick: true,
-                        customClass: {
-                            popup: 'swal2-popup-custom',
-                            icon: 'swal2-icon-custom',
-                            title: 'swal2-title-custom',
-                            htmlContainer: 'swal2-text-custom',
-                            confirmButton: 'swal2-confirm-custom swal2-confirm-success',
-                            backdrop: 'swal2-backdrop-custom',
-                        }
-                    });
-                }
-
-                if (errorEl) {
-                    Swal.fire({
-                        position: 'top-end',
-                        toast: true,
-                        icon: 'error',
-                        title: 'Gagal Menyimpan',
-                        text: errorEl.dataset.message,
-                        confirmButtonText: 'Coba Lagi',
-                        showConfirmButton: true,
-                        timer: 5000,
-                        timerProgressBar: true,
-                        backdrop: true,
-                        allowOutsideClick: true,
-                        customClass: {
-                            popup: 'swal2-popup-custom',
-                            icon: 'swal2-icon-custom',
-                            title: 'swal2-title-custom',
-                            htmlContainer: 'swal2-text-custom',
-                            confirmButton: 'swal2-confirm-custom swal2-confirm-error',
-                            backdrop: 'swal2-backdrop-custom',
-                        }
-                    });
-                }
-            });
-        </script>
-    @endif
+            if (errorEl) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: errorEl.dataset.message,
+                    confirmButtonText: 'Coba Lagi',
+                    showConfirmButton: true,
+                    timer: 5000,
+                    timerProgressBar: true,
+                    backdrop: true,
+                    allowOutsideClick: true,
+                    customClass: {
+                        popup:         'swal2-popup-custom',
+                        icon:          'swal2-icon-custom',
+                        title:         'swal2-title-custom',
+                        htmlContainer: 'swal2-text-custom',
+                        confirmButton: 'swal2-confirm-custom swal2-confirm-error',
+                        backdrop:      'swal2-backdrop-custom',
+                    }
+                });
+            }
+        });
+    </script>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-
 
         {{-- SISI KIRI: LIST ADMIN --}}
         <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
@@ -169,7 +168,7 @@
 
                             <div class="flex gap-2 flex-shrink-0">
                                 <a href="{{ route('admin.admin-accounts.edit', $admin->id) }}"
-                                class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 transition">
+                                   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 transition">
                                     Edit
                                 </a>
 
@@ -242,8 +241,7 @@
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Konfirmasi Password</label>
                         <input type="password" name="password_confirmation"
                             class="w-full bg-gray-50 border @error('password_confirmation') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition" required>
-                            <p class="text-[11px] text-gray-500 mt-1">Password minimal 8 karakter</p>
-
+                        <p class="text-[11px] text-gray-500 mt-1">Password minimal 8 karakter</p>
                         @error('password_confirmation')
                             <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
                         @enderror
@@ -259,15 +257,56 @@
                         @enderror
                     </div>
 
-                    <button type="submit"
+                    <button type="button" onclick="confirmCreateAdmin()"
                             class="w-full bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]">
                         Simpan Akun Admin
                     </button>
+
+                    <input type="hidden" name="_confirm_submit" value="0">
+                    <button type="submit" id="confirmSubmitAdminBtn" class="hidden"></button>
                 </form>
             </div>
         </div>
 
     </div>
 </div>
-@endsection
 
+<script>
+    function confirmCreateAdmin() {
+        const nama   = document.querySelector('input[name="nama"]').value;
+        const email  = document.querySelector('input[name="email"]').value;
+        const posisi = document.querySelector('input[name="posisi"]').value;
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Konfirmasi Tambah Admin',
+            html: `Apakah data admin berikut sudah benar?<br><br>
+                   <b>Nama</b>: ${nama}<br>
+                   <b>Email</b>: ${email}<br>
+                   <b>Posisi</b>: ${posisi}`,
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Tambah Admin',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            backdrop: true,
+            allowOutsideClick: false,
+            allowEscapeKey: true,
+            customClass: {
+                popup:         'swal2-popup-custom',
+                icon:          'swal2-icon-custom',
+                title:         'swal2-title-custom',
+                htmlContainer: 'swal2-text-custom',
+                confirmButton: 'swal2-confirm-custom swal2-confirm-success',
+                cancelButton:  'swal2-confirm-custom',
+                backdrop:      'swal2-backdrop-custom',
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.querySelector('input[name="_confirm_submit"]').value = '1';
+                document.getElementById('confirmSubmitAdminBtn').click();
+            }
+        });
+    }
+</script>
+
+@endsection
