@@ -12,20 +12,40 @@ class PelaporMiddleware
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next): Response
-    {
-        if (Auth::check() && Auth::user()->role === 'pelapor') {
+    public function handle(
+        Request $request,
+        Closure $next
+    ): Response {
+
+        // =========================
+        // CEK ROLE PELAPOR
+        // =========================
+        if (
+            Auth::check()
+            && Auth::user()->role === 'pelapor'
+        ) {
+
             return $next($request);
-        }
-        
-        if (Auth::check()) {
-            // Logout jika bukan pelapor
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+
         }
 
-        return redirect()->route('login')
-            ->withErrors(['email' => 'Anda tidak memiliki akses ke dashboard pelapor.']);
+        // =========================
+        // JIKA BUKAN PELAPOR
+        // =========================
+        if (Auth::check()) {
+
+            Auth::logout();
+
+            $request->session()->invalidate();
+
+            $request->session()->regenerateToken();
+
+        }
+
+        return redirect()
+            ->route('login')
+            ->withErrors([
+                'email' => 'Anda tidak memiliki akses ke dashboard pelapor.'
+            ]);
     }
 }

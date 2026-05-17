@@ -5,11 +5,11 @@
     <meta charset="UTF-8" />
     <title>Serojap - Pelaporan Jalan Rusak Purwakarta</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <link rel="stylesheet" href="{{ asset('assets/pelapor/css/index.css') }}">
-    
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
     <style>
         body {
             overflow-x: hidden;
@@ -18,11 +18,12 @@
 
         /* Dibuat lebih naik (padding dikurangi dari 6rem ke 3rem) */
         .hero-section {
-            padding-top: 3rem !important; 
+            padding-top: 3rem !important;
             padding-bottom: 2rem !important;
             position: relative;
             z-index: 1;
-            min-height: 85vh; /* Memastikan konten tetap proposional */
+            min-height: 85vh;
+            /* Memastikan konten tetap proposional */
             display: flex;
             align-items: center;
         }
@@ -52,7 +53,7 @@
             width: 100%;
             height: 480px;
             object-fit: cover;
-            border-radius: 40px; 
+            border-radius: 40px;
         }
 
         .btn-custom-action {
@@ -74,7 +75,7 @@
                 width: auto;
             }
         }
-        
+
         .btn-custom-action:hover {
             background-color: #e2eaea !important;
             border-color: #226d71 !important;
@@ -114,7 +115,7 @@
 
         <div class="container">
             <div class="row align-items-center gy-5">
-                
+
                 <div class="col-lg-6">
                     <div class="d-inline-flex align-items-center bg-teal-light text-teal px-4 py-2 border border-teal-light border-opacity-25 rounded-pill mb-4">
                         <span class="dot-green"></span>
@@ -143,9 +144,9 @@
 
                 <div class="col-lg-6">
                     <div class="img-frame">
-                        <img src="{{ asset('assets/pelapor/images/jalan-purwakarta.png') }}" 
-                             alt="Jalan Purwakarta" 
-                             class="img-hero">
+                        <img src="{{ asset('assets/pelapor/images/jalan-purwakarta.png') }}"
+                            alt="Jalan Purwakarta"
+                            class="img-hero">
                     </div>
                 </div>
 
@@ -162,4 +163,5 @@
 
     <script src="{{ asset('assets/pelapor/js/index.js') }}" defer></script>
 </body>
+
 </html>
