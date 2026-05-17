@@ -8,6 +8,8 @@ use App\Models\TabelFaq;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Validator;
+
 class TabelFaqController extends Controller
 {
     /**
@@ -16,7 +18,7 @@ class TabelFaqController extends Controller
     public function index()
     {
         $faqs = TabelFaq::orderBy('urutan', 'asc')->get();
-        return view('admin.faq.index', compact('faqs'));
+        return view('admin.manajemen-faq.index', compact('faqs'));
     }
 
     /**
@@ -32,13 +34,25 @@ class TabelFaqController extends Controller
      */
     public function store(Request $request)
     {
-       $request->validate([
-        'pertanyaan' => 'required|string|max:255',
-        'jawaban' => 'required|string',
-        'urutan' => 'nullable|integer',
+        $validator = Validator::make($request->all(), [
+            'pertanyaan' => 'required|string|max:255',
+            'jawaban'    => 'required|string',
+            'urutan'     => 'nullable|integer|min:1|unique:tabel_faqs,urutan', // Mengunci urutan agar UNIK global
+        ], [
+        'urutan.unique' => 'Angka urutan tersebut sudah digunakan! Silakan gunakan nomor urut lain.',
        ]);
 
-        $urutan = $request->urutan ?? ( TabelFaq::max('urutan') + 1 );
+       if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $urutan = $request->urutan;
+        if (is_null($urutan)) {
+            $maxUrutan = TabelFaq::max('urutan') ?? 0; // FIX: Menggunakan TabelFaq, bukan Faq bawaan
+            $urutan = $maxUrutan + 1;
+        }
 
         TabelFaq::create([
             'user_id'    => auth()->id(), 
@@ -63,7 +77,7 @@ class TabelFaqController extends Controller
     public function edit($id)
     {
         $faq = TabelFaq::findOrFail($id);
-        return view('admin.faq.edit', compact('faq'));
+        return view('admin.manajemen-faq.edit', compact('faq'));
     }
 
     /**
@@ -71,13 +85,21 @@ class TabelFaqController extends Controller
      */
     public function update(Request $request, $id)
     {
-       $request->validate([
+       $faq = TabelFaq::findOrFail($id);
+       $validator = Validator::make($request->all(), [
             'pertanyaan' => 'required|string|max:255',
-            'jawaban' => 'required|string',
-            'urutan' => 'nullable|integer',
+            'jawaban'    => 'required|string',
+            'urutan'     => 'nullable|integer|min:1|unique:tabel_faqs,urutan,' . $id . ',id_faq', // sesuaikan 'id_faq' jika nama primary key database-mu berbeda
+        ], [
+            'urutan.unique' => 'Angka urutan tersebut sudah digunakan oleh data FAQ lain!',
         ]);
 
-        $faq = TabelFaq::findOrFail($id);
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', $validator->errors()->first('urutan'));
+        }
         
         $faq->update([
             'pertanyaan' => $request->pertanyaan,
