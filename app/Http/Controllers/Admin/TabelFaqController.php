@@ -1,13 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
 use App\Http\Controllers\Controller;
-
 use App\Models\TabelFaq;
-
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Validator;
 
 class TabelFaqController extends Controller
@@ -18,7 +14,7 @@ class TabelFaqController extends Controller
     public function index()
     {
         $faqs = TabelFaq::orderBy('urutan', 'asc')->get();
-        return view('admin.manajemen-faq.index', compact('faqs'));
+        return view('admin.faq.index', compact('faqs'));
     }
 
     /**
@@ -37,7 +33,7 @@ class TabelFaqController extends Controller
         $validator = Validator::make($request->all(), [
             'pertanyaan' => 'required|string|max:255',
             'jawaban'    => 'required|string',
-            'urutan'     => 'nullable|integer|min:1|unique:tabel_faqs,urutan', // Mengunci urutan agar UNIK global
+            'urutan'     => 'nullable|integer|min:1|unique:tabel_faq,urutan', 
         ], [
         'urutan.unique' => 'Angka urutan tersebut sudah digunakan! Silakan gunakan nomor urut lain.',
        ]);
@@ -50,7 +46,7 @@ class TabelFaqController extends Controller
 
         $urutan = $request->urutan;
         if (is_null($urutan)) {
-            $maxUrutan = TabelFaq::max('urutan') ?? 0; // FIX: Menggunakan TabelFaq, bukan Faq bawaan
+            $maxUrutan = TabelFaq::max('urutan') ?? 0; 
             $urutan = $maxUrutan + 1;
         }
 
@@ -77,7 +73,7 @@ class TabelFaqController extends Controller
     public function edit($id)
     {
         $faq = TabelFaq::findOrFail($id);
-        return view('admin.manajemen-faq.edit', compact('faq'));
+        return view('admin.faq.edit', compact('faq'));
     }
 
     /**
@@ -89,9 +85,9 @@ class TabelFaqController extends Controller
        $validator = Validator::make($request->all(), [
             'pertanyaan' => 'required|string|max:255',
             'jawaban'    => 'required|string',
-            'urutan'     => 'nullable|integer|min:1|unique:tabel_faqs,urutan,' . $id . ',id_faq', // sesuaikan 'id_faq' jika nama primary key database-mu berbeda
+            'urutan'     => 'nullable|integer|min:1|unique:tabel_faq,urutan,' . $id . ',id_faq', 
         ], [
-            'urutan.unique' => 'Angka urutan tersebut sudah digunakan oleh data FAQ lain!',
+            'urutan.unique' => 'Angka urutan tersebut sudah digunakan! Silakan gunakan nomor urut lain.',
         ]);
 
         if ($validator->fails()) {

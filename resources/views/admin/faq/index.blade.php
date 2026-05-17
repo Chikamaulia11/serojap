@@ -22,7 +22,7 @@
         <div id="swal-error" data-message="{{ session('error') }}" class="hidden"></div>
     @endif
 
-    {{-- Style SweetAlert2 — SELALU dimuat, tidak boleh di dalam @if --}}
+    {{-- Style SweetAlert2 --}}
     <style>
         .swal2-popup-custom {
             border-radius: 20px !important;
@@ -64,7 +64,7 @@
         }
     </style>
 
-    {{-- Script SweetAlert2 — SELALU dimuat, tidak boleh di dalam @if --}}
+    {{-- Script SweetAlert2 --}}
     <script>
         function confirmDeleteFaq(event, formEl) {
             event.preventDefault();
@@ -99,13 +99,11 @@
         }
 
        function confirmCreateFaq(event, formEl) {
-        event.preventDefault(); // Mencegah form langsung terkirim
+        event.preventDefault(); 
 
-        // Mengambil value spesifik dari form yang disubmit
         const pertanyaan = formEl.querySelector('input[name="pertanyaan"]').value.trim();
         const jawaban    = formEl.querySelector('textarea[name="jawaban"]').value.trim();
 
-        // Validasi tambahan jika input kosong / hanya spasi sebelum memicu konfirmasi
         if (!pertanyaan || !jawaban) {
             Swal.fire({
                 icon: 'error',
@@ -146,7 +144,7 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                formEl.submit(); // Mengirimkan form asli ke Controller
+                formEl.submit(); 
             }
         });
         return false;
