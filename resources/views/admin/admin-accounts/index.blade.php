@@ -168,7 +168,7 @@
 
                             <div class="flex gap-2 flex-shrink-0">
                                 <a href="{{ route('admin.admin-accounts.edit', $admin->id) }}"
-                                   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 transition">
+                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 transition">
                                     Edit
                                 </a>
 
@@ -281,9 +281,9 @@
             icon: 'warning',
             title: 'Konfirmasi Tambah Admin',
             html: `Apakah data admin berikut sudah benar?<br><br>
-                   <b>Nama</b>: ${nama}<br>
-                   <b>Email</b>: ${email}<br>
-                   <b>Posisi</b>: ${posisi}`,
+                    <b>Nama</b>: ${nama}<br>
+                    <b>Email</b>: ${email}<br>
+                    <b>Posisi</b>: ${posisi}`,
             showCancelButton: true,
             confirmButtonText: 'Ya, Tambah Admin',
             cancelButtonText: 'Batal',
