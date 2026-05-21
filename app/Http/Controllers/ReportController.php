@@ -3,40 +3,92 @@
 namespace App\Http\Controllers;
 
 use App\Models\Report;
+use App\Models\TabelStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
+    // =========================
+    // FORM LAPORAN
+    // =========================
+    public function create()
+    {
+        return view('pelapor.form');
+    }
+
+    // =========================
+    // SIMPAN LAPORAN
+    // =========================
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
-            'foto' => 'required|image',
-            'alamat' => 'required',
-            'latitude' => 'required',
-            'longitude' => 'required',
+            'nama'       => 'required',
+            'foto'       => 'required|image',
+            'alamat'     => 'required',
+            'latitude'   => 'required',
+            'longitude'  => 'required',
             'keterangan' => 'required',
         ]);
 
-        $foto = $request->file('foto')->store('reports', 'public');
+        // Upload Foto
+        $foto = $request->file('foto')
+            ->store('reports', 'public');
 
-        Report::create([
-            'user_id' => 1,
+        // Simpan Laporan
+        $report = Report::create([
+            'user_id'      => Auth::id(),
             'nama_pelapor' => $request->nama,
-            'foto' => $foto,
-            'alamat' => $request->alamat,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'keterangan' => $request->keterangan,
-            'status' => 'diterima'
+            'foto'         => $foto,
+            'alamat'       => $request->alamat,
+            'latitude'     => $request->latitude,
+            'longitude'    => $request->longitude,
+            'keterangan'   => $request->keterangan,
         ]);
 
-        return back()->with('success', 'Laporan berhasil dikirim');
+        // Status Pertama
+        TabelStatus::create([
+            'report_id'  => $report->id,
+            'user_id'    => Auth::id(),
+            'status'     => 'diterima',
+            'keterangan' => 'Laporan berhasil dikirim',
+        ]);
+
+        return back()->with(
+            'success',
+            'Laporan berhasil dikirim'
+        );
     }
 
+    // =========================
+    // RIWAYAT LAPORAN USER
+    // =========================
+    public function index()
+    {
+        $reports = Report::with('statusTerbaru')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+
+        return view(
+            'pelapor.riwayat',
+            compact('reports')
+        );
+    }
+
+    // =========================
+    // MY REPORT
+    // =========================
     public function myReport()
     {
-        $reports = Report::latest()->get();
-        return view('pelapor.riwayat', compact('reports'));
+        $reports = Report::with('statusTerbaru')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+
+        return view(
+            'pelapor.riwayat',
+            compact('reports')
+        );
     }
 }
