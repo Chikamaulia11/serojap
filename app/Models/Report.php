@@ -18,7 +18,6 @@ class Report extends Model
        FILLABLE
     ========================= */
     protected $fillable = [
-
         'user_id',
         'nama_pelapor',
         'foto',
@@ -26,17 +25,15 @@ class Report extends Model
         'latitude',
         'longitude',
         'keterangan',
-
+        'status',
     ];
 
     /* =========================
        CAST
     ========================= */
     protected $casts = [
-
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-
     ];
 
     /* =========================
@@ -66,8 +63,10 @@ class Report extends Model
     ========================= */
     public function latestStatus()
     {
-        return $this->hasOne(TabelStatus::class, 'report_id')
-                    ->ofMany('id_status', 'max'); // pakai id terbesar = status terbaru
+        return $this->hasOne(
+            TabelStatus::class,
+            'report_id'
+        )->ofMany('id_status', 'max');
     }
 
     /* =========================

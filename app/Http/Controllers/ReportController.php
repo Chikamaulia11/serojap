@@ -23,35 +23,35 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama'        => 'required',
-            'foto'        => 'required|image',
-            'alamat'      => 'required',
-            'latitude'    => 'required',
-            'longitude'   => 'required',
-            'keterangan'  => 'required',
+            'nama'       => 'required',
+            'foto'       => 'required|image',
+            'alamat'     => 'required',
+            'latitude'   => 'required',
+            'longitude'  => 'required',
+            'keterangan' => 'required',
         ]);
 
-        // upload foto
+        // Upload Foto
         $foto = $request->file('foto')
             ->store('reports', 'public');
 
-        // simpan laporan utama
+        // Simpan Laporan
         $report = Report::create([
-            'user_id'       => Auth::id(),
-            'nama_pelapor'  => $request->nama,
-            'foto'          => $foto,
-            'alamat'        => $request->alamat,
-            'latitude'      => $request->latitude,
-            'longitude'     => $request->longitude,
-            'keterangan'    => $request->keterangan,
+            'user_id'      => Auth::id(),
+            'nama_pelapor' => $request->nama,
+            'foto'         => $foto,
+            'alamat'       => $request->alamat,
+            'latitude'     => $request->latitude,
+            'longitude'    => $request->longitude,
+            'keterangan'   => $request->keterangan,
         ]);
 
-        // status pertama otomatis
+        // Status Pertama
         TabelStatus::create([
-            'report_id'   => $report->id,
-            'user_id'     => Auth::id(),
-            'status'      => 'diterima',
-            'keterangan'  => 'Laporan berhasil dikirim',
+            'report_id'  => $report->id,
+            'user_id'    => Auth::id(),
+            'status'     => 'diterima',
+            'keterangan' => 'Laporan berhasil dikirim',
         ]);
 
         return back()->with(
