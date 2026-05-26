@@ -135,13 +135,9 @@
         </a>
 
         {{-- Manajemen FAQ --}}
-<<<<<<< HEAD
-         <a href="{{ route('admin.manajemen-faq.index') }}"
-           class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-=======
+
         <a href="{{ route('admin.manajemen-faq.index') }}"
         class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
->>>>>>> a1cdd517a41dd78fbf33d6a5f3c0f3df46951ccf
 
             <div class="flex items-center gap-6">
 

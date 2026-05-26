@@ -76,21 +76,18 @@
         <form
             method="GET"
             action="{{ route('admin.laporan.index') }}"
-            class="flex flex-wrap gap-3"
-        >
+            class="flex flex-wrap gap-3">
 
             <input
                 type="text"
                 name="search"
                 placeholder="Cari alamat atau keterangan..."
                 value="{{ request('search') }}"
-                class="flex-1 min-w-[200px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg px-4 py-2.5"
-            >
+                class="flex-1 min-w-[200px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg px-4 py-2.5">
 
             <select
                 name="status"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg px-4 py-2.5 pr-10"
-            >
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg px-4 py-2.5 pr-10">
 
                 <option value="">Semua Status</option>
 
@@ -118,15 +115,11 @@
 
             <button
                 type="submit"
-                class="bg-[#1f4674] hover:bg-[#2657c1] text-white font-medium rounded-lg text-sm px-5 py-2.5 transition"
-            >
-                Filter
-            </button>
-
+                class="bg-[#1f4674] hover:bg-[#2657c1] text-white font-medium rounded-lg text-sm px-5 py-2.5 transition">
+                Filter</button>
             <a
                 href="{{ route('admin.laporan.index') }}"
-                class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 transition"
-            >
+                class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 transition">
                 Reset
             </a>
 
