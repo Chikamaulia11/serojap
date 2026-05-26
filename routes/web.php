@@ -8,12 +8,15 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\LaporanController;
-use App\Http\Controllers\TabelFaqController;
+use App\Http\Controllers\Admin\TabelFaqController;
 use App\Http\Controllers\Pelapor\FaqController;
-use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+<<<<<<< HEAD
+use App\Http\Controllers\Admin\StatistikController;
+=======
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Middleware\SuperAdminMiddleware;
+>>>>>>> a1cdd517a41dd78fbf33d6a5f3c0f3df46951ccf
 
 
 // =========================
