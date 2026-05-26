@@ -90,8 +90,13 @@
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Pertanyaan</label>
                     <input type="text" name="pertanyaan" 
+<<<<<<< HEAD
                            class="w-full bg-gray-50 border @error('pertanyaan') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition" 
                            value="{{ old('pertanyaan', $faq->pertanyaan) }}">
+=======
+                            class="w-full bg-gray-50 border @error('pertanyaan') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition" 
+                            value="{{ old('pertanyaan', $faq->pertanyaan) }}" required>
+>>>>>>> a1cdd517a41dd78fbf33d6a5f3c0f3df46951ccf
                     @error('pertanyaan')
                         <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
                     @enderror
@@ -100,8 +105,8 @@
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Jawaban</label>
                     <textarea name="jawaban" 
-                              class="w-full bg-gray-50 border @error('jawaban') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2.5 text-sm min-h-[200px] focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition" 
-                              required>{{ old('jawaban', $faq->jawaban) }}</textarea>
+                            class="w-full bg-gray-50 border @error('jawaban') border-red-500 @else border-gray-300 @enderror rounded-lg px-3 py-2.5 text-sm min-h-[200px] focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition" 
+                            required>{{ old('jawaban', $faq->jawaban) }}</textarea>
                     @error('jawaban')
                         <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
                     @enderror
@@ -110,11 +115,16 @@
                 <div class="mb-8">
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Urutan Tampil</label>
                     <input type="number" name="urutan" 
+<<<<<<< HEAD
                         class="w-full bg-gray-50 border @error('urutan') border-red-500 focus:ring-red-500/20 focus:border-red-500 @else border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 @enderror rounded-lg px-3 py-2.5 text-sm outline-none transition" 
                         value="{{ old('urutan', $faq->urutan) }}">
                         @error('urutan')
                             <p class="text-red-600 text-[11px] mt-1">{{ $message }}</p>
                         @enderror    
+=======
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none" 
+                            value="{{ old('urutan', $faq->urutan) }}">
+>>>>>>> a1cdd517a41dd78fbf33d6a5f3c0f3df46951ccf
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -122,7 +132,7 @@
                         Simpan Perubahan
                     </button>
                     <a href="{{ route('admin.manajemen-faq.index') }}" 
-                       class="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-lg hover:bg-gray-200 transition text-center">
+                            class="px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-lg hover:bg-gray-200 transition text-center">
                         Batal
                     </a>
                 </div>

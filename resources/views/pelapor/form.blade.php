@@ -14,21 +14,13 @@
 </div>
 @endif
 
-@if(session('success'))
-<div class="popup">
-    <div class="popup-content">
-        <div class="checkmark">✔</div>
-        <p>{{ session('success') }}</p>
-
-        <div class="popup-buttons">
-            <button class="btn-popup btn-selesai" onclick="goToRiwayat()">Selesai</button>
-            <button class="btn-popup btn-kembali" onclick="resetForm()">Kembali</button>
-        </div>
-    </div>
-</div>
-@endif
-
 <div class="container">
+
+    <!-- BACK -->
+    <a href="{{ route('dashboard') }}" class="back-btn">
+        ← Kembali ke Dashboard
+    </a>
+
     <div class="card">
 
         <div class="header">
@@ -36,35 +28,123 @@
             <h2>SEROJAP</h2>
         </div>
 
-        <form action="/report" method="POST" enctype="multipart/form-data">
+        <form 
+            action="{{ route('laporan.store') }}" 
+            method="POST" 
+            enctype="multipart/form-data"
+        >
             @csrf
 
             <div class="grid">
-                <input type="text" name="nama" placeholder="Nama Pelapor">
-                <input type="file" name="foto">
-                <input type="text" id="alamat" name="alamat" class="full" placeholder="Titik Kerusakan">
 
-                <button type="button" class="btn btn-alt full" onclick="toggleMap()">
+                <!-- NAMA -->
+                <input 
+                    type="text" 
+                    name="nama" 
+                    placeholder="Nama Pelapor"
+                    value="{{ old('nama') }}"
+                >
+
+                <!-- FOTO -->
+                <input 
+                    type="file" 
+                    name="foto"
+                >
+
+                <!-- ALAMAT -->
+                <div class="autocomplete-wrapper full">
+
+                    <input 
+                        type="text" 
+                        id="alamat" 
+                        name="alamat" 
+                        class="full"
+                        placeholder="Cari lokasi kerusakan..."
+                        autocomplete="off"
+                        value="{{ old('alamat') }}"
+                    >
+
+                    <div id="autocomplete-list" class="autocomplete-list"></div>
+
+                </div>
+
+                <!-- BUTTON MAP -->
+                <button 
+                    type="button" 
+                    class="btn btn-alt full" 
+                    onclick="toggleMap()"
+                >
                     📍 Tentukan Lokasi di Peta
                 </button>
 
+                <!-- MAP -->
                 <div id="mapContainer" class="full">
                     <div id="map"></div>
                 </div>
 
-                <input type="text" id="lat" name="latitude" readonly placeholder="Latitude">
-                <input type="text" id="lng" name="longitude" readonly placeholder="Longitude">
+                <!-- LAT -->
+                <input 
+                    type="text" 
+                    id="lat" 
+                    name="latitude" 
+                    readonly 
+                    placeholder="Latitude"
+                    value="{{ old('latitude') }}"
+                >
 
-                <textarea name="keterangan" class="full" placeholder="Keterangan"></textarea>
+                <!-- LNG -->
+                <input 
+                    type="text" 
+                    id="lng" 
+                    name="longitude" 
+                    readonly 
+                    placeholder="Longitude"
+                    value="{{ old('longitude') }}"
+                >
 
-                <button class="btn btn-main full">Kirim Laporan</button>
+                <!-- KETERANGAN -->
+                <textarea 
+                    name="keterangan" 
+                    class="full" 
+                    placeholder="Keterangan"
+                >{{ old('keterangan') }}</textarea>
+
+                <!-- BUTTON -->
+                <button class="btn btn-main full">
+                    Kirim Laporan
+                </button>
+
             </div>
+
         </form>
 
     </div>
+
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- SWEET ALERT -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if(session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Laporan Berhasil Dikirim!',
+    text: '{{ session('success') }}',
+    confirmButtonColor: '#226d71',
+    confirmButtonText: 'Lihat Riwayat'
+}).then((result) => {
+
+    if(result.isConfirmed){
+        window.location.href = "/my-report";
+    }
+
+});
+</script>
+@endif
+
 <script src="{{ asset('js/form.js') }}"></script>
 
 @endsection

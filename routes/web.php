@@ -11,20 +11,26 @@ use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\TabelFaqController;
 use App\Http\Controllers\Pelapor\FaqController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+<<<<<<< HEAD
 use App\Http\Controllers\Admin\StatistikController;
+=======
+use App\Http\Controllers\Admin\AdminAccountController;
+use App\Http\Middleware\SuperAdminMiddleware;
+>>>>>>> a1cdd517a41dd78fbf33d6a5f3c0f3df46951ccf
 
-/* =========================
-   LANDING PAGE
-========================= */
+
+// =========================
+//    LANDING PAGE
+// =========================
 Route::get('/', function () {
 
     return view('welcome');
 
 });
 
-/* =========================
-   AUTH (GUEST)
-========================= */
+// =========================
+//    AUTH (GUEST)
+// =========================
 Route::middleware('guest')->group(function () {
 
     // =========================
@@ -68,9 +74,9 @@ Route::middleware('guest')->group(function () {
 
 });
 
-/* =========================
-   LOGOUT
-========================= */
+// =========================
+//    LOGOUT
+// =========================
 Route::post(
     '/logout',
     [AuthenticatedSessionController::class, 'destroy']
@@ -78,9 +84,9 @@ Route::post(
     ->middleware('auth')
     ->name('logout');
 
-/* =========================
-   PROTECTED (PELAPOR)
-========================= */
+//=========================
+//    PROTECTED (PELAPOR)
+// =========================
 Route::middleware([
     'auth',
     'pelapor'
@@ -155,9 +161,9 @@ Route::middleware([
 
 });
 
-/* =========================
-   ADMIN ROUTES
-========================= */
+// =========================
+//    ADMIN ROUTES
+// =========================
 Route::middleware([
     'auth',
     'admin'
@@ -239,6 +245,29 @@ Route::middleware([
             'destroy' => 'manajemen-faq.destroy',
 
         ]);
+
+        // =========================
+        // MANAJEMEN AKUN ADMIN (HANYA SUPER ADMIN)
+        // =========================
+        Route::middleware([SuperAdminMiddleware::class])->group(function () {
+            Route::get('/admin-accounts', [AdminAccountController::class, 'index'])
+                ->name('admin-accounts.index');
+
+            Route::get('/admin-accounts/create', [AdminAccountController::class, 'create'])
+                ->name('admin-accounts.create');
+
+            Route::post('/admin-accounts', [AdminAccountController::class, 'store'])
+                ->name('admin-accounts.store');
+
+            Route::get('/admin-accounts/{admin}/edit', [AdminAccountController::class, 'edit'])
+                ->name('admin-accounts.edit');
+
+            Route::put('/admin-accounts/{admin}', [AdminAccountController::class, 'update'])
+                ->name('admin-accounts.update');
+
+            Route::delete('/admin-accounts/{admin}', [AdminAccountController::class, 'destroy'])
+                ->name('admin-accounts.destroy');
+        });
 
     });
 
