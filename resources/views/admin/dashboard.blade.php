@@ -99,12 +99,11 @@
 
     </div>
 
-
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {{-- Manajemen Laporan --}}
         <a href="{{ route('admin.laporan.index') }}"
-           class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+        class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
 
             <div class="flex items-center gap-6">
 
@@ -137,7 +136,7 @@
 
         {{-- Manajemen FAQ --}}
         <a href="{{ route('admin.manajemen-faq.index') }}"
-           class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+        class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
 
             <div class="flex items-center gap-6">
 
@@ -197,6 +196,39 @@
             </div>
 
         </a>
+
+        {{-- Manajemen Admin (Super Admin Only) --}}
+        @if(auth()->user()->role === 'super_admin')
+        <a href="{{ route('admin.admin-accounts.index') }}"
+        class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
+
+            <div class="flex items-center gap-6">
+
+                <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
+
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5V20"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12H19.5"/>
+                    </svg>
+
+                </div>
+
+                <div>
+
+                    <h3 class="text-xl font-bold" style="color: #2657c1;">
+                    Manajemen Admin
+                    </h3>
+
+                    <p class="text-lg text-gray-600 mt-2">
+                        Buat akun admin baru
+                    </p>
+
+                </div>
+
+            </div>
+
+        </a>
+        @endif
 
     </div>
 </div>
