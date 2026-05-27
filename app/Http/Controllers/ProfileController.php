@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -16,7 +17,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
+        return view('admin.profile.index', [
             'user' => $request->user(),
         ]);
     }
@@ -28,29 +29,33 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        $data = $request->validated();
-
-        // upload foto profil
-        if ($request->hasFile('foto_profil')) {
-
-            $foto = $request->file('foto_profil')->store(
-                'foto-profil',
-                'public'
-            );
-
-            $data['foto_profil'] = $foto;
-        }
-
-        $user->fill($data);
+        // 1. Masukkan data teks secara manual dan pasti masuk ke database
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
 
+        // 2. Logika utama pemindahan file gambar dari form (profile_image) ke kolom (foto_profil)
+        if ($request->hasFile('profile_image')) {
+
+            // Hapus file fisik lama di storage jika sebelumnya user sudah punya foto
+            if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
+
+            // Simpan file gambar baru ke folder: storage/app/public/foto-profil
+            $fotoPath = $request->file('profile_image')->store('foto-profil', 'public');
+
+            // Set langsung ke kolom database tujuan
+            $user->foto_profil = $fotoPath;
+        }
+
+        // 3. Eksekusi simpan perubahan objek user ke database MySQL
         $user->save();
 
-        return Redirect::route('profile.edit')
-            ->with('status', 'profile-updated');
+        return Redirect::route('admin.profile.index')->with('status', 'profile-updated');
     }
 
     /**
@@ -65,6 +70,10 @@ class ProfileController extends Controller
         $user = $request->user();
 
         Auth::logout();
+
+        if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
+            Storage::disk('public')->delete($user->foto_profil);
+        }
 
         $user->delete();
 

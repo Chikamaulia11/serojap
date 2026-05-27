@@ -4,6 +4,7 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
+    
     <div class="mb-12">
         <div class="flex items-center gap-6 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
             <img src="{{ asset('assets/pelapor/images/logo-serojap.png') }}" alt="Serojap" class="w-24 h-24 rounded-xl shadow-lg object-cover">
@@ -24,9 +25,8 @@
         </div>
     </div>
 
-    {{-- Stat Cards --}}
+    {{-- Stat Cards Logic (Menghitung Total & Status via Relasi Model) --}}
     @php
-
         $total = \App\Models\Report::count();
 
         // Status terbaru per report (pakai relasi Report::latestStatus)
@@ -38,9 +38,7 @@
         $diterima = $latestStatuses->where('diterima')->count();
         $diproses  = $latestStatuses->where('diproses')->count();
         $selesai   = $latestStatuses->where('selesai')->count();
-
     @endphp
-
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
 
@@ -116,103 +114,72 @@
 
     </div>
 
-
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {{-- Manajemen Laporan --}}
         <a href="{{ route('admin.laporan.index') }}"
            class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-
             <div class="flex items-center gap-6">
-
                 <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
-
                     <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5a2 2 0 002 2h2a2 2 0 002-2 2 2 0 00-2-2h-2a2 2 0 00-2 2z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 17h6"/>
                     </svg>
-
                 </div>
-
                 <div>
-
                     <h3 class="text-xl font-bold" style="color: #2657c1;">
                         Manajemen Laporan
                     </h3>
-
                     <p class="text-lg text-gray-600 mt-2">
                         Kelola dan verifikasi semua laporan masuk
                     </p>
-
                 </div>
-
             </div>
-
         </a>
 
         {{-- Manajemen FAQ --}}
         <a href="{{ route('admin.manajemen-faq.index') }}"
            class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-
             <div class="flex items-center gap-6">
-
                 <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
-
                     <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 17h.01"/>
                         <circle cx="12" cy="12" r="10"/>
                     </svg>
-
                 </div>
-
                 <div>
-
                     <h3 class="text-xl font-bold" style="color: #2657c1;">
                         Manajemen FAQ
                     </h3>
-
                     <p class="text-lg text-gray-600 mt-2">
                         Kelola dan update data FAQ
                     </p>
-
                 </div>
-
             </div>
-
         </a>
 
         {{-- Grafik Statistik --}}
         <a href="{{ route('admin.statistik.index') }}"
-        class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
-
+           class="bg-white rounded-2xl border border-gray-100 p-8 shadow-lg hover:shadow-2xl hover:border-[#2657c1] transition-all duration-300 group">
             <div class="flex items-center gap-6">
-
                 <div class="w-20 h-20 bg-gradient-to-br from-[#2657c1] to-[#1e4ba8] rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-105 transition-all flex-shrink-0">
-
                     <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M7 16v-4M11 16V8M15 16v-6M19 16v-9"/>
                     </svg>
-
                 </div>
-
                 <div>
-
                     <h3 class="text-xl font-bold" style="color: #2657c1;">
                         Grafik Statistik
                     </h3>
-
                     <p class="text-lg text-gray-600 mt-2">
                         Melihat visualisasi data pelaporan
                     </p>
-
                 </div>
-
             </div>
-
         </a>
 
     </div>

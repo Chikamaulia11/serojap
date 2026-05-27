@@ -12,18 +12,16 @@ use App\Http\Controllers\TabelFaqController;
 use App\Http\Controllers\Pelapor\FaqController;
 use App\Http\Controllers\Admin\StatistikController;
 
-/* =========================
+/* ==============================================================================
    LANDING PAGE
-========================= */
+============================================================================== */
 Route::get('/', function () {
-
     return view('welcome');
-
 });
 
-/* =========================
+/* ==============================================================================
    AUTH (GUEST)
-========================= */
+============================================================================== */
 Route::middleware('guest')->group(function () {
 
     // =========================
@@ -67,9 +65,9 @@ Route::middleware('guest')->group(function () {
 
 });
 
-/* =========================
+/* ==============================================================================
    LOGOUT
-========================= */
+============================================================================== */
 Route::post(
     '/logout',
     [AuthenticatedSessionController::class, 'destroy']
@@ -77,9 +75,9 @@ Route::post(
     ->middleware('auth')
     ->name('logout');
 
-/* =========================
+/* ==============================================================================
    PROTECTED (PELAPOR)
-========================= */
+============================================================================== */
 Route::middleware([
     'auth',
     'pelapor'
@@ -129,9 +127,7 @@ Route::middleware([
     // PROSEDUR
     // =========================
     Route::get('/prosedur', function () {
-
         return view('pelapor.prosedur');
-
     })->name('prosedur');
 
     // =========================
@@ -154,25 +150,23 @@ Route::middleware([
 
 });
 
-/* =========================
-   ADMIN ROUTES
-========================= */
+/* ==============================================================================
+   ADMIN ROUTES (Diproteksi Middleware Auth dan Admin)
+============================================================================== */
 Route::middleware([
     'auth',
     'admin'
 ])
     ->prefix('admin')
-    ->name('admin.')
+    ->name('admin.') // <-- Semua nama rute di bawah otomatis diawali dengan 'admin.'
     ->group(function () {
 
         // =========================
         // DASHBOARD ADMIN
         // =========================
         Route::get('/dashboard', function () {
-
             return view('admin.dashboard');
-
-        })->name('dashboard');
+        })->name('dashboard'); // Menjadi: admin.dashboard
 
         // =========================
         // DAFTAR LAPORAN
@@ -229,7 +223,6 @@ Route::middleware([
             'manajemen-faq',
             TabelFaqController::class
         )->names([
-
             'index'   => 'manajemen-faq.index',
             'create'  => 'manajemen-faq.create',
             'store'   => 'manajemen-faq.store',
@@ -237,9 +230,22 @@ Route::middleware([
             'edit'    => 'manajemen-faq.edit',
             'update'  => 'manajemen-faq.update',
             'destroy' => 'manajemen-faq.destroy',
-
         ]);
 
-    });
+        // =====================================
+        // PROFIL ADMIN 
+        // =====================================
+        // 1. Menampilkan halaman profil admin (Nama Rute: admin.profile.index)
+        Route::get('/profile-setting', function () {
+            return view('admin.profile.index');
+        })->name('profile.index');
+
+        // 2. Memproses perubahan data Nama & Email (Nama Rute: admin.profile.update)
+        Route::patch('/profile-setting', [ProfileController::class, 'update'])->name('profile.update');
+
+        // 3. Memproses perubahan kata sandi admin (Nama Rute: admin.profile.password)
+        Route::put('/profile-setting/password', [App\Http\Controllers\Auth\PasswordController::class, 'update'])->name('profile.password');
+
+}); // Penutup utama Group Admin Anda
 
 require __DIR__ . '/auth.php';

@@ -1,128 +1,108 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Serojap Admin')</title>
+    <title>@yield('title', 'Panel Admin — Serojap')</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <style>
-        body { font-family: 'Inter', 'Roboto', 'Poppins', 'Public Sans', sans-serif; }
-        .font-serojap { font-family: 'Inter', sans-serif; font-weight: 700; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
     </style>
-    <link rel="stylesheet" href="{{ asset('assets/admin/vendors/mdi/css/materialdesignicons.min.css') }}">
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-white font-sans text-slate-800 antialiased">
+<body class="bg-slate-50/50 min-h-screen flex">
 
-    <!-- Sidebar -->
-    <aside class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-slate-200 flex flex-col z-50 overflow-y-auto">
-
-        <!-- Brand -->
-        <div class="flex items-center gap-2.5 px-5 py-5 border-b border-slate-100">
-            <img src="{{ asset('assets/pelapor/images/logo-serojap.png') }}" alt="Serojap" class="w-10 h-10 rounded-lg object-cover shadow-md">
-            <span class="text-lg font-bold text-[#2657c1] tracking-wide">SEROJAP</span>
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col fixed inset-y-0 left-0 z-20">
+        
+        <div class="h-20 px-6 border-b border-slate-100 flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-50 text-[#2657c1] rounded-lg flex items-center justify-center font-bold">
+                <i class="mdi mdi-flower-tulip text-xl"></i>
+            </div>
+            <span class="font-black text-lg tracking-tight text-[#2657c1]">SEROJAP</span>
         </div>
 
-        <!-- Menu Utama -->
-        <div class="py-5 px-4 pb-1.5">
-            <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Menu Utama</p>
-        </div>
-
-        <nav class="flex-1 px-2 space-y-0.5">
-
-            {{-- Dashboard --}}
-            <a href="{{ route('admin.dashboard') }}"
-                class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                    {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
-                <i class="mdi mdi-view-dashboard-outline text-lg w-5 text-center"></i>
+        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+            <span class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Menu Utama</span>
+            
+            <a href="{{ url('/admin/dashboard') }}" 
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#2657c1] transition">
+                <i class="mdi mdi-view-dashboard-outline text-lg"></i>
                 Dashboard
             </a>
 
-            {{-- Manajemen Laporan (dropdown) --}}
-            <div x-data="{ open: {{ request()->routeIs('admin.laporan.*') ? 'true' : 'false' }} }" class="relative">
-                <button @click="open = !open"
-                    class="w-full flex items-center justify-between gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                        {{ request()->routeIs('admin.laporan.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
-                    <span class="flex items-center gap-2.5">
-                        <i class="mdi mdi-clipboard-text-outline text-lg w-5 text-center"></i>
-                        Manajemen Laporan
-                    </span>
-                    <i class="mdi mdi-chevron-down text-lg transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
-                </button>
+            <a href="#" 
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#2657c1] transition">
+                <i class="mdi mdi-file-document-outline text-lg"></i>
+                Manajemen Laporan
+            </a>
 
-                <div x-show="open" x-transition class="mt-1 ml-4 space-y-0.5">
-
-                    {{-- Semua Laporan --}}
-                    <a href="{{ route('admin.laporan.index') }}"
-                        class="flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition
-                            {{ request()->routeIs('admin.laporan.index') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
-                        <i class="mdi mdi-file-document-outline text-lg w-5 text-center"></i>
-                        Daftar Laporan
-                    </a>
-
-                    {{-- Update Status --}}
-                    <a href="{{ route('admin.laporan.update-status') }}"
-                        class="flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition
-                            {{ request()->routeIs('admin.laporan.update-status') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
-                        <i class="mdi mdi-clipboard-check-outline text-lg w-5 text-center"></i>
-                        Update Status
-                    </a>
-
-                </div>
-            </div>
-
-            {{-- Manajemen FAQ --}}
-            <a href="{{ route('admin.manajemen-faq.index') }}"
-                class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                    {{ request()->routeIs('admin.faq.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
-                <i class="mdi mdi-frequently-asked-questions text-lg w-5 text-center"></i>
+            <a href="#" 
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#2657c1] transition">
+                <i class="mdi mdi-help-circle-outline text-lg"></i>
                 Manajemen FAQ
             </a>
 
-            {{-- Grafik Statistik --}}
-            <a href="{{ route('admin.statistik.index') }}"
-                class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                    {{ request()->routeIs('admin.statistik.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
-                <i class="mdi mdi-chart-bar text-lg w-5 text-center"></i>
+            <a href="#" 
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#2657c1] transition">
+                <i class="mdi mdi-chart-bar text-lg"></i>
                 Grafik Statistik
             </a>
-
         </nav>
 
-        <!-- Footer / User Info -->
-        <div class="mt-auto px-4 py-4 border-t border-slate-100">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 bg-gradient-to-br from-[#2657c1] to-[#226d71] rounded-full flex items-center justify-center text-white font-bold text-sm">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+        <div class="mt-auto px-4 py-4 border-t border-slate-100 bg-slate-50/30">
+            <a href="{{ route('admin.profile.index') }}" 
+               class="flex items-center gap-2.5 p-2 rounded-xl transition group block hover:bg-white hover:shadow-sm border border-transparent">
+                
+                <div class="w-9 h-9 bg-gradient-to-br from-[#2657c1] to-[#226d71] rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md shadow-blue-100 overflow-hidden flex-shrink-0">
+                    @if(auth()->user()->foto_profil)
+                        <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}" class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                    @endif
                 </div>
+
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-slate-800 truncate">{{ auth()->user()->name ?? 'Admin' }}</p>
-                    <p class="text-xs text-slate-400">{{ ucfirst(auth()->user()->role ?? 'admin') }}</p>
+                    <p class="text-sm font-bold text-slate-800 truncate group-hover:text-[#2657c1] transition">
+                        {{ auth()->user()->name ?? 'Admin' }}
+                    </p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                        Edit Profil
+                    </p>
                 </div>
-            </div>
-
-            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 mt-2 transition">
-                <i class="mdi mdi-logout text-lg w-5 text-center"></i>
-                Logout
             </a>
-            <form id="logout-form" method="POST" action="{{ route('logout') }}">@csrf</form>
-        </div>
 
+            <form method="POST" action="{{ route('logout') }}" class="mt-2">
+                @csrf
+                <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-50 rounded-xl transition uppercase tracking-wider cursor-pointer">
+                    <i class="mdi mdi-logout text-sm"></i>
+                    Logout
+                </button>
+            </form>
+        </div>
     </aside>
 
-    <!-- Main Content -->
-    <div class="ml-60 flex flex-col min-h-screen">
+    <div class="flex-1 pl-64 flex flex-col min-h-screen">
+        
+        <header class="h-20 px-8 bg-white border-b border-slate-200 flex items-center justify-end sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <span class="text-xs font-bold text-[#2657c1] bg-blue-50 px-3 py-1.5 rounded-full uppercase tracking-widest">
+                    {{ auth()->user()->role ?? 'ADMIN' }}
+                </span>
+            </div>
+        </header>
+
         <main class="flex-1 p-8">
             @yield('content')
         </main>
-        <footer class="py-4 px-8 text-sm text-slate-400 text-center border-t border-slate-200 bg-white">
-            &copy; {{ date('Y') }} Serojap — Sistem Pelaporan Jalan Rusak
-        </footer>
     </div>
 
 </body>

@@ -104,7 +104,7 @@
         </div>
     </div>
 
-    {{-- Top Kecamatan --}}
+    <!-- {{-- Top Kecamatan --}}
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div class="mb-4">
             <h2 class="text-sm font-semibold text-gray-700">🏭 Top Kecamatan</h2>
@@ -135,7 +135,7 @@
         @else
             <div class="text-gray-500 text-sm text-center py-8">Belum ada data</div>
         @endif
-    </div>
+    </div> -->
 
     {{-- Chart.js --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

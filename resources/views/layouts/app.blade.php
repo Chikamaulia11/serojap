@@ -8,15 +8,11 @@
 
     <title>SEROJAP</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-    <!-- Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Navbar CSS -->
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 
     <style>
@@ -31,7 +27,6 @@
 
 <body>
 
-    <!-- NAVBAR -->
     <div class="navbar">
 
         <div class="nav-left">
@@ -53,13 +48,8 @@
 
             @if(auth()->check())
                 <a href="{{ route('profile.edit') }}" class="nav-profile">
-
-                    <img src="{{ auth()->user()->foto_profil
-                        ? asset('storage/' . auth()->user()->foto_profil)
-                        : 'https://i.pravatar.cc/100' }}">
-
+                    <img src="{{ auth()->user()->foto_profil ? asset('storage/' . auth()->user()->foto_profil) : 'https://i.pravatar.cc/100' }}">
                     <span>{{ auth()->user()->name }}</span>
-
                 </a>
             @endif
 
@@ -67,7 +57,6 @@
 
     </div>
 
-    <!-- MOBILE MENU -->
     <div id="mobileMenu" class="mobile-menu">
         <a href="#dashboard">Dashboard</a>
         <a href="#prosedur">Prosedur</a>
@@ -76,12 +65,11 @@
         <a href="#faq">FAQ</a>
     </div>
 
-    <!-- CONTENT -->
     <div class="content">
+        {{ $slot ?? '' }}
         @yield('content')
     </div>
 
-    <!-- Navbar JS -->
     <script src="{{ asset('js/navbar.js') }}"></script>
 
 </body>
