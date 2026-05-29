@@ -6,10 +6,14 @@
 
 <script>
     function go(id) {
-        document.getElementById(id).scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
+        const target = document.getElementById(id);
+
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
     }
 </script>
 
@@ -45,7 +49,8 @@
                     secara cepat, modern, dan transparan demi mobilitas
                     Purwakarta yang lebih aman.
                 </p>
-<!-- 
+
+                <!-- 
                 <div class="hero-buttons">
 
                     <button
@@ -62,7 +67,8 @@
                         Lihat Riwayat
                     </button>
 
-                </div> -->
+                </div> 
+                -->
 
             </div>
 
@@ -97,11 +103,11 @@
         </div>
 
         <div class="prosedur-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; margin-top: 30px; padding: 0 20px;">
-            
+
             <div class="prosedur-image" style="width: 100%; max-width: 500px;">
-                <img 
-                    src="{{ asset('assets/pelapor/images/alur.jpeg') }}" 
-                    alt="Alur Sistem Pelaporan" 
+                <img
+                    src="{{ asset('assets/pelapor/images/alur.jpeg') }}"
+                    alt="Alur Sistem Pelaporan"
                     style="width: 100%; height: auto; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);"
                 >
             </div>
@@ -112,31 +118,50 @@
                 </p>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    
+
                     <div style="padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 4px solid #075985;">
-                        <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">1. User submits report</h4>
-                        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">Pengguna mengirimkan laporan lengkap dengan lokasi, jenis kerusakan, dan foto pendukung melalui sistem.</p>
+                        <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">
+                            1. User submits report
+                        </h4>
+                        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                            Pengguna mengirimkan laporan lengkap dengan lokasi, jenis kerusakan, dan foto pendukung melalui sistem.
+                        </p>
                     </div>
 
                     <div style="padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 4px solid #075985;">
-                        <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">3. Report processed</h4>
-                        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">Tim melakukan verifikasi, pengecekan lokasi, dan indentifikasi pengaduan.</p>
+                        <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">
+                            3. Report processed
+                        </h4>
+                        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                            Tim melakukan verifikasi, pengecekan lokasi, dan indentifikasi pengaduan.
+                        </p>
                     </div>
 
                     <div style="padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 4px solid #075985;">
-                        <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">2. Report received</h4>
-                        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">Laporan masuk, tercatat dalam sistem, dan pelapor dapat langsung memantau status awal aduan tersebut melalui menu Riwayat.</p>
+                        <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">
+                            2. Report received
+                        </h4>
+                        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                            Laporan masuk, tercatat dalam sistem, dan pelapor dapat langsung memantau status awal aduan tersebut melalui menu Riwayat.
+                        </p>
                     </div>
 
                     <div style="padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 4px solid #075985;">
-                        <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">4. Work completed</h4>
-                        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">Perbaikan selesai dilaksanakan, pengguna bisa melihat foto hasilnya langsung di menu Riwayat.</p>
+                        <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">
+                            4. Work completed
+                        </h4>
+                        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                            Perbaikan selesai dilaksanakan, pengguna bisa melihat foto hasilnya langsung di menu Riwayat.
+                        </p>
                     </div>
 
                 </div>
             </div>
 
+        </div>
+
     </section>
+
     <!-- ================= LAPORAN ================= -->
     <section id="laporan" class="section reveal">
 
@@ -184,7 +209,13 @@
 
                     </div>
 
-                    <a href="/report" class="btn-primary big glow" style="display: inline-block; padding: 12px 28px; background-color: #0d9488; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2); transition: all 0.3s ease; text-align: center;" onmouseover="this.style.backgroundColor='#0f766e'; this.style.transform='translateY(-2px)';" onmouseout="this.style.backgroundColor='#0d9488'; this.style.transform='translateY(0)';">
+                    <a
+                        href="/report"
+                        class="btn-primary big glow"
+                        style="display: inline-block; padding: 12px 28px; background-color: #0d9488; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2); transition: all 0.3s ease; text-align: center;"
+                        onmouseover="this.style.backgroundColor='#0f766e'; this.style.transform='translateY(-2px)';"
+                        onmouseout="this.style.backgroundColor='#0d9488'; this.style.transform='translateY(0)';"
+                    >
                         Buat Laporan Aduan
                     </a>
 
@@ -261,7 +292,6 @@
 
                     <div class="progress-group">
 
-                        <!-- DITERIMA -->
                         <div class="progress-item">
 
                             <div class="progress-top">
@@ -278,7 +308,6 @@
 
                         </div>
 
-                        <!-- DIPROSES -->
                         <div class="progress-item">
 
                             <div class="progress-top">
@@ -295,7 +324,6 @@
 
                         </div>
 
-                        <!-- SELESAI -->
                         <div class="progress-item">
 
                             <div class="progress-top">
@@ -312,7 +340,6 @@
 
                         </div>
 
-                        <!-- DITOLAK -->
                         <div class="progress-item">
 
                             <div class="progress-top">
@@ -407,92 +434,100 @@
             <h2>Pertanyaan Umum</h2>
         </div>
 
-        <style>
-            .faq-search-google-wrapper {
-                display: flex;
-                justify-content: center;
-                margin-bottom: 40px;
-                padding: 0 20px;
-            }
-
-            .google-search-box {
-                display: flex;
-                align-items: center;
-                width: 100%;
-                max-width: 584px;
-                height: 48px;
-                background: #fff;
-                border: 1px solid #dfe1e5;
-                border-radius: 24px;
-                padding: 0 20px;
-                transition: box-shadow 0.2s;
-            }
-
-            .google-search-box:hover,
-            .google-search-box:focus-within {
-                box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
-                border-color: rgba(223, 225, 229, 0);
-            }
-
-            .google-search-box input {
-                flex: 1;
-                background-color: transparent;
-                border: none !important;
-                outline: none !important;
-                box-shadow: none !important;
-                padding: 10px 0;
-                font-size: 16px;
-                color: #202124;
-            }
-
-            .search-icon-left {
-                margin-right: 12px;
-                display: flex;
-                align-items: center;
-            }
-        </style>
-
         <div class="faq-search-google-wrapper">
             <div class="google-search-box">
+
                 <div class="search-icon-left">
-                    <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#9aa0a6">
-                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+                    <svg
+                        focusable="false"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="20"
+                        height="20"
+                        fill="#9aa0a6"
+                    >
+                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
                     </svg>
                 </div>
-                <input type="text" id="faqSearch" placeholder="Cari pertanyaan atau jawaban..." autocomplete="off">
+
+                <input
+                    type="text"
+                    id="faqSearch"
+                    placeholder="Cari pertanyaan atau jawaban..."
+                    autocomplete="off"
+                >
+
             </div>
         </div>
 
-        <div class="row g-4" id="faqGrid">
-            @forelse($faqs as $f)
-            <div class="col-md-6 col-lg-4 faq-item">
-                <div class="card h-100 white-card shadow-sm border-0"
-                    style="background: #fff; border-radius: 20px; cursor: pointer; transition: all 0.3s ease;"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#ans{{ $f->id_faq }}">
+        <div class="faq-bubble-grid" id="faqGrid">
 
-                    <div class="card-body text-center p-4">
-                        <h6 class="fw-bold mb-0" style="color: #1e293b; line-height: 1.5;">
-                            {{ $f->pertanyaan }}
-                        </h6>
+            @forelse($faqs as $index => $f)
 
-                        <div id="ans{{ $f->id_faq }}" class="collapse mt-3 text-start">
-                            <hr style="opacity: 0.1; margin: 15px 0;">
-                            <p class="small text-muted mb-0" style="line-height: 1.6;">
-                                {{ $f->jawaban }}
+                <div
+                    class="faq-item faq-bubble-item {{ $index >= 6 ? 'extra-faq' : '' }}"
+                    style="{{ $index >= 6 ? 'display: none;' : '' }}"
+                >
+
+                    <div
+                        class="faq-bubble-card"
+                        onclick="toggleFaqBubble(this)"
+                        role="button"
+                        tabindex="0"
+                    >
+
+                        <div class="faq-bubble-top">
+
+                            <div class="faq-bubble-icon">
+                                ?
+                            </div>
+
+                            <p class="faq-question">
+                                {{ $f->pertanyaan }}
                             </p>
+
+                            <div class="faq-arrow">
+                                ↓
+                            </div>
+
                         </div>
+
+                        <div class="faq-answer-wrap">
+                            <div class="faq-answer">
+                                {{ $f->jawaban }}
+                            </div>
+                        </div>
+
                     </div>
+
                 </div>
-            </div>
+
             @empty
-            <div class="col-12 text-center text-muted italic py-5">
-                Belum ada pertanyaan FAQ yang ditambahkan.
-            </div>
+
+                <div class="faq-empty">
+                    Belum ada pertanyaan FAQ yang ditambahkan.
+                </div>
+
             @endforelse
+
         </div>
+
+        @if($faqs->count() > 6)
+            <div class="faq-more-wrapper">
+                <button
+                    type="button"
+                    class="faq-more-btn"
+                    id="btnMoreFaq"
+                    onclick="showMoreFaq()"
+                >
+                    Lihat Pertanyaan Lainnya
+                </button>
+            </div>
+        @endif
 
     </section>
+
+</div>
 
 <script src="{{ asset('js/dashboard.js') }}"></script>
 
