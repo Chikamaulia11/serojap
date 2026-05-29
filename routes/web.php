@@ -7,12 +7,16 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
+
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\TabelFaqController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\AdminAccountController;
+use App\Http\Controllers\Admin\AdminProfileController;
+
 use App\Http\Controllers\Pelapor\FaqController;
+
 use App\Http\Middleware\SuperAdminMiddleware;
 
 /* =========================
@@ -177,6 +181,19 @@ Route::middleware([
         )->name('dashboard');
 
         // =========================
+        // PROFILE ADMIN
+        // =========================
+        Route::get(
+            '/profile',
+            [AdminProfileController::class, 'index']
+        )->name('profile.index');
+
+        Route::patch(
+            '/profile',
+            [AdminProfileController::class, 'update']
+        )->name('profile.update');
+
+        // =========================
         // DAFTAR LAPORAN
         // =========================
         Route::get(
@@ -215,6 +232,7 @@ Route::middleware([
             '/laporan/{id}',
             [LaporanController::class, 'update']
         )->name('laporan.update');
+
 
         // =========================
         // STATISTIK

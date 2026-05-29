@@ -78,7 +78,7 @@
             {{-- Manajemen FAQ --}}
             <a href="{{ route('admin.manajemen-faq.index') }}"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                    {{ request()->routeIs('admin.faq.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
+                    {{ request()->routeIs('admin.manajemen-faq.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
                 <i class="mdi mdi-frequently-asked-questions text-lg w-5 text-center"></i>
                 Manajemen FAQ
             </a>
@@ -105,15 +105,25 @@
 
         <!-- Footer / User Info -->
         <div class="mt-auto px-4 py-4 border-t border-slate-100">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 bg-gradient-to-br from-[#2657c1] to-[#226d71] rounded-full flex items-center justify-center text-white font-bold text-sm">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+
+            <a href="{{ route('admin.profile.index') }}"
+                class="flex items-center gap-2.5 rounded-lg p-2 hover:bg-slate-50 transition">
+
+                <div class="w-9 h-9 bg-gradient-to-br from-[#2657c1] to-[#226d71] rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                    @if(auth()->user()->foto_profil)
+                        <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
+                             alt="Profil"
+                             class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                    @endif
                 </div>
+
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-slate-800 truncate">{{ auth()->user()->name ?? 'Admin' }}</p>
-                    <p class="text-xs text-slate-400">{{ ucfirst(auth()->user()->role ?? 'admin') }}</p>
+                    <p class="text-xs text-slate-400">{{ ucfirst(str_replace('_', ' ', auth()->user()->role ?? 'admin')) }}</p>
                 </div>
-            </div>
+            </a>
 
             <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 mt-2 transition">
