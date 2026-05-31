@@ -209,6 +209,13 @@
     0 0 0 4px rgba(34,109,113,0.12);
 }
 
+.form-error{
+    margin-top:8px;
+    color:#d63031;
+    font-size:13px;
+    line-height:1.5;
+}
+
 /* BUTTON */
 
 .save-btn{
@@ -264,6 +271,13 @@
 .password-box p{
     line-height:1.8;
     color:#444;
+}
+
+.password-note{
+    font-size:13px;
+    color:#666;
+    line-height:1.7;
+    margin-bottom:20px;
 }
 
 /* DELETE */
@@ -410,13 +424,21 @@
                             src="{{ Auth::user()->foto_profil
                                 ? asset('storage/' . Auth::user()->foto_profil)
                                 : asset('assets/pelapor/images/avatar-1.jpg') }}"
+                            alt="Foto Profil"
                         >
 
                         <input
                             type="file"
                             name="foto_profil"
                             class="form-input"
+                            accept="image/png,image/jpeg,image/jpg"
                         >
+
+                        @error('foto_profil')
+                            <div class="form-error">
+                                {{ $message }}
+                            </div>
+                        @enderror
 
                     </div>
 
@@ -433,6 +455,12 @@
                             required
                         >
 
+                        @error('name')
+                            <div class="form-error">
+                                {{ $message }}
+                            </div>
+                        @enderror
+
                     </div>
 
                     <!-- EMAIL -->
@@ -448,6 +476,12 @@
                             required
                         >
 
+                        @error('email')
+                            <div class="form-error">
+                                {{ $message }}
+                            </div>
+                        @enderror
+
                     </div>
 
                     <button class="save-btn">
@@ -461,22 +495,7 @@
             <!-- PASSWORD -->
             <div class="profile-card">
 
-                <div class="card-title">
-                    <h2>Update Password</h2>
-
-                    <p>
-                        Jaga keamanan akun dengan password yang kuat.
-                    </p>
-                </div>
-
-                <div class="password-box">
-
-                    <p>
-                        Fitur update password sedang dalam pengembangan
-                        dan akan segera tersedia di versi berikutnya.
-                    </p>
-
-                </div>
+                @include('profile.partials.update-password-form')
 
             </div>
 
@@ -500,6 +519,7 @@
                     </p>
 
                     <form
+                        id="deleteAccountForm"
                         method="POST"
                         action="{{ route('profile.destroy') }}"
                     >
@@ -508,9 +528,9 @@
                         @method('DELETE')
 
                         <button
-                            type="submit"
+                            type="button"
+                            id="deleteAccountButton"
                             class="delete-btn"
-                            onclick="return confirm('Yakin ingin menghapus akun?')"
                         >
                             Hapus Akun
                         </button>
@@ -526,5 +546,66 @@
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        @if(session('status') === 'profile-updated')
+            Swal.fire({
+                icon: 'success',
+                title: 'Profil Berhasil Diperbarui',
+                text: 'Informasi profil kamu sudah berhasil disimpan.',
+                confirmButtonText: 'Oke',
+                confirmButtonColor: '#226d71'
+            });
+        @endif
+
+        @if(session('status') === 'password-updated')
+            Swal.fire({
+                icon: 'success',
+                title: 'Password Berhasil Diperbarui',
+                text: 'Password akun kamu sudah berhasil diganti.',
+                confirmButtonText: 'Oke',
+                confirmButtonColor: '#226d71'
+            });
+        @endif
+
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Data Belum Sesuai',
+                text: 'Periksa kembali data yang kamu isi.',
+                confirmButtonText: 'Oke',
+                confirmButtonColor: '#226d71'
+            });
+        @endif
+
+        const deleteButton = document.getElementById('deleteAccountButton');
+        const deleteForm = document.getElementById('deleteAccountForm');
+
+        if (deleteButton && deleteForm) {
+            deleteButton.addEventListener('click', function () {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Hapus Akun?',
+                    text: 'Setelah akun dihapus, seluruh data akun akan hilang secara permanen.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#d63031',
+                    cancelButtonColor: '#64748b',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteForm.submit();
+                    }
+                });
+            });
+        }
+
+    });
+</script>
 
 @endsection

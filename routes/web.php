@@ -12,8 +12,9 @@ use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\TabelFaqController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\StatistikController;
-use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AdminProfileController;
+
+use App\Http\Controllers\SuperAdmin\AccountController;
 
 use App\Http\Controllers\Pelapor\FaqController;
 
@@ -23,9 +24,7 @@ use App\Http\Middleware\SuperAdminMiddleware;
    LANDING PAGE
 ========================= */
 Route::get('/', function () {
-
     return view('welcome');
-
 });
 
 /* =========================
@@ -44,10 +43,12 @@ Route::middleware('guest')->group(function () {
     Route::post(
         '/login',
         [AuthenticatedSessionController::class, 'store']
-    );
+    )->name('login.post');
 
     // =========================
-    // REGISTER
+    // REGISTER PELAPOR
+    // Pelapor tetap boleh registrasi sendiri.
+    // Admin dan super admin tidak registrasi sendiri.
     // =========================
     Route::get(
         '/register',
@@ -72,6 +73,19 @@ Route::middleware('guest')->group(function () {
         [AuthenticatedSessionController::class, 'store']
     )->name('login.admin.post');
 
+    // =========================
+    // LOGIN SUPER ADMIN
+    // =========================
+    Route::get(
+        '/login/superadmin',
+        [AuthenticatedSessionController::class, 'createSuperAdmin']
+    )->name('login.superadmin');
+
+    Route::post(
+        '/login/superadmin',
+        [AuthenticatedSessionController::class, 'store']
+    )->name('login.superadmin.post');
+
 });
 
 /* =========================
@@ -92,58 +106,35 @@ Route::middleware([
     'pelapor'
 ])->group(function () {
 
-    // =========================
-    // DASHBOARD
-    // =========================
     Route::get(
         '/dashboard',
         [DashboardController::class, 'index']
     )->name('dashboard');
 
-    // =========================
-    // FORM LAPORAN
-    // =========================
     Route::get(
         '/report',
         [ReportController::class, 'create']
     )->name('laporan.create');
 
-    // =========================
-    // SIMPAN LAPORAN
-    // =========================
     Route::post(
         '/report',
         [ReportController::class, 'store']
     )->name('laporan.store');
 
-    // =========================
-    // MY REPORT / RIWAYAT
-    // =========================
     Route::get(
         '/my-report',
         [ReportController::class, 'myReport']
     )->name('laporan.my-report');
 
-    // =========================
-    // FAQ
-    // =========================
     Route::get(
         '/pusat-bantuan',
         [FaqController::class, 'index']
     )->name('pelapor.faq');
 
-    // =========================
-    // PROSEDUR
-    // =========================
     Route::get('/prosedur', function () {
-
         return view('pelapor.prosedur');
-
     })->name('prosedur');
 
-    // =========================
-    // PROFILE
-    // =========================
     Route::get(
         '/profile',
         [ProfileController::class, 'edit']
@@ -163,6 +154,7 @@ Route::middleware([
 
 /* =========================
    ADMIN ROUTES
+   Khusus admin biasa.
 ========================= */
 Route::middleware([
     'auth',
@@ -172,17 +164,11 @@ Route::middleware([
     ->name('admin.')
     ->group(function () {
 
-        // =========================
-        // DASHBOARD ADMIN
-        // =========================
         Route::get(
             '/dashboard',
             [AdminDashboardController::class, 'index']
         )->name('dashboard');
 
-        // =========================
-        // PROFILE ADMIN
-        // =========================
         Route::get(
             '/profile',
             [AdminProfileController::class, 'index']
@@ -193,112 +179,77 @@ Route::middleware([
             [AdminProfileController::class, 'update']
         )->name('profile.update');
 
-        // =========================
-        // DAFTAR LAPORAN
-        // =========================
         Route::get(
             '/laporan',
             [LaporanController::class, 'index']
         )->name('laporan.index');
 
-        // =========================
-        // HALAMAN UPDATE STATUS
-        // =========================
         Route::get(
             '/laporan/update-status',
             [LaporanController::class, 'updateStatusIndex']
         )->name('laporan.update-status');
 
-        // =========================
-        // RIWAYAT STATUS
-        // =========================
         Route::get(
             '/laporan/riwayat-status',
             [LaporanController::class, 'riwayatStatusIndex']
         )->name('laporan.riwayat-status');
 
-        // =========================
-        // DETAIL LAPORAN
-        // =========================
         Route::get(
             '/laporan/{id}',
             [LaporanController::class, 'show']
         )->name('laporan.show');
 
-        // =========================
-        // UPDATE STATUS LAPORAN
-        // =========================
         Route::put(
             '/laporan/{id}',
             [LaporanController::class, 'update']
         )->name('laporan.update');
 
-
-        // =========================
-        // STATISTIK
-        // =========================
         Route::get(
             '/statistik',
             [StatistikController::class, 'index']
         )->name('statistik.index');
 
-        // =========================
-        // FAQ MANAGEMENT
-        // =========================
         Route::resource(
             'manajemen-faq',
             TabelFaqController::class
         )->names([
-
-            'index'   => 'manajemen-faq.index',
-            'create'  => 'manajemen-faq.create',
-            'store'   => 'manajemen-faq.store',
-            'show'    => 'manajemen-faq.show',
-            'edit'    => 'manajemen-faq.edit',
-            'update'  => 'manajemen-faq.update',
+            'index' => 'manajemen-faq.index',
+            'create' => 'manajemen-faq.create',
+            'store' => 'manajemen-faq.store',
+            'show' => 'manajemen-faq.show',
+            'edit' => 'manajemen-faq.edit',
+            'update' => 'manajemen-faq.update',
             'destroy' => 'manajemen-faq.destroy',
-
         ]);
 
-        // =========================
-        // MANAJEMEN AKUN ADMIN
-        // HANYA SUPER ADMIN
-        // =========================
-        Route::middleware([
-            SuperAdminMiddleware::class
-        ])->group(function () {
+    });
 
-            Route::get(
-                '/admin-accounts',
-                [AdminAccountController::class, 'index']
-            )->name('admin-accounts.index');
+/* =========================
+   SUPER ADMIN ROUTES
+   Terpisah total dari admin.
+========================= */
+Route::middleware([
+    'auth',
+    SuperAdminMiddleware::class
+])
+    ->prefix('superadmin')
+    ->name('superadmin.')
+    ->group(function () {
 
-            Route::get(
-                '/admin-accounts/create',
-                [AdminAccountController::class, 'create']
-            )->name('admin-accounts.create');
+        Route::get('/dashboard', function () {
+            return view('superadmin.dashboard');
+        })->name('dashboard');
 
-            Route::post(
-                '/admin-accounts',
-                [AdminAccountController::class, 'store']
-            )->name('admin-accounts.store');
-
-            Route::get(
-                '/admin-accounts/{admin}/edit',
-                [AdminAccountController::class, 'edit']
-            )->name('admin-accounts.edit');
-
-            Route::put(
-                '/admin-accounts/{admin}',
-                [AdminAccountController::class, 'update']
-            )->name('admin-accounts.update');
-
-            Route::delete(
-                '/admin-accounts/{admin}',
-                [AdminAccountController::class, 'destroy']
-            )->name('admin-accounts.destroy');
-
-        });
+        Route::resource(
+            'accounts',
+            AccountController::class
+        )
+            ->parameters([
+                'accounts' => 'account',
+            ])
+            ->except([
+                'show',
+            ]);
 
     });
 

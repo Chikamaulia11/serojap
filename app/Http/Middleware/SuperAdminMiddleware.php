@@ -13,23 +13,29 @@ class SuperAdminMiddleware
     {
         if (! Auth::check()) {
             return redirect()
-                ->route('login.admin')
+                ->route('login.superadmin')
                 ->withErrors([
-                    'email' => 'Anda harus login sebagai admin.'
+                    'email' => 'Anda harus login sebagai super admin.'
                 ]);
         }
 
         if (Auth::user()->role !== 'super_admin') {
-            // Amankan agar pengguna admin biasa tidak bisa akses aksi super admin.
+
+            if (Auth::user()->role === 'admin') {
+                return redirect()
+                    ->route('admin.dashboard')
+                    ->withErrors([
+                        'email' => 'Anda tidak memiliki akses sebagai super admin.'
+                    ]);
+            }
+
             return redirect()
-                ->route('admin.dashboard')
+                ->route('login.superadmin')
                 ->withErrors([
                     'email' => 'Anda tidak memiliki akses sebagai super admin.'
                 ]);
         }
 
-
         return $next($request);
     }
 }
-

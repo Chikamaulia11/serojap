@@ -70,20 +70,151 @@
         @yield('content')
     </div>
 
-    <footer class="footer-section" style="background-color: #ffffff; color: #1e293b; padding: 60px 40px 40px; margin-top: 60px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; border-top-left-radius: 20px; border-top-right-radius: 20px; width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; box-sizing: border-box;">
-        <div style="width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 20px; box-sizing: border-box;">
-            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 50px;">
-                <img src="{{ asset('assets/pelapor/images/logo-serojap.png') }}" alt="Logo SEROJAP" style="height: 45px; width: auto; object-fit: contain;">
-                <div>
-                    <h3 style="font-size: 22px; font-weight: 700; margin: 0; letter-spacing: 0.5px; color: #1e293b;">SEROJAP</h3>
-                    <p style="font-size: 13px; opacity: 0.8; margin: 0; color: #1e293b;">Sistem Pelaporan Jalan Purwakarta</p>
+    <!-- ================= FOOTER ================= -->
+    <footer class="footer-section">
+
+        <div class="footer-container">
+
+            <div class="footer-top">
+
+                <!-- BRAND / INSTANSI -->
+                <div class="footer-brand">
+
+                    <div class="footer-brand-head">
+                        <img src="{{ asset('assets/pelapor/images/logo-serojap.png') }}" alt="Logo SEROJAP">
+
+                        <div>
+                            <h3>SEROJAP</h3>
+                            <p>Sistem Pelaporan Jalan Rusak Purwakarta</p>
+                        </div>
+                    </div>
+
+                    <p class="footer-description">
+                        SEROJAP merupakan layanan pelaporan kerusakan jalan berbasis digital
+                        untuk mendukung penanganan infrastruktur jalan secara lebih cepat,
+                        transparan, dan terintegrasi di wilayah Kabupaten Purwakarta.
+                    </p>
+
+                    <div class="footer-badges">
+                        <span>Transparan</span>
+                        <span>Terintegrasi</span>
+                        <span>Responsif</span>
+                    </div>
+
                 </div>
+
+                <!-- LAYANAN -->
+                <div class="footer-column">
+
+                    <h4>Layanan</h4>
+
+                    <a href="{{ route('dashboard') }}#laporan">
+                        Buat Laporan
+                    </a>
+
+                    <a href="{{ route('dashboard') }}#riwayat">
+                        Riwayat Laporan
+                    </a>
+
+                    <a href="{{ route('dashboard') }}#prosedur">
+                        Prosedur Pelaporan
+                    </a>
+
+                    <a href="{{ route('dashboard') }}#faq">
+                        Pusat Bantuan
+                    </a>
+
+                </div>
+
+                <!-- INFORMASI -->
+                <div class="footer-column">
+
+                    <h4>Informasi Situs</h4>
+
+                    <a href="{{ route('dashboard') }}#dashboard">
+                        Dashboard
+                    </a>
+
+                    <a href="{{ route('dashboard') }}#prosedur">
+                        Alur Sistem
+                    </a>
+
+                    <a href="{{ route('dashboard') }}#faq">
+                        FAQ
+                    </a>
+
+                    @if(auth()->check())
+                        <a href="{{ route('profile.edit') }}">
+                            Profil Pengguna
+                        </a>
+                    @endif
+
+                </div>
+
+                <!-- KONTAK INSTANSI -->
+                <div class="footer-column footer-contact">
+
+                    <h4>Kontak Instansi</h4>
+
+                    <div class="footer-contact-item">
+                        <span>📍</span>
+                        <p>
+                            Dinas Pekerjaan Umum dan Penataan Ruang<br>
+                            Kabupaten Purwakarta
+                        </p>
+                    </div>
+
+                    <div class="footer-contact-item">
+                        <span>✉</span>
+                        <p>
+                            <a href="mailto:info@serojap.purwakartakab.go.id">
+                                info@serojap.purwakartakab.go.id
+                            </a>
+                        </p>
+                    </div>
+
+                    <div class="footer-contact-item">
+                        <span>🕘</span>
+                        <p>
+                            Layanan sistem tersedia untuk pelaporan masyarakat
+                            secara daring.
+                        </p>
+                    </div>
+
+                </div>
+
             </div>
 
-            <div style="margin-top: 50px; border-top: 1px solid rgba(30, 41, 59, 0.15); padding-top: 25px; text-align: center; font-size: 13px; opacity: 0.8; color: #1e293b;">
-                <p style="margin: 0;">© {{ date('Y') }} SEROJAP - Sistem Pelaporan Jalan Purwakarta</p>
+            <div class="footer-middle">
+
+                <div>
+                    <strong>Layanan Pengaduan Infrastruktur Jalan</strong>
+                    <p>
+                        Membantu masyarakat menyampaikan laporan kerusakan jalan
+                        agar dapat dipantau dan ditindaklanjuti oleh pihak terkait.
+                    </p>
+                </div>
+
+                <a href="{{ route('dashboard') }}#laporan" class="footer-report-btn">
+                    Laporkan Kerusakan Jalan
+                </a>
+
             </div>
+
+            <div class="footer-bottom">
+
+                <p>
+                    © {{ date('Y') }} SEROJAP - Sistem Pelaporan Jalan Rusak Purwakarta.
+                </p>
+
+                <p>
+                    Pemerintah Kabupaten Purwakarta
+                </p>
+
+            </div>
+
         </div>
+
     </footer>
 
     <script src="{{ asset('js/navbar.js') }}"></script>

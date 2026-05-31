@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminAccountController extends Controller
 {
-    // NOTE: Semua endpoint di halaman ini dijaga oleh SuperAdminMiddleware di routes.
+    // Semua endpoint halaman ini dijaga oleh SuperAdminMiddleware di routes.
 
     public function index()
     {
@@ -19,7 +19,20 @@ class AdminAccountController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        return view('admin.admin-accounts.index', compact('admins'));
+        $pelapors = User::query()
+            ->where('role', 'pelapor')
+            ->orderByDesc('id')
+            ->get();
+
+        $users = User::query()
+            ->whereIn('role', ['admin', 'pelapor'])
+            ->orderByDesc('id')
+            ->get();
+
+        return view(
+            'admin.admin-accounts.index',
+            compact('admins', 'pelapors', 'users')
+        );
     }
 
     public function create()
@@ -29,40 +42,47 @@ class AdminAccountController extends Controller
 
     public function store(CreateAdminRequest $request)
     {
+        $role = $request->input('role');
+
         User::create([
             'name' => $request->input('nama'),
             'email' => $request->input('email'),
             'password' => Hash::make($request->input('password')),
-            'role' => 'admin',
-            'posisi' => $request->input('posisi'),
+            'role' => $role,
+            'posisi' => $role === 'admin'
+                ? $request->input('posisi')
+                : null,
         ]);
+
+        $message = $role === 'admin'
+            ? 'Akun admin berhasil ditambahkan.'
+            : 'Akun pelapor berhasil ditambahkan.';
 
         return redirect()
             ->route('admin.admin-accounts.index')
-            ->with('success', 'Admin berhasil ditambahkan.');
+            ->with('success', $message);
     }
 
     public function edit(User $admin)
     {
-        // Pastikan hanya admin role admin yang bisa di-edit
-        if ($admin->role !== 'admin') {
+        // Route param tetap {admin}, tapi data yang dikelola bisa admin atau pelapor.
+        if (! in_array($admin->role, ['admin', 'pelapor'])) {
             abort(404);
         }
 
-        return view('admin.admin-accounts.edit', compact('admin'));
+        return view('admin.admin-accounts.edit', [
+            'account' => $admin,
+        ]);
     }
 
     public function update(UpdateAdminRequest $request, User $admin)
     {
-        if ($admin->role !== 'admin') {
+        if (! in_array($admin->role, ['admin', 'pelapor'])) {
             abort(404);
         }
 
         $type = $request->input('type');
 
-        // type:
-        // - profile: update nama/email/posisi (password tidak wajib)
-        // - password: update password saja
         if ($type === 'password') {
             $admin->update([
                 'password' => Hash::make($request->input('password')),
@@ -70,34 +90,41 @@ class AdminAccountController extends Controller
 
             return redirect()
                 ->route('admin.admin-accounts.index')
-                ->with('success', 'Password admin berhasil diperbarui.');
+                ->with('success', 'Password akun berhasil diperbarui.');
         }
 
-        // default: profile
+        $role = $request->input('role');
+
         $admin->update([
             'name' => $request->input('nama'),
             'email' => $request->input('email'),
-            'posisi' => $request->input('posisi'),
+            'role' => $role,
+            'posisi' => $role === 'admin'
+                ? $request->input('posisi')
+                : null,
         ]);
 
         return redirect()
             ->route('admin.admin-accounts.index')
-            ->with('success', 'Profil admin berhasil diperbarui.');
+            ->with('success', 'Data akun berhasil diperbarui.');
     }
 
     public function destroy(User $admin)
     {
-        if ($admin->role !== 'admin') {
+        if (! in_array($admin->role, ['admin', 'pelapor'])) {
             abort(404);
         }
 
+        $role = $admin->role;
+
         $admin->delete();
+
+        $message = $role === 'admin'
+            ? 'Akun admin berhasil dihapus.'
+            : 'Akun pelapor berhasil dihapus.';
 
         return redirect()
             ->route('admin.admin-accounts.index')
-            ->with('success', 'Admin berhasil dihapus.');
+            ->with('success', $message);
     }
 }
-
-
-
