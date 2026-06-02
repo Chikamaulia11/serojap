@@ -15,18 +15,26 @@ class AdminMiddleware
     ): Response {
 
         // =========================
-        // CEK LOGIN
+        // ADMIN BIASA SAJA
+        // SUPER ADMIN SUDAH DIPISAH
         // =========================
         if (
             Auth::check()
-            && (
-                Auth::user()->role === 'admin'
-                || Auth::user()->role === 'super_admin'
-            )
+            && Auth::user()->role === 'admin'
         ) {
-
             return $next($request);
+        }
 
+        // =========================
+        // JIKA SUPER ADMIN MASUK KE AREA ADMIN
+        // ARAHKAN KE DASHBOARD SUPER ADMIN
+        // =========================
+        if (
+            Auth::check()
+            && Auth::user()->role === 'super_admin'
+        ) {
+            return redirect()
+                ->route('superadmin.dashboard');
         }
 
         // =========================

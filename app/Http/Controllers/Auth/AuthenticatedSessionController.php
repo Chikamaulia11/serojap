@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     // =========================
-    // HALAMAN LOGIN USER
+    // HALAMAN LOGIN USER / PELAPOR
     // =========================
     public function create(): View
     {
@@ -28,6 +28,14 @@ class AuthenticatedSessionController extends Controller
     }
 
     // =========================
+    // HALAMAN LOGIN SUPER ADMIN
+    // =========================
+    public function createSuperAdmin(): View
+    {
+        return view('auth.login-superadmin');
+    }
+
+    // =========================
     // PROSES LOGIN
     // =========================
     public function store(LoginRequest $request): RedirectResponse
@@ -38,24 +46,89 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        $routeName = $request->route()?->getName();
+
         // =========================
-        // REDIRECT ADMIN
+        // LOGIN PELAPOR
         // =========================
-        if (
-            $user->role === 'admin' ||
-            $user->role === 'super_admin'
-        ) {
+        if ($routeName === 'login.post' || $routeName === 'login') {
+
+            if ($user->role !== 'pelapor') {
+                return $this->logoutAndBack(
+                    $request,
+                    'Akun ini bukan akun pelapor.'
+                );
+            }
 
             return redirect()
-                ->route('admin.dashboard');
-
+                ->route('dashboard');
         }
 
         // =========================
-        // REDIRECT USER / PELAPOR
+        // LOGIN ADMIN
         // =========================
+        if ($routeName === 'login.admin.post') {
+
+            if ($user->role !== 'admin') {
+                return $this->logoutAndBack(
+                    $request,
+                    'Akun ini bukan akun admin.'
+                );
+            }
+
+            return redirect()
+                ->route('admin.dashboard');
+        }
+
+        // =========================
+        // LOGIN SUPER ADMIN
+        // =========================
+        if ($routeName === 'login.superadmin.post') {
+
+            if ($user->role !== 'super_admin') {
+                return $this->logoutAndBack(
+                    $request,
+                    'Akun ini bukan akun super admin.'
+                );
+            }
+
+            return redirect()
+                ->route('superadmin.dashboard');
+        }
+
+        // =========================
+        // FALLBACK BERDASARKAN ROLE
+        // =========================
+        if ($user->role === 'super_admin') {
+            return redirect()
+                ->route('superadmin.dashboard');
+        }
+
+        if ($user->role === 'admin') {
+            return redirect()
+                ->route('admin.dashboard');
+        }
+
         return redirect()
             ->route('dashboard');
+    }
+
+    // =========================
+    // LOGOUT DAN KEMBALI KE LOGIN
+    // =========================
+    private function logoutAndBack(Request $request, string $message): RedirectResponse
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return back()
+            ->withInput($request->only('email'))
+            ->withErrors([
+                'email' => $message,
+            ]);
     }
 
     // =========================

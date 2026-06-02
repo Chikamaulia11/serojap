@@ -125,12 +125,16 @@
                 </div>
             </a>
 
-            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+            <a href="#"
+                id="adminLogoutButton"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 mt-2 transition">
                 <i class="mdi mdi-logout text-lg w-5 text-center"></i>
                 Logout
             </a>
-            <form id="logout-form" method="POST" action="{{ route('logout') }}">@csrf</form>
+
+            <form id="logout-form" method="POST" action="{{ route('logout') }}">
+                @csrf
+            </form>
         </div>
 
     </aside>
@@ -144,6 +148,37 @@
             &copy; {{ date('Y') }} Serojap — Sistem Pelaporan Jalan Rusak
         </footer>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const logoutButton = document.getElementById('adminLogoutButton');
+            const logoutForm = document.getElementById('logout-form');
+
+            if (logoutButton && logoutForm) {
+                logoutButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Logout?',
+                        text: 'Kamu akan keluar dari halaman admin.',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Logout',
+                        cancelButtonText: 'Batal',
+                        confirmButtonColor: '#d63031',
+                        cancelButtonColor: '#64748b',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            logoutForm.submit();
+                        }
+                    });
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>

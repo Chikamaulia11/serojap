@@ -13,9 +13,6 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    // =========================
-    // FILLABLE
-    // =========================
     protected $fillable = [
         'name',
         'email',
@@ -25,17 +22,11 @@ class User extends Authenticatable
         'posisi',
     ];
 
-    // =========================
-    // HIDDEN
-    // =========================
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    // =========================
-    // CASTS
-    // =========================
     protected function casts(): array
     {
         return [
@@ -44,9 +35,6 @@ class User extends Authenticatable
         ];
     }
 
-    // =========================
-    // RELASI KE REPORT
-    // =========================
     public function reports()
     {
         return $this->hasMany(
@@ -55,9 +43,6 @@ class User extends Authenticatable
         );
     }
 
-    // =========================
-    // RELASI KE STATUS
-    // =========================
     public function statuses()
     {
         return $this->hasMany(
@@ -66,9 +51,6 @@ class User extends Authenticatable
         );
     }
 
-    // =========================
-    // ROLE HELPER
-    // =========================
     public function isPelapor()
     {
         return $this->role === 'pelapor';
