@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Report;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -30,8 +33,13 @@ class ProfileController extends Controller
 
         $data = $request->validated();
 
-        // upload foto profil
+        // Upload foto profil baru
         if ($request->hasFile('foto_profil')) {
+
+            // Hapus foto profil lama jika ada
+            if ($user->foto_profil) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
 
             $foto = $request->file('foto_profil')->store(
                 'foto-profil',
@@ -58,19 +66,46 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
 
-        Auth::logout();
+        DB::transaction(function () use ($user, $request) {
 
-        $user->delete();
+            // Ambil semua laporan milik user/pelapor
+            $reports = Report::where('user_id', $user->id)->get();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            foreach ($reports as $report) {
 
-        return Redirect::to('/');
+                // Hapus foto laporan jika ada
+                if ($report->foto) {
+                    Storage::disk('public')->delete($report->foto);
+                }
+
+                // Hapus riwayat/status laporan jika relasi tersedia
+                if (method_exists($report, 'statuses')) {
+                    $report->statuses()->delete();
+                }
+
+                // Hapus laporan
+                $report->delete();
+            }
+
+            // Hapus foto profil user jika ada
+            if ($user->foto_profil) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
+
+            // Logout dulu
+            Auth::logout();
+
+            // Hapus akun user
+            $user->delete();
+
+            // Hapus session login
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        });
+
+        return Redirect::to('/')
+            ->with('account_deleted', 'Akun tidak ditemukan karena akun dan seluruh data terkait sudah berhasil dihapus dari sistem.');
     }
 }

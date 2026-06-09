@@ -66,6 +66,7 @@
             font-size: 14px;
             font-weight: 700;
             transition: 0.25s ease;
+            text-decoration: none;
         }
 
         .sidebar-link.active {
@@ -98,6 +99,29 @@
         .sidebar-link.active .sidebar-icon {
             background: #ffffff;
             color: #2657c1;
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            font-weight: 800;
+            color: #ef4444;
+            background: #fff;
+            border: 1px solid #fee2e2;
+            text-decoration: none;
+            transition: 0.25s ease;
+            box-shadow: 0 10px 24px rgba(239, 68, 68, 0.05);
+        }
+
+        .logout-link:hover {
+            background: #fef2f2;
+            transform: translateY(-2px);
         }
 
         .page-animate {
@@ -188,60 +212,15 @@
                 Manajemen Akun
             </a>
 
-            <a href="{{ route('admin.dashboard') }}"
-               class="sidebar-link">
-                <span class="sidebar-icon">
-                    <i class="mdi mdi-shield-account-outline text-xl"></i>
-                </span>
-                Area Admin
-            </a>
-
-            <div class="mt-5 rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 to-cyan-50 p-4">
-                <div class="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center text-[#2657c1] mb-3">
-                    <i class="mdi mdi-shield-check-outline text-2xl"></i>
-                </div>
-
-                <h3 class="text-sm font-extrabold text-slate-800">
-                    Akses Tertinggi
-                </h3>
-
-                <p class="text-xs text-slate-500 mt-2 leading-relaxed">
-                    Mengelola akun admin dan pelapor dari area terpisah.
-                </p>
-            </div>
-
         </nav>
 
-        <!-- User Info -->
+        <!-- Logout -->
         <div class="mt-auto px-4 py-4 border-t border-slate-200">
-
-            <div class="flex items-center gap-3 rounded-2xl p-3 bg-white shadow-sm border border-slate-100">
-
-                <div class="w-10 h-10 bg-gradient-to-br from-[#2657c1] to-[#226d71] rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden flex-shrink-0">
-                    @if(auth()->user()?->foto_profil)
-                        <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
-                             alt="Profil"
-                             class="w-full h-full object-cover">
-                    @else
-                        {{ strtoupper(substr(auth()->user()->name ?? 'S', 0, 1)) }}
-                    @endif
-                </div>
-
-                <div class="min-w-0">
-                    <p class="text-sm font-extrabold text-slate-800 truncate">
-                        {{ auth()->user()->name ?? 'Super Admin' }}
-                    </p>
-
-                    <p class="text-xs text-slate-400 font-semibold">
-                        {{ ucfirst(str_replace('_', ' ', auth()->user()->role ?? 'super_admin')) }}
-                    </p>
-                </div>
-            </div>
 
             <a href="#"
                id="superAdminLogoutButton"
-               class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-red-500 hover:bg-red-50 mt-3 transition">
-                <i class="mdi mdi-logout text-xl w-5 text-center"></i>
+               class="logout-link">
+                <i class="mdi mdi-logout text-xl"></i>
                 Logout
             </a>
 

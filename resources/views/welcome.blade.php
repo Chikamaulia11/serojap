@@ -157,9 +157,27 @@
     <footer class="container py-4 border-top border-light">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <p class="small text-muted mb-0">© 2026 Serojap Purwakarta</p>
-            <p class="small text-muted mb-0">Indonesia University of Education Project</p>
+            <a class="small text-muted mb-0">infoserojap@gmail.com</a>
         </div>
     </footer>
+
+    @if(session('account_deleted'))
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Akun Tidak Ditemukan',
+                    text: "{{ session('account_deleted') }}",
+                    confirmButtonText: 'Kembali ke Beranda',
+                    confirmButtonColor: '#226d71',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                });
+            });
+        </script>
+    @endif
 
     <script src="{{ asset('assets/pelapor/js/index.js') }}" defer></script>
 </body>
