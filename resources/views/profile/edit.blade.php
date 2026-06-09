@@ -290,6 +290,26 @@
     padding:25px;
 }
 
+.delete-box p{
+    color:#444;
+    line-height:1.7;
+}
+
+.delete-warning{
+    margin-top:16px;
+
+    background:rgba(214,48,49,0.07);
+    border:1px solid rgba(214,48,49,0.12);
+
+    padding:14px 16px;
+
+    border-radius:16px;
+
+    color:#9f1d1d;
+    font-size:14px;
+    line-height:1.7;
+}
+
 .delete-btn{
     margin-top:20px;
 
@@ -518,6 +538,11 @@
                         menghapus akun.
                     </p>
 
+                    <div class="delete-warning">
+                        Akun, foto profil, laporan, foto laporan, dan riwayat status laporan akan dihapus dari sistem.
+                        Setelah berhasil dihapus, kamu akan otomatis logout dan kembali ke halaman awal SEROJAP.
+                    </div>
+
                     <form
                         id="deleteAccountForm"
                         method="POST"
@@ -590,15 +615,30 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Hapus Akun?',
-                    text: 'Setelah akun dihapus, seluruh data akun akan hilang secara permanen.',
+                    html: `
+                        <b>Akun kamu akan dihapus permanen.</b><br><br>
+                        Seluruh data akun, foto profil, laporan, foto laporan, dan riwayat status laporan akan ikut hilang dari sistem.
+                    `,
                     showCancelButton: true,
-                    confirmButtonText: 'Ya, Hapus',
+                    confirmButtonText: 'Ya, Hapus Akun',
                     cancelButtonText: 'Batal',
                     confirmButtonColor: '#d63031',
                     cancelButtonColor: '#64748b',
-                    reverseButtons: true
+                    reverseButtons: true,
+                    allowOutsideClick: false,
+                    allowEscapeKey: true
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Menghapus Akun...',
+                            text: 'Mohon tunggu, sistem sedang menghapus akun dan seluruh data terkait.',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
                         deleteForm.submit();
                     }
                 });

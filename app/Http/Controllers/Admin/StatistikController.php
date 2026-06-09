@@ -23,7 +23,13 @@ class StatistikController extends Controller
 
         $countByStatus = function (string $status) use ($latestIds): int {
             return DB::table('tabel_status')
-                ->joinSub($latestIds, 'latest', 'tabel_status.id_status', '=', 'latest.id_status')
+                ->joinSub(
+                    $latestIds,
+                    'latest',
+                    'tabel_status.id_status',
+                    '=',
+                    'latest.id_status'
+                )
                 ->where('tabel_status.status', $status)
                 ->count();
         };
@@ -33,8 +39,9 @@ class StatistikController extends Controller
         $selesai  = $countByStatus('selesai');
         $ditolak  = $countByStatus('ditolak');
 
-        // LAPORAN PER BULAN (chart bar)
+        // LAPORAN PER BULAN
         $perBulan = collect();
+
         try {
             $perBulan = Report::select(
                     DB::raw('MONTH(created_at) as bulan'),
@@ -49,32 +56,36 @@ class StatistikController extends Controller
             $perBulan = collect();
         }
 
-        $labelBulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-        $dataBulan  = array_fill(0, 12, 0);
+        $labelBulan = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'Mei',
+            'Jun',
+            'Jul',
+            'Agu',
+            'Sep',
+            'Okt',
+            'Nov',
+            'Des',
+        ];
+
+        $dataBulan = array_fill(0, 12, 0);
+
         foreach ($perBulan as $row) {
             $dataBulan[$row->bulan - 1] = $row->jumlah;
         }
 
-        // TOP KECAMATAN (top 5)
-        $perKecamatan = collect();
-        try {
-            $columns = DB::getSchemaBuilder()->getColumnListing('reports');
-            if (in_array('kecamatan', $columns)) {
-                $perKecamatan = Report::select('kecamatan', DB::raw('COUNT(*) as jumlah'))
-                    ->whereNotNull('kecamatan')
-                    ->where('kecamatan', '!=', '')
-                    ->groupBy('kecamatan')
-                    ->orderByDesc('jumlah')
-                    ->limit(5)
-                    ->get();
-            }
-        } catch (\Throwable $e) {
-            $perKecamatan = collect();
-        }
-
         return view('admin.statistik.index', compact(
-            'total', 'baru', 'diterima', 'proses', 'selesai', 'ditolak',
-            'labelBulan', 'dataBulan', 'perKecamatan'
+            'total',
+            'baru',
+            'diterima',
+            'proses',
+            'selesai',
+            'ditolak',
+            'labelBulan',
+            'dataBulan'
         ));
     }
 }

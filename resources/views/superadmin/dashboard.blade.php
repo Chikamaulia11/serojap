@@ -121,7 +121,7 @@
 
     .summary-grid {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 18px;
         margin-top: 22px;
     }
@@ -287,11 +287,6 @@
                         Dashboard Super Admin
                     </h1>
 
-                    <p class="hero-desc">
-                        Panel terpisah untuk mengelola akun admin dan pelapor pada sistem SEROJAP.
-                        Admin dibuat dari panel ini, sedangkan pelapor tetap bisa registrasi sendiri.
-                    </p>
-
                 </div>
 
                 <div class="hero-stats">
@@ -333,9 +328,6 @@
                 {{ $totalAdmin }} Admin
             </h2>
 
-            <p class="summary-desc">
-                Akun admin dibuat, diperbarui, dan dihapus melalui super admin.
-            </p>
         </div>
 
         <div class="summary-card">
@@ -348,26 +340,6 @@
             <h2 class="summary-title">
                 {{ $totalPelapor }} Pelapor
             </h2>
-
-            <p class="summary-desc">
-                Pelapor tetap bisa registrasi sendiri atau dibantu oleh super admin.
-            </p>
-        </div>
-
-        <div class="summary-card">
-            <div class="summary-icon" style="background:#fffbeb; color:#d97706;">
-                <i class="mdi mdi-shield-check-outline text-2xl"></i>
-            </div>
-
-            <p class="summary-label">Akses Sistem</p>
-
-            <h2 class="summary-title">
-                Super Admin
-            </h2>
-
-            <p class="summary-desc">
-                Area kontrol tertinggi dan dipisahkan dari dashboard admin biasa.
-            </p>
         </div>
 
     </div>
@@ -388,11 +360,6 @@
             <h2 style="font-size:24px; font-weight:800; color:#0f172a; margin-top:10px;">
                 Kelola admin dan pelapor dari satu panel.
             </h2>
-
-            <p style="font-size:15px; color:#64748b; line-height:1.7; margin-top:10px;">
-                Gunakan halaman manajemen akun untuk membuat akun admin baru, mengelola pelapor,
-                mengubah password, serta menjaga data pengguna tetap rapi dan terkontrol.
-            </p>
 
             <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:22px;">
                 <a href="{{ route('superadmin.accounts.index') }}" class="btn-primary-super">
