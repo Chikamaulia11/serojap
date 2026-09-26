@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PublicController;
 use App\Http\Controllers\ReportController;
 
 use App\Http\Controllers\Admin\LaporanController;
@@ -23,9 +24,10 @@ use App\Http\Middleware\SuperAdminMiddleware;
 /* =========================
    LANDING PAGE
 ========================= */
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get(
+    '/',
+    [PublicController::class, 'home']
+)->name('beranda');
 
 /* =========================
    AUTH (GUEST)
