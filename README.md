@@ -88,7 +88,11 @@ npm install
 cp .env.example .env
 
 # 5. Isi konfigurasi database di .env sesuai mesin lokal
-#    Contoh MySQL:
+#    Opsi A, SQLite (paling cepat, tanpa service tambahan):
+#    DB_CONNECTION=sqlite
+#    touch database/database.sqlite
+#
+#    Opsi B, MySQL:
 #    DB_CONNECTION=mysql
 #    DB_HOST=127.0.0.1
 #    DB_PORT=3306
@@ -99,14 +103,17 @@ cp .env.example .env
 # 6. Buat application key
 php artisan key:generate
 
-# 7. Jalankan migration (dan seed bila perlu data contoh)
+# 7. Hubungkan folder upload agar foto laporan bisa diakses publik
+php artisan storage:link
+
+# 8. Jalankan migration (dan seed bila perlu data contoh)
 php artisan migrate --seed
 
-# 8. Build asset untuk production, atau jalankan Vite saat develops
+# 9. Build asset untuk production, atau jalankan Vite saat develops
 npm run build      # production
 npm run dev        # development, hot reload
 
-# 9. Jalankan aplikasi
+# 10. Jalankan aplikasi
 php artisan serve
 ```
 
@@ -118,13 +125,28 @@ Alternatif menjalankan semuanya sekaligus (server + queue + log + Vite):
 composer run dev
 ```
 
+### Akun Demo
+
+`php artisan migrate --seed` mengisi data contoh untuk pengembangan lokal:
+
+| Peran          | Email                      | Kata sandi |
+| -------------- | -------------------------- | ---------- |
+| Super admin    | `superadmin@serojap.test`  | `password` |
+| Admin          | `admin@serojap.test`        | `password` |
+| Admin lapangan | `petugas@serojap.test`     | `password` |
+| Pelapor        | `pelapor@serojap.test`     | `password` |
+
+Masing-masing halaman login punya alamat sendiri: `/login` (pelapor),
+`/login/admin`, dan `/login/superadmin`.
+
+Seeder demo hanya untuk lokal. Jangan menjalankan `migrate:fresh --seed` di
+server produksi karena akan menghapus seluruh data.
+
 ### Membuat Akun
 
 - **Pelapor** bisa mendaftar sendiri lewat `/register`.
 - **Admin** dan **super admin** dibuat oleh super admin lewat menu
   Manajemen Akun (`/superadmin/accounts`).
-- Seeder bawaan membuat satu akun contoh `test@example.com` dengan kata sandi
-  `password` (role `pelapor`). Ganti atau hapus sebelum dipakai di produksi.
 
 ---
 
@@ -152,6 +174,7 @@ Cakupan test yang ada:
 | `tests/Feature/PublicLandingPageTest.php` | Beranda terbuka untuk guest, statistik real, dan tidak bocornya data pelapor |
 | `tests/Feature/Auth/*` | Login per role, registrasi, ganti kata sandi, verifikasi email |
 | `tests/Feature/ProfileTest.php` | Ubah profil dan hapus akun beserta seluruh laporannya |
+| `tests/Feature/RuntimeSmokeTest.php` | Semua halaman publik, pelapor, admin, dan super admin benar-benar bisa dirender, termasuk verifikasi `@vite` |
 
 ---
 
