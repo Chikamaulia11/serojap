@@ -23,12 +23,12 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama'       => 'required',
-            'foto'       => 'required|image',
-            'alamat'     => 'required',
-            'latitude'   => 'required',
-            'longitude'  => 'required',
-            'keterangan' => 'required',
+            'nama'       => ['required', 'string', 'max:255'],
+            'foto'       => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'alamat'     => ['required', 'string', 'max:255'],
+            'latitude'   => ['required', 'numeric', 'between:-90,90'],
+            'longitude'  => ['required', 'numeric', 'between:-180,180'],
+            'keterangan' => ['required', 'string', 'min:10', 'max:1000'],
         ]);
 
         // Upload Foto

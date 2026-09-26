@@ -121,7 +121,10 @@ Route::middleware([
     Route::post(
         '/report',
         [ReportController::class, 'store']
-    )->name('laporan.store');
+    )
+        // Batasi spam submit laporan, tidak memengaruhi navigasi halaman lain
+        ->middleware('throttle:5,1')
+        ->name('laporan.store');
 
     Route::get(
         '/my-report',
