@@ -25,7 +25,13 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        // Registrasi tidak langsung login, user diarahkan ke halaman login.
+        $this->assertGuest();
+        $response->assertRedirect(route('login', absolute: false));
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'test@example.com',
+            'role' => 'pelapor',
+        ]);
     }
 }
