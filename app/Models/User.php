@@ -13,6 +13,15 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    /**
+     * Daftar role yang dikenal aplikasi ini.
+     */
+    public const ROLE = [
+        'pelapor' => 'pelapor',
+        'admin' => 'admin',
+        'super_admin' => 'super_admin',
+    ];
+
     protected $fillable = [
         'name',
         'email',
@@ -51,18 +60,26 @@ class User extends Authenticatable
         );
     }
 
-    public function isPelapor()
+    /**
+     * Apakah user ini punya role tertentu.
+     */
+    public function hasRole(string $role): bool
     {
-        return $this->role === 'pelapor';
+        return $this->role === $role;
     }
 
-    public function isAdmin()
+    public function isPelapor(): bool
     {
-        return $this->role === 'admin';
+        return $this->hasRole(self::ROLE['pelapor']);
     }
 
-    public function isSuperAdmin()
+    public function isAdmin(): bool
     {
-        return $this->role === 'super_admin';
+        return $this->hasRole(self::ROLE['admin']);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole(self::ROLE['super_admin']);
     }
 }

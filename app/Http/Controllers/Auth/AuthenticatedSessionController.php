@@ -11,6 +11,57 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    /**
+     * =========================
+     * PETA LOGIN -> ROLE
+     *
+     * Route login (berdasarkan nama route) → role yang diizinkan,
+     * tujuan dashboard, dan pesan penolakan.
+     * Menambah role baru cukup dilakukan di sini.
+     * =========================
+     */
+    private const PETA_LOGIN = [
+        'login' => [
+            'role' => 'pelapor',
+            'dashboard' => 'dashboard',
+            'pesan' => 'Akun ini bukan akun pelapor.',
+        ],
+        'login.post' => [
+            'role' => 'pelapor',
+            'dashboard' => 'dashboard',
+            'pesan' => 'Akun ini bukan akun pelapor.',
+        ],
+        'login.admin.post' => [
+            'role' => 'admin',
+            'dashboard' => 'admin.dashboard',
+            'pesan' => 'Akun ini bukan akun admin.',
+        ],
+        'login.superadmin.post' => [
+            'role' => 'super_admin',
+            'dashboard' => 'superadmin.dashboard',
+            'pesan' => 'Akun ini bukan akun super admin.',
+        ],
+    ];
+
+    /**
+     * =========================
+     * PETA ROLE -> DASHBOARD
+     *
+     * Dipakai kalau login datang dari route yang tidak punya aturan
+     * khusus, jadi user diarahkan ke dashboard sesuai role-nya.
+     * =========================
+     */
+    private const PETA_DASHBOARD = [
+        'pelapor' => 'dashboard',
+        'admin' => 'admin.dashboard',
+        'super_admin' => 'superadmin.dashboard',
+    ];
+
+    /**
+     * Dashboard default bila role tidak dikenal.
+     */
+    private const DASHBOARD_DEFAULT = 'dashboard';
+
     // =========================
     // HALAMAN LOGIN USER / PELAPOR
     // =========================
@@ -35,9 +86,11 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login-superadmin');
     }
 
-    // =========================
-    // PROSES LOGIN
-    // =========================
+    /**
+     * =========================
+     * PROSES LOGIN
+     * =========================
+     */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
@@ -46,71 +99,25 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-        $routeName = $request->route()?->getName();
+        $aturan = self::PETA_LOGIN[$request->route()?->getName()] ?? null;
 
         // =========================
-        // LOGIN PELAPOR
+        // CEK ROLE SESUAI HALAMAN LOGIN
         // =========================
-        if ($routeName === 'login.post' || $routeName === 'login') {
-
-            if ($user->role !== 'pelapor') {
-                return $this->logoutAndBack(
-                    $request,
-                    'Akun ini bukan akun pelapor.'
-                );
+        if ($aturan !== null) {
+            if (! $user->hasRole($aturan['role'])) {
+                return $this->logoutAndBack($request, $aturan['pesan']);
             }
 
-            return redirect()
-                ->route('dashboard');
-        }
-
-        // =========================
-        // LOGIN ADMIN
-        // =========================
-        if ($routeName === 'login.admin.post') {
-
-            if ($user->role !== 'admin') {
-                return $this->logoutAndBack(
-                    $request,
-                    'Akun ini bukan akun admin.'
-                );
-            }
-
-            return redirect()
-                ->route('admin.dashboard');
-        }
-
-        // =========================
-        // LOGIN SUPER ADMIN
-        // =========================
-        if ($routeName === 'login.superadmin.post') {
-
-            if ($user->role !== 'super_admin') {
-                return $this->logoutAndBack(
-                    $request,
-                    'Akun ini bukan akun super admin.'
-                );
-            }
-
-            return redirect()
-                ->route('superadmin.dashboard');
+            return redirect()->route($aturan['dashboard']);
         }
 
         // =========================
         // FALLBACK BERDASARKAN ROLE
         // =========================
-        if ($user->role === 'super_admin') {
-            return redirect()
-                ->route('superadmin.dashboard');
-        }
-
-        if ($user->role === 'admin') {
-            return redirect()
-                ->route('admin.dashboard');
-        }
-
-        return redirect()
-            ->route('dashboard');
+        return redirect()->route(
+            self::PETA_DASHBOARD[$user->role] ?? self::DASHBOARD_DEFAULT
+        );
     }
 
     // =========================

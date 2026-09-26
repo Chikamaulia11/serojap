@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +23,7 @@ class PelaporMiddleware
         // =========================
         if (
             Auth::check()
-            && Auth::user()->role === 'pelapor'
+            && Auth::user()->hasRole(User::ROLE['pelapor'])
         ) {
 
             return $next($request);

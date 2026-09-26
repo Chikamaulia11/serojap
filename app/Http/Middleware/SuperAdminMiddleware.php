@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,9 +20,9 @@ class SuperAdminMiddleware
                 ]);
         }
 
-        if (Auth::user()->role !== 'super_admin') {
+        if (! Auth::user()->hasRole(User::ROLE['super_admin'])) {
 
-            if (Auth::user()->role === 'admin') {
+            if (Auth::user()->hasRole(User::ROLE['admin'])) {
                 return redirect()
                     ->route('admin.dashboard')
                     ->withErrors([

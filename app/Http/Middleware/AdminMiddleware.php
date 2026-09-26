@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,7 @@ class AdminMiddleware
         // =========================
         if (
             Auth::check()
-            && Auth::user()->role === 'admin'
+            && Auth::user()->hasRole(User::ROLE['admin'])
         ) {
             return $next($request);
         }
@@ -31,7 +32,7 @@ class AdminMiddleware
         // =========================
         if (
             Auth::check()
-            && Auth::user()->role === 'super_admin'
+            && Auth::user()->hasRole(User::ROLE['super_admin'])
         ) {
             return redirect()
                 ->route('superadmin.dashboard');
