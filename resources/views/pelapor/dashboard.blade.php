@@ -23,7 +23,7 @@
     <section class="hero reveal" id="dashboard">
 
         <div class="hero-bg">
-            <img src="{{ asset('assets/pelapor/images/utama.png') }}">
+            <img src="{{ asset('assets/pelapor/images/utama.webp') }}">
         </div>
 
         <div class="hero-overlay"></div>
@@ -230,7 +230,7 @@
                     <div class="map-glow"></div>
 
                     <img
-                        src="{{ asset('assets/pelapor/images/peta.png') }}"
+                        src="{{ asset('assets/pelapor/images/peta.webp') }}"
                         alt="Peta Purwakarta"
                         class="map-image">
 

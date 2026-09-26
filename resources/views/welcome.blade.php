@@ -418,7 +418,7 @@
 
                 <div class="col-lg-6">
                     <div class="img-frame">
-                        <img src="{{ asset('assets/pelapor/images/jalan-purwakarta.png') }}"
+                        <img src="{{ asset('assets/pelapor/images/jalan-purwakarta.webp') }}"
                             alt="Jalan Purwakarta"
                             class="img-hero">
                     </div>

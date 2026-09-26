@@ -10,7 +10,7 @@
         <div class="flex items-center gap-6 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
 
             <img
-                src="{{ asset('assets/pelapor/images/logo-serojap.png') }}"
+                src="{{ asset('assets/pelapor/images/logo-serojap.webp') }}"
                 alt="Serojap"
                 class="w-24 h-24 rounded-xl shadow-lg object-cover"
             >
