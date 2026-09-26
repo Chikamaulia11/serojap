@@ -43,13 +43,27 @@ class StatistikController extends Controller
         $perBulan = collect();
 
         try {
+            // MONTH()/YEAR() hanya ada di MySQL, jadi untuk driver lain
+            // dipakai padanan strftime(). Hasilnya sama-sama angka bulan/tahun.
+            [$bulanSql, $tahunSql] = match (DB::connection()->getDriverName()) {
+                'sqlite' => [
+                    "CAST(STRFTIME('%m', created_at) AS INTEGER)",
+                    "CAST(STRFTIME('%Y', created_at) AS INTEGER)",
+                ],
+                'pgsql' => [
+                    'CAST(EXTRACT(MONTH FROM created_at) AS INTEGER)',
+                    'CAST(EXTRACT(YEAR FROM created_at) AS INTEGER)',
+                ],
+                default => ['MONTH(created_at)', 'YEAR(created_at)'],
+            };
+
             $perBulan = Report::select(
-                    DB::raw('MONTH(created_at) as bulan'),
-                    DB::raw('YEAR(created_at) as tahun'),
+                    DB::raw($bulanSql . ' as bulan'),
+                    DB::raw($tahunSql . ' as tahun'),
                     DB::raw('COUNT(*) as jumlah')
                 )
                 ->whereYear('created_at', now()->year)
-                ->groupBy('tahun', 'bulan')
+                ->groupBy('bulan', 'tahun')
                 ->orderBy('bulan')
                 ->get();
         } catch (\Throwable $e) {
