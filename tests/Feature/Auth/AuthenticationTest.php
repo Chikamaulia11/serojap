@@ -51,4 +51,111 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    public function test_admin_can_authenticate_using_the_admin_login_screen(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->post('/login/admin', [
+            'email' => $admin->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($admin);
+        $response->assertRedirect(route('admin.dashboard', absolute: false));
+    }
+
+    public function test_super_admin_can_authenticate_using_the_super_admin_login_screen(): void
+    {
+        $superAdmin = User::factory()->superAdmin()->create();
+
+        $response = $this->post('/login/superadmin', [
+            'email' => $superAdmin->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($superAdmin);
+        $response->assertRedirect(route('superadmin.dashboard', absolute: false));
+    }
+
+    public function test_pelapor_cannot_log_in_through_the_admin_login_screen(): void
+    {
+        $pelapor = User::factory()->pelapor()->create();
+
+        $response = $this->from('/login/admin')
+            ->post('/login/admin', [
+                'email' => $pelapor->email,
+                'password' => 'password',
+            ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login/admin');
+        $response->assertSessionHasErrors([
+            'email' => 'Akun ini bukan akun admin.',
+        ]);
+    }
+
+    public function test_admin_cannot_log_in_through_the_pelapor_login_screen(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->from('/login')
+            ->post('/login', [
+                'email' => $admin->email,
+                'password' => 'password',
+            ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors([
+            'email' => 'Akun ini bukan akun pelapor.',
+        ]);
+    }
+
+    public function test_pelapor_cannot_log_in_through_the_super_admin_login_screen(): void
+    {
+        $pelapor = User::factory()->pelapor()->create();
+
+        $response = $this->from('/login/superadmin')
+            ->post('/login/superadmin', [
+                'email' => $pelapor->email,
+                'password' => 'password',
+            ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login/superadmin');
+        $response->assertSessionHasErrors([
+            'email' => 'Akun ini bukan akun super admin.',
+        ]);
+    }
+
+    public function test_admin_cannot_log_in_through_the_super_admin_login_screen(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->from('/login/superadmin')
+            ->post('/login/superadmin', [
+                'email' => $admin->email,
+                'password' => 'password',
+            ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login/superadmin');
+        $response->assertSessionHasErrors([
+            'email' => 'Akun ini bukan akun super admin.',
+        ]);
+    }
+
+    public function test_email_yang_gagal_login_kemudian_ada_di_input_kembali(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->from('/login')
+            ->post('/login', [
+                'email' => $admin->email,
+                'password' => 'password',
+            ]);
+
+        $response->assertSessionHasInput('email', $admin->email);
+    }
 }
