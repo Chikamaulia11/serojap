@@ -1,0 +1,152 @@
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#eef2ff,#f8fafc);
+    padding:20px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+.back-btn{
+    display:inline-block;
+    margin-bottom:18px;
+    text-decoration:none;
+    color:#226d71;
+    font-weight:600;
+    transition:.2s;
+}
+
+.back-btn:hover{
+    transform:translateX(-3px);
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.08);
+}
+
+.header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:25px;
+}
+
+.header img{
+    width:40px;
+}
+
+.header h2{
+    color:#1f4674;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:15px;
+}
+
+.full{
+    grid-column:1/-1;
+}
+
+input,
+textarea{
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #ddd;
+    font-family:'Poppins',sans-serif;
+}
+
+textarea{
+    min-height:120px;
+    resize:vertical;
+}
+
+/* AUTOCOMPLETE */
+.autocomplete-wrapper{
+    position:relative;
+}
+
+.autocomplete-list{
+    position:absolute;
+    top:105%;
+    left:0;
+    width:100%;
+    background:white;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    overflow:hidden;
+    z-index:999;
+    display:none;
+    max-height:240px;
+    overflow-y:auto;
+}
+
+.autocomplete-item{
+    padding:12px 15px;
+    cursor:pointer;
+    transition:.2s;
+    border-bottom:1px solid #f1f5f9;
+}
+
+.autocomplete-item:hover{
+    background:#eef2ff;
+}
+
+/* MAP */
+#mapContainer{
+    display:none;
+}
+
+#map{
+    height:300px;
+    border-radius:12px;
+}
+
+/* BUTTON */
+.btn{
+    padding:12px;
+    border-radius:12px;
+    border:none;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.btn-main{
+    background:#1f4674;
+    color:white;
+}
+
+.btn-main:hover{
+    background:#173657;
+}
+
+.btn-alt{
+    background:#226d71;
+    color:white;
+}
+
+.btn-alt:hover{
+    background:#1b575a;
+}
+
+/* ERROR */
+.error-box{
+    background:#dc2626;
+    color:white;
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:15px;
+}
