@@ -139,22 +139,33 @@ class LaporanManagementTest extends TestCase
         $pelapor = User::factory()->pelapor()->create();
         $laporan = $this->buatLaporan($pelapor);
 
+        // Semua request dari role yang salah harus tertahan dan
+        // diarahkan ke dashboard pelapor-nya sendiri.
         $this->actingAs($pelapor)
             ->get(route('admin.laporan.index'))
-            ->assertRedirect(route('login.admin'));
+            ->assertRedirect(route('dashboard'));
 
         $this->actingAs($pelapor)
             ->get(route('admin.laporan.show', $laporan->id))
-            ->assertRedirect(route('login.admin'));
+            ->assertRedirect(route('dashboard'));
 
         $this->actingAs($pelapor)
             ->put(route('admin.laporan.update', $laporan->id), [
                 'status' => 'selesai',
                 'keterangan' => 'Mencoba update sendiri.',
             ])
-            ->assertRedirect(route('login.admin'));
+            ->assertRedirect(route('dashboard'));
 
-        $this->assertGuest();
+        // Role yang salah DITARUH di dashboard sendiri, tapi sesi tetap
+        // dipakai: middleware sengaja tidak melakukan logout karena
+        // orangnya cuma salah klik.
+        $this->assertAuthenticatedAs($pelapor);
+
+        // Tidak ada data yang berubah dari percobaan update tadi.
+        $this->assertDatabaseMissing('tabel_status', [
+            'report_id' => $laporan->id,
+            'keterangan' => 'Mencoba update sendiri.',
+        ]);
     }
 
     public function test_super_admin_diarahkan_ke_dashboard_super_admin(): void

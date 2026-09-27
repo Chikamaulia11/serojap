@@ -41,9 +41,14 @@ class StatistikTest extends TestCase
     {
         $pelapor = User::factory()->pelapor()->create();
 
-        $this->actingAs($pelapor)
-            ->get(route('admin.statistik.index'))
-            ->assertRedirect(route('login.admin'));
+        // `AdminMiddleware` mengarahkan role yang salah ke dashboard
+        // sendiri, bukan ke halaman login: user cuma salah klik, jadi
+        // sesinya sengaja tidak di-logout.
+        $response = $this->actingAs($pelapor)
+            ->get(route('admin.statistik.index'));
+
+        $response->assertRedirect(route('dashboard'));
+        $response->assertSessionHas('error');
     }
 
     public function test_statistik_kosong_saat_belum_ada_laporan(): void

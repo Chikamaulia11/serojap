@@ -89,7 +89,7 @@
 
     <div>
         <a href="{{ route('superadmin.accounts.index') }}"
-           class="inline-flex items-center gap-2 text-[#2657c1] text-sm hover:underline font-extrabold">
+           class="inline-flex items-center gap-2 py-1 text-[#2657c1] text-sm hover:underline font-extrabold">
             <i class="mdi mdi-arrow-left"></i>
             Kembali ke Manajemen Akun
         </a>

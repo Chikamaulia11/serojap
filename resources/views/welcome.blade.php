@@ -35,6 +35,13 @@
             min-height: 85vh;
             display: flex;
             align-items: center;
+            /* WAJIB: `.gradient-bg` adalah dekorasi 600x600px yang digeser
+               ke `left: -100px`, jadi ujungnya berada di 500px. Tanpa
+               `overflow: hidden` di sini, elemen itu ikut lebarkan
+               `scrollWidth` dokumen: di layar 375px (iPhone SE) halaman
+               jadi bisa di-scroll ke samping dan seluruh konten geser
+               keluar layar. */
+            overflow: hidden;
         }
 
         .gradient-bg {
@@ -271,42 +278,6 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-        }
-
-        .badge-status {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            border-radius: 50px;
-            padding: 0.3rem 0.75rem;
-            white-space: nowrap;
-        }
-
-        .badge-status-diterima {
-            background-color: #d1fae5;
-            color: #047857;
-        }
-
-        .badge-status-diproses {
-            background-color: #fef3c7;
-            color: #b45309;
-        }
-
-        .badge-status-selesai {
-            background-color: #ede9fe;
-            color: #6d28d9;
-        }
-
-        .badge-status-ditolak {
-            background-color: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .badge-status-kosong {
-            background-color: #f3f4f6;
-            color: #4b5563;
         }
 
         /* =========================
@@ -564,10 +535,7 @@
             @else
                 <div class="row g-4">
                     @foreach ($laporanTerbaru as $laporan)
-                        @php
-                            $status = $laporan->latestStatus->status ?? null;
-                            $labelStatus = $status ? ucfirst($status) : 'Menunggu Verifikasi';
-                        @endphp
+                        @php $status = $laporan->latestStatus->status ?? null; @endphp
                         <div class="col-12 col-md-6 col-lg-4">
                             <div class="laporan-card">
                                 <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
@@ -583,8 +551,7 @@
                                             <path d="M4.5 20 h15" />
                                         </svg>
                                     </div>
-                                    <span
-                                        class="badge-status badge-status-{{ $status ?? 'kosong' }}">{{ $labelStatus }}</span>
+                                    <x-status-badge :status="$status" />
                                 </div>
 
                                 <h3 class="h6 fw-bold mb-2">{{ $laporan->alamat }}</h3>
@@ -670,7 +637,7 @@
     <footer class="container py-4 border-top border-light">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <p class="small text-muted mb-0">© 2026 Serojap Purwakarta</p>
-            <a class="small text-muted mb-0">infoserojap@gmail.com</a>
+            <a class="small text-muted mb-0 py-1">infoserojap@gmail.com</a>
         </div>
     </footer>
 

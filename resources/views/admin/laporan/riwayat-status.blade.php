@@ -130,20 +130,6 @@
                         <tbody class="divide-y divide-gray-100">
 
                             @forelse($riwayat as $item)
-
-                            @php
-
-                                $badgeClasses = [
-
-                                    'diterima' => 'bg-emerald-100 text-emerald-700',
-                                    'diproses' => 'bg-amber-100 text-amber-700',
-                                    'selesai'  => 'bg-purple-100 text-purple-700',
-                                    'ditolak'  => 'bg-red-100 text-red-700',
-
-                                ][$item->status] ?? 'bg-gray-100 text-gray-700';
-
-                            @endphp
-
                             <tr class="hover:bg-gray-50 transition">
 
                                 <td class="px-6 py-4 text-gray-500 whitespace-nowrap">
@@ -177,12 +163,7 @@
 
                                 <td class="px-6 py-4">
 
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badgeClasses }}">
-
-                                        {{ ucfirst($item->status) }}
-
-                                    </span>
-
+                                    <x-status-badge :status="$item->status" />
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 max-w-xs">
@@ -248,12 +229,21 @@
 
                                     </div>
 
+                                    {{-- Sama seperti `admin/laporan/index`: bedakan kondisi tanpa data
+                                         dari hasil filter yang kosong. --}}
+                                    @php
+                                        $adaFilter = trim((string) request('search')) !== ''
+                                            || request('status') !== null;
+                                    @endphp
+
                                     <p class="text-gray-900 font-medium">
-                                        Belum ada riwayat status
+                                        {{ $adaFilter ? 'Tidak ada riwayat yang cocok' : 'Belum ada riwayat status' }}
                                     </p>
 
                                     <p class="text-gray-500 text-sm">
-                                        Riwayat akan muncul setelah ada perubahan status
+                                        {{ $adaFilter
+                                            ? 'Coba kata kunci lain atau kosongkan filter status.'
+                                            : 'Riwayat akan muncul setelah ada perubahan status' }}
                                     </p>
 
                                 </td>

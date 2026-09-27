@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', 'Prosedur Pelaporan')
+@section('deskripsi', 'Alur lengkap pelaporan kerusakan jalan di Purwakarta, dari laporan dikirim sampai perbaikan selesai.')
+
 @section('content')
 
 <div style="max-width: 900px; margin: 0 auto; padding: 10px 20px 40px 20px;">
@@ -31,19 +34,19 @@
         @php
             $langkah = [
                 [
-                    'judul' => '1. User submits report',
+                    'judul' => '1. Laporan dikirim',
                     'teks' => 'Pengguna mengirimkan laporan lengkap dengan lokasi, jenis kerusakan, dan foto pendukung melalui sistem.',
                 ],
                 [
-                    'judul' => '2. Report received',
+                    'judul' => '2. Laporan diterima',
                     'teks' => 'Laporan masuk, tercatat dalam sistem, dan pelapor dapat langsung memantau status awal aduan tersebut melalui menu Riwayat.',
                 ],
                 [
-                    'judul' => '3. Report processed',
+                    'judul' => '3. Laporan diproses',
                     'teks' => 'Tim melakukan verifikasi, pengecekan lokasi, dan identifikasi pengaduan.',
                 ],
                 [
-                    'judul' => '4. Work completed',
+                    'judul' => '4. Perbaikan selesai',
                     'teks' => 'Perbaikan selesai dilaksanakan, pengguna bisa melihat foto hasilnya langsung di menu Riwayat.',
                 ],
             ];

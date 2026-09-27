@@ -4,39 +4,24 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Report;
-use Illuminate\Support\Facades\DB;
+use App\Support\LaporanStats;
 
 class AdminDashboardController extends Controller
 {
     public function index()
     {
-        // =========================
-        // TOTAL SEMUA LAPORAN
-        // =========================
-        $total = Report::count();
+        $stats = LaporanStats::ringkasan();
 
-        // =========================
-        // SUBQUERY: ambil id_status terbaru (MAX) per report_id
-        // MAX(id_status) lebih aman dari MAX(created_at) karena id pasti unik
-        // =========================
-        $latestIds = DB::table('tabel_status')
-            ->select(DB::raw('MAX(id_status) as id_status'))
-            ->groupBy('report_id');
+        // Laporan yang menunggu tindakan petugas lebih dari 3 hari.
+        $perluTindakan = LaporanStats::perluTindakan(3);
 
-        $countByStatus = function (string $status) use ($latestIds): int {
-            return DB::table('tabel_status')
-                ->joinSub($latestIds, 'latest', 'tabel_status.id_status', '=', 'latest.id_status')
-                ->where('tabel_status.status', $status)
-                ->count();
-        };
+        // Laporan terbaru supaya petugas bisa langsung bekerja dari
+        // antrean, bukan harus mencari satu per satu lewat menu.
+        $antrean = Report::with(['user', 'latestStatus'])
+            ->latest()
+            ->limit(8)
+            ->get();
 
-        $diterima = $countByStatus('diterima');
-        $diproses = $countByStatus('diproses');
-        $selesai  = $countByStatus('selesai');
-        $ditolak  = $countByStatus('ditolak');
-
-        return view('admin.dashboard', compact(
-            'total', 'diterima', 'diproses', 'selesai', 'ditolak'
-        ));
+        return view('admin.dashboard', compact('stats', 'perluTindakan', 'antrean'));
     }
 }

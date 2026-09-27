@@ -78,7 +78,11 @@ class ProfileTest extends TestCase
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
+        // Akun di-soft delete, bukan di-hard delete: super admin masih
+        // harus bisa memulihkannya lewat `AccountController@restore`
+        // (`User::withTrashed()` + `restore()`). Jadi barisnya masih ada,
+        // hanya `deleted_at` yang terisi.
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
     }
 
     public function test_user_account_and_reports_are_deleted_together(): void
@@ -100,7 +104,11 @@ class ProfileTest extends TestCase
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
+        // Akun di-soft delete, bukan di-hard delete: super admin masih
+        // harus bisa memulihkannya lewat `AccountController@restore`
+        // (`User::withTrashed()` + `restore()`). Jadi barisnya masih ada,
+        // hanya `deleted_at` yang terisi.
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
         $this->assertDatabaseMissing('reports', ['id' => $laporan->id]);
         $this->assertDatabaseMissing('tabel_status', ['report_id' => $laporan->id]);
     }

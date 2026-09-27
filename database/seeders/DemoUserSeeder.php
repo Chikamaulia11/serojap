@@ -4,18 +4,21 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 /**
  * Akun demo untuk pengembangan lokal.
  *
  * Jalankan `php artisan migrate:fresh --seed` pada environment lokal.
- * Jangan pernah menjalankan seeder ini di production.
+ *
+ * Seeder ini menolak jalan di production dan TIDAK pernah menimpa
+ * password akun yang sudah ada. Kedua hal sama pentingnya: kalau tidak,
+ * satu `db:seed` di server akan me-reset password super admin yang sedang
+ * dipakai menjadi string publik "password".
  */
 class DemoUserSeeder extends Seeder
 {
     /**
-     * @var array<int, array{name: string, email: string, role: string, posisi: string}>
+     * @var array<int, array{name: string, email: string, role: string, posisi: ?string}>
      */
     private const AKUN = [
         [
@@ -46,17 +49,33 @@ class DemoUserSeeder extends Seeder
 
     public function run(): void
     {
+        if (! app()->environment('local', 'testing')) {
+            $this->command?->warn('DemoUserSeeder dilewati: environment bukan local/testing.');
+
+            return;
+        }
+
         foreach (self::AKUN as $akun) {
-            User::query()->updateOrCreate(
-                ['email' => $akun['email']],
-                [
-                    'name' => $akun['name'],
-                    'role' => $akun['role'],
-                    'posisi' => $akun['posisi'],
-                    'password' => Hash::make('password'),
-                    'email_verified_at' => now(),
-                ],
-            );
+            $ada = User::withTrashed()
+                ->where('email', $akun['email'])
+                ->exists();
+
+            if ($ada) {
+                $this->command?->line('  - lewati ' . $akun['email'] . ' (akun sudah ada)');
+
+                continue;
+            }
+
+            $user = User::withRole($akun['role'], [
+                'name' => $akun['name'],
+                'email' => $akun['email'],
+                'password' => 'password',
+                'posisi' => $akun['posisi'],
+            ]);
+
+            $user->forceFill(['email_verified_at' => now()])->save();
+
+            $this->command?->line('  + buat ' . $akun['email']);
         }
     }
 }

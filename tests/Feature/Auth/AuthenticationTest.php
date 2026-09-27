@@ -80,9 +80,20 @@ class AuthenticationTest extends TestCase
 
     public function test_pelapor_cannot_log_in_through_the_admin_login_screen(): void
     {
+    // Catatan: test ini SENGAJA tidak memakai `->from()`.
+    //
+    // `AuthenticatedSessionController::logoutAndBack()` memanggil
+    // `session()->invalidate()`, yang menjalankan `flush()` sehingga key
+    // `_previous.url` ikut terhapus. Kalau redirect-nya `back()`, di
+    // test selalu jatuh ke URL dari `->from()`, tapi di permintaan nyata
+    // yang tidak mengirim `Referer` ia jatuh ke "/" yang tidak
+    // menampilkan pesan apa pun.
+    //
+    // Jadi test ini menguji redirect EXPLICIT ke halaman login yang
+    // sesuai, bukan andalkan `back()`.
         $pelapor = User::factory()->pelapor()->create();
 
-        $response = $this->from('/login/admin')
+        $response = $this
             ->post('/login/admin', [
                 'email' => $pelapor->email,
                 'password' => 'password',
@@ -97,9 +108,20 @@ class AuthenticationTest extends TestCase
 
     public function test_admin_cannot_log_in_through_the_pelapor_login_screen(): void
     {
+    // Catatan: test ini SENGAJA tidak memakai `->from()`.
+    //
+    // `AuthenticatedSessionController::logoutAndBack()` memanggil
+    // `session()->invalidate()`, yang menjalankan `flush()` sehingga key
+    // `_previous.url` ikut terhapus. Kalau redirect-nya `back()`, di
+    // test selalu jatuh ke URL dari `->from()`, tapi di permintaan nyata
+    // yang tidak mengirim `Referer` ia jatuh ke "/" yang tidak
+    // menampilkan pesan apa pun.
+    //
+    // Jadi test ini menguji redirect EXPLICIT ke halaman login yang
+    // sesuai, bukan andalkan `back()`.
         $admin = User::factory()->admin()->create();
 
-        $response = $this->from('/login')
+        $response = $this
             ->post('/login', [
                 'email' => $admin->email,
                 'password' => 'password',
@@ -114,9 +136,20 @@ class AuthenticationTest extends TestCase
 
     public function test_pelapor_cannot_log_in_through_the_super_admin_login_screen(): void
     {
+    // Catatan: test ini SENGAJA tidak memakai `->from()`.
+    //
+    // `AuthenticatedSessionController::logoutAndBack()` memanggil
+    // `session()->invalidate()`, yang menjalankan `flush()` sehingga key
+    // `_previous.url` ikut terhapus. Kalau redirect-nya `back()`, di
+    // test selalu jatuh ke URL dari `->from()`, tapi di permintaan nyata
+    // yang tidak mengirim `Referer` ia jatuh ke "/" yang tidak
+    // menampilkan pesan apa pun.
+    //
+    // Jadi test ini menguji redirect EXPLICIT ke halaman login yang
+    // sesuai, bukan andalkan `back()`.
         $pelapor = User::factory()->pelapor()->create();
 
-        $response = $this->from('/login/superadmin')
+        $response = $this
             ->post('/login/superadmin', [
                 'email' => $pelapor->email,
                 'password' => 'password',
@@ -131,9 +164,20 @@ class AuthenticationTest extends TestCase
 
     public function test_admin_cannot_log_in_through_the_super_admin_login_screen(): void
     {
+    // Catatan: test ini SENGAJA tidak memakai `->from()`.
+    //
+    // `AuthenticatedSessionController::logoutAndBack()` memanggil
+    // `session()->invalidate()`, yang menjalankan `flush()` sehingga key
+    // `_previous.url` ikut terhapus. Kalau redirect-nya `back()`, di
+    // test selalu jatuh ke URL dari `->from()`, tapi di permintaan nyata
+    // yang tidak mengirim `Referer` ia jatuh ke "/" yang tidak
+    // menampilkan pesan apa pun.
+    //
+    // Jadi test ini menguji redirect EXPLICIT ke halaman login yang
+    // sesuai, bukan andalkan `back()`.
         $admin = User::factory()->admin()->create();
 
-        $response = $this->from('/login/superadmin')
+        $response = $this
             ->post('/login/superadmin', [
                 'email' => $admin->email,
                 'password' => 'password',
@@ -150,7 +194,7 @@ class AuthenticationTest extends TestCase
     {
         $admin = User::factory()->admin()->create();
 
-        $response = $this->from('/login')
+        $response = $this
             ->post('/login', [
                 'email' => $admin->email,
                 'password' => 'password',

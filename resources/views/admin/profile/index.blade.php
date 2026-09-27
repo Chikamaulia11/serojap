@@ -160,10 +160,13 @@
                     Kembali
                 </a>
 
-                <button type="submit"
-                        class="px-5 py-2.5 rounded-xl text-sm font-medium bg-[#2657c1] text-white hover:bg-blue-700 transition shadow-sm">
+                <x-submit-button
+                    type="submit"
+                    loading-text="Menyimpan..."
+                    class="px-5 py-2.5 rounded-xl text-sm font-medium bg-[#2657c1] text-white hover:bg-blue-700 transition shadow-sm"
+                >
                     Simpan Perubahan
-                </button>
+                </x-submit-button>
             </div>
 
         </form>

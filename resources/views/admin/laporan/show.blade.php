@@ -113,7 +113,7 @@
 
     <a
         href="{{ route('admin.laporan.index') }}"
-        class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4 transition"
+        class="inline-flex items-center gap-1 py-1 text-sm text-gray-500 hover:text-gray-700 mb-4 transition"
     >
 
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,18 +130,14 @@
     </a>
 
     @php
-
-        $statusNow = $laporan->statusTerbaru?->status ?? 'diterima';
-
-        $badgeClasses = [
-
-            'diterima' => 'bg-emerald-100 text-emerald-700',
-            'diproses' => 'bg-amber-100 text-amber-700',
-            'selesai'  => 'bg-purple-100 text-purple-700',
-            'ditolak'  => 'bg-red-100 text-red-700',
-
-        ][$statusNow] ?? 'bg-gray-100 text-gray-700';
-
+        /*
+         * Tanpa `?? 'diterima'`: laporan yang belum pernah disentuh
+         * petugas harus tampil "Menunggu", bukan "Diterima" -- nilai
+         * fallback lama membuat laporan baru terlihat sudah diproses.
+         * Peta warna/label dibaca dari `StatusPeta` lewat
+         * komponen `x-status-badge`.
+         */
+        $statusNow = $laporan->statusTerbaru?->status;
     @endphp
 
     <div class="flex items-start justify-between mb-6 gap-6">
@@ -160,9 +156,7 @@
         </div>
 
         <div class="flex flex-col items-end gap-3">
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $badgeClasses }}">
-                {{ ucfirst($statusNow) }}
-            </span>
+            <x-status-badge :status="$statusNow" size="lg" />
 
             @if(isset($daftarLaporan) && $daftarLaporan->count())
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 w-auto min-w-[12rem]">
@@ -362,33 +356,28 @@
 
                         <div class="space-y-6">
 
-                            @foreach($laporan->statuses->sortByDesc('created_at') as $s)
+                            @foreach($laporan->statuses->sortByDesc('id_status') as $s)
 
                             @php
-
-                                $dotColors = [
-
-                                    'diterima' => 'bg-emerald-100 text-emerald-600 border-emerald-200',
-                                    'diproses' => 'bg-amber-100 text-amber-600 border-amber-200',
-                                    'selesai'  => 'bg-purple-100 text-purple-600 border-purple-200',
-                                    'ditolak'  => 'bg-red-100 text-red-600 border-red-200',
-
-                                ][$s->status] ?? 'bg-gray-100 text-gray-600 border-gray-200';
-
+                                // Warna & label timeline ikut `StatusPeta`,
+                                // bukan palet terpisah di view ini.
+                                $petaStatus = \App\Support\StatusPeta::get($s->status);
                             @endphp
 
                             <div class="flex gap-4 relative">
 
-                                <div class="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-bold flex-shrink-0 {{ $dotColors }}">
-                                    ●
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 {{ $petaStatus['bg'] }} {{ $petaStatus['text'] }} ring-1 ring-inset {{ $petaStatus['ring'] }}">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="{{ $petaStatus['ikon'] }}" />
+                                    </svg>
                                 </div>
 
                                 <div class="flex-1 min-w-0">
 
                                     <div class="flex items-center justify-between gap-2">
 
-                                        <span class="font-semibold text-sm text-gray-900">
-                                            {{ ucfirst($s->status) }}
+                                        <span class="font-semibold text-sm {{ $petaStatus['text'] }}">
+                                            {{ $petaStatus['label'] }}
                                         </span>
 
                                         <span class="text-xs text-gray-400 whitespace-nowrap">
@@ -551,12 +540,18 @@
 
                         </div>
 
-                        <button
+                        {{-- `validate="validateForm"` menggantikan inline
+                             `onclick="return validateForm(event)"`: kalau
+                             validasi gagal, `busy` tidak pernah diset, jadi
+                             tombol tidak terkunci permanen. --}}
+                        <x-submit-button
                             type="submit"
-                            onclick="return validateForm(event)"
-                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm px-5 py-3 transition">
+                            validate="validateForm"
+                            loading-text="Menyimpan..."
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm px-5 py-3 transition"
+                        >
                             Simpan Perubahan
-                        </button>
+                        </x-submit-button>
 
                     </form>
 
@@ -598,15 +593,25 @@
             </div>
 
             <div class="p-4 bg-gray-50">
+                {{-- `src` sengaja TIDAK diberi atribut. `<img src="">` membuat
+                     browser meminta URL halaman saat ini sebagai gambar, yang
+                     selalu gagal: sia-sia satu request dan bisa memunculkan
+                     ikon gambar rusak. Modal ini diisi oleh `showImageModal()`
+                     di bawah setiap kali pengguna mengeklik sebuah foto. --}}
                 <img
                     id="imageModalImg"
-                    src=""
                     alt=""
                     class="w-full max-h-[75vh] object-contain rounded-lg bg-white border border-gray-200"
                 >
             </div>
         </div>
     </div>
+</div>
+
+{{-- Menutup <div class="max-w-7xl mx-auto"> yang dibuka di baris atas
+     file. Tanpa penutup ini, lightbox gambar ikut ter-nest di dalam
+     wrapper halaman -- dan karena memakai `position: fixed`, ia bisa
+     ikut terpotong/scroll bersama halaman. --}}
 </div>
 
 <script>
@@ -632,7 +637,9 @@
         modal.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('overflow-hidden');
 
-        img.src = img.src;
+        // Kosongkan `src` supaya tidak menggantungkan request ke
+        // halaman ini setelah modal ditutup.
+        img.removeAttribute('src');
     }
 
     document.addEventListener('keydown', function (e) {

@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,45 +15,68 @@ class AdminMiddleware
     ): Response {
 
         // =========================
-        // ADMIN BIASA SAJA
-        // SUPER ADMIN SUDAH DIPISAH
+        // BELUM LOGIN
         // =========================
-        if (
-            Auth::check()
-            && Auth::user()->hasRole(User::ROLE['admin'])
-        ) {
+        if (! Auth::check()) {
+            return redirect()
+                ->route('login.admin')
+                ->withErrors([
+                    'email' => 'Silakan login sebagai admin untuk melanjutkan.',
+                ]);
+        }
+
+        $user = Auth::user();
+
+        // =========================
+        // AKUN DINONAKTIFKAN
+        // =========================
+        if (! $user->bisaLogin()) {
+            $this->keluarkan($request);
+
+            return redirect()
+                ->route('login.admin')
+                ->withErrors([
+                    'email' => 'Akun Anda sudah dinonaktifkan oleh super admin. Hubungi super admin untuk mengaktifkan kembali.',
+                ]);
+        }
+
+        // =========================
+        // SUPER ADMIN DI AREA ADMIN
+        // ARAHKAN KE DASHBOARD SUPER ADMIN
+        // =========================
+        if ($user->isSuperAdmin()) {
+            return redirect()->route('superadmin.dashboard');
+        }
+
+        // =========================
+        // ADMIN BIASA SAJA
+        // =========================
+        if ($user->isAdmin()) {
             return $next($request);
         }
 
         // =========================
-        // JIKA SUPER ADMIN MASUK KE AREA ADMIN
-        // ARAHKAN KE DASHBOARD SUPER ADMIN
+        // ROLE LAIN (PELAPOR)
+        // Jangan logout: user-nya cuma salah klik, sesi tetap dipakai.
         // =========================
-        if (
-            Auth::check()
-            && Auth::user()->hasRole(User::ROLE['super_admin'])
-        ) {
+        if ($user->isPelapor()) {
             return redirect()
-                ->route('superadmin.dashboard');
-        }
-
-        // =========================
-        // JIKA BUKAN ADMIN
-        // =========================
-        if (Auth::check()) {
-
-            Auth::logout();
-
-            $request->session()->invalidate();
-
-            $request->session()->regenerateToken();
-
+                ->route('dashboard')
+                ->with('error', 'Halaman admin hanya untuk petugas. Kamu sedang masuk sebagai pelapor.');
         }
 
         return redirect()
             ->route('login.admin')
             ->withErrors([
-                'email' => 'Anda tidak memiliki akses ke dashboard admin.'
+                'email' => 'Anda tidak memiliki akses ke dashboard admin.',
             ]);
+    }
+
+    private function keluarkan(Request $request): void
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
     }
 }

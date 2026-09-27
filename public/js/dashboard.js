@@ -31,47 +31,66 @@ window.addEventListener("load", handleReveal);
 
 // ================= ACTIVE NAV =================
 
-const sections = document.querySelectorAll("section[id]");
-const navLinks = document.querySelectorAll(".nav-item");
+/*
+ * Versi lama.feature dari `href` yang berakhiran `#id-section`, jadi
+ * ia menambah DAN MENGHAPUS class `active` pada setiap event scroll.
+ *
+ * Sekarang link navbar menunjuk halaman sungguhan (`/report`,
+ * `/my-report`, ...) dan status aktifnya ditentukan server lewat
+ * `request()->routeIs()` di Blade. Kalau script ini tetap jalan, setiap
+ * kali pengguna menggulir, class `active` di navbar ikut terhapus --
+ * indikator halaman yang sedang aktif ikut hilang.
+ *
+ * Jadi: kalau tidak ada satu pun link navbar berbasis anchor, script
+ * ini tidak melakukan apa-apa sama sekali.
+ */
+const anchorLinks = Array.from(
+    document.querySelectorAll(".nav-item[href*='#']")
+);
 
-function handleActiveNav() {
+if (anchorLinks.length > 0) {
 
-    let current = "";
+    const sections = document.querySelectorAll("section[id]");
 
-    sections.forEach(section => {
+    function handleActiveNav() {
 
-        const sectionTop = section.offsetTop - 220;
-        const sectionHeight = section.offsetHeight;
+        let current = "";
 
-        if (
-            window.scrollY >= sectionTop &&
-            window.scrollY < sectionTop + sectionHeight
-        ) {
-            current = section.getAttribute("id");
-        }
+        sections.forEach(section => {
 
-    });
+            const sectionTop = section.offsetTop - 220;
+            const sectionHeight = section.offsetHeight;
 
-    navLinks.forEach(link => {
+            if (
+                window.scrollY >= sectionTop &&
+                window.scrollY < sectionTop + sectionHeight
+            ) {
+                current = section.getAttribute("id");
+            }
 
-        link.classList.remove("active");
+        });
 
-        const href = link.getAttribute("href");
+        anchorLinks.forEach(link => {
 
-        if (
-            href === `#${current}` ||
-            href === `/dashboard#${current}` ||
-            href.endsWith(`#${current}`)
-        ) {
-            link.classList.add("active");
-        }
+            link.classList.remove("active");
 
-    });
+            const href = link.getAttribute("href");
 
+            if (
+                href === `#${current}` ||
+                href === `/dashboard#${current}` ||
+                href.endsWith(`#${current}`)
+            ) {
+                link.classList.add("active");
+            }
+
+        });
+
+    }
+
+    window.addEventListener("scroll", handleActiveNav, { passive: true });
+    window.addEventListener("load", handleActiveNav);
 }
-
-window.addEventListener("scroll", handleActiveNav);
-window.addEventListener("load", handleActiveNav);
 
 
 // ================= FAQ BUBBLE =================
@@ -82,24 +101,12 @@ function toggleFaqBubble(card) {
 
     document.querySelectorAll(".faq-bubble-card.open").forEach((item) => {
         item.classList.remove("open");
+        item.setAttribute("aria-expanded", "false");
     });
 
     if (!isOpen) {
         card.classList.add("open");
-    }
-
-}
-
-function showMoreFaq() {
-
-    document.querySelectorAll(".extra-faq").forEach((item) => {
-        item.style.display = "";
-    });
-
-    const button = document.getElementById("btnMoreFaq");
-
-    if (button) {
-        button.style.display = "none";
+        card.setAttribute("aria-expanded", "true");
     }
 
 }
@@ -107,7 +114,6 @@ function showMoreFaq() {
 document.addEventListener("DOMContentLoaded", function () {
 
     const searchInput = document.getElementById("faqSearch");
-    const moreButton = document.getElementById("btnMoreFaq");
 
     document.querySelectorAll(".faq-bubble-card").forEach((card) => {
 
@@ -137,24 +143,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (keyword === "") {
 
-                if (item.classList.contains("extra-faq")) {
-                    item.style.display = "none";
-                } else {
-                    item.style.display = "";
-                }
-
-                if (moreButton) {
-                    moreButton.style.display = "";
-                }
-
-            } else {
-
+                /* Faq ke-7 dan ke-8 disembunyikan sampai pengguna
+                   menekan "Lihat Semua Pertanyaan" (sekarang tautan ke
+                   /pusat-bantuan). Kalau sedang mengetik pencarian, SEMUA
+                   item yang cocok harus muncul -- termasuk yang tersembunyi
+                   itu -- kalau tidak, hasil pencarian jadi tidak lengkap. */
                 item.style.display = text.includes(keyword) ? "" : "none";
-
-                if (moreButton) {
-                    moreButton.style.display = "none";
-                }
-
             }
 
         });

@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Pelapor;
 
 use App\Http\Controllers\Controller;
-use App\Models\TabelFaq; 
-use Illuminate\Http\Request;
+use App\Models\TabelFaq;
 
 class FaqController extends Controller
 {

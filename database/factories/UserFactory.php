@@ -29,9 +29,10 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
-            'role' => 'pelapor',
-        ];
+                'remember_token' => Str::random(10),
+                'role' => 'pelapor',
+                'is_active' => true,
+            ];
     }
 
     /**
@@ -71,6 +72,21 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'role' => 'super_admin',
+        ]);
+    }
+
+    /**
+     * Akun yang dinonaktifkan super admin.
+     *
+     * `is_active` bernilai default `true` di level database, jadi
+     * setiap factory tetap membuat akun yang bisa login. State ini
+     * ada supaya test bisa memverifikasi perilaku `bisaLogin()` dan
+     * penolakan login tanpa menuliskan atributnya manual di tiap test.
+     */
+    public function nonaktif(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
         ]);
     }
 }

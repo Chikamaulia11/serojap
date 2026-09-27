@@ -1,152 +1,428 @@
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+/* =========================================================
+   FORM LAPORAN KERUSAKAN JALAN
+   =========================================================
+
+   Catatan penting:
+   - Rule `body` TIDAK ditulis di sini. Sebelumnya file ini menimpa
+     font dan background yang sudah diset di layouts/app.blade.php,
+     sehingga /report tiba-tiba tampil berbeda dari halaman lain.
+   - Semua target sentuh minimal 44px.
+   - Semua warna teks di atas background putih punya kontras >= 4.5:1.
+========================================================= */
+
+* {
+    box-sizing: border-box;
 }
 
-body{
-    font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,#eef2ff,#f8fafc);
-    padding:20px;
+.container {
+    max-width: 900px;
+    margin: 0 auto;
 }
 
-.container{
-    max-width:900px;
-    margin:auto;
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    margin-bottom: 12px;
+    padding: 0 4px;
+    text-decoration: none;
+    color: #1d5a5d;
+    font-size: 14px;
+    font-weight: 600;
+    transition: transform 0.2s ease;
 }
 
-.back-btn{
-    display:inline-block;
-    margin-bottom:18px;
-    text-decoration:none;
-    color:#226d71;
-    font-weight:600;
-    transition:.2s;
+.back-btn:hover {
+    transform: translateX(-3px);
 }
 
-.back-btn:hover{
-    transform:translateX(-3px);
+.back-btn:focus-visible {
+    outline: 2px solid #226d71;
+    outline-offset: 2px;
+    border-radius: 6px;
 }
 
-.card{
-    background:white;
-    border-radius:20px;
-    padding:25px;
-    box-shadow:0 15px 35px rgba(0,0,0,0.08);
+/* ================= CARD ================= */
+
+.card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.06);
 }
 
-.header{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:25px;
+.header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
-.header img{
-    width:40px;
+.header img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
 }
 
-.header h2{
-    color:#1f4674;
+.header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:15px;
+.header-sub {
+    font-size: 14px;
+    color: #475569;
+    margin-top: 2px;
 }
 
-.full{
-    grid-column:1/-1;
+/* ================= GRID ================= */
+
+.grid {
+    display: grid;
+    /* minmax(0, 1fr), bukan minmax(250px, 1fr): track 250px
+       melebihi lebar konten di HP 320px sehingga halaman
+       tergulir horizontal. */
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 20px;
 }
 
-input,
-textarea{
-    width:100%;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid #ddd;
-    font-family:'Poppins',sans-serif;
+.full {
+    grid-column: 1 / -1;
 }
 
-textarea{
-    min-height:120px;
-    resize:vertical;
+.field {
+    min-width: 0;
 }
 
-/* AUTOCOMPLETE */
-.autocomplete-wrapper{
-    position:relative;
+.field-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
 }
 
-.autocomplete-list{
-    position:absolute;
-    top:105%;
-    left:0;
-    width:100%;
-    background:white;
-    border-radius:14px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
-    overflow:hidden;
-    z-index:999;
-    display:none;
-    max-height:240px;
-    overflow-y:auto;
+.wajib {
+    color: #b91c1c;
 }
 
-.autocomplete-item{
-    padding:12px 15px;
-    cursor:pointer;
-    transition:.2s;
-    border-bottom:1px solid #f1f5f9;
+.field-help {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #475569;
+    margin-bottom: 8px;
 }
 
-.autocomplete-item:hover{
-    background:#eef2ff;
+.field-help a {
+    color: #1d5a5d;
+    font-weight: 600;
 }
 
-/* MAP */
-#mapContainer{
-    display:none;
+.field-kabut {
+    font-size: 12px;
+    color: #64748b;
+    text-align: right;
+    margin-top: 4px;
 }
 
-#map{
-    height:300px;
-    border-radius:12px;
+.field-error {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: #b91c1c;
+    margin-top: 6px;
 }
 
-/* BUTTON */
-.btn{
-    padding:12px;
-    border-radius:12px;
-    border:none;
-    cursor:pointer;
-    font-weight:600;
+.text-center {
+    text-align: center;
+    margin-top: 10px;
 }
 
-.btn-main{
-    background:#1f4674;
-    color:white;
+/* ================= PRATINJAU FOTO ================= */
+
+.foto-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #f8fafc;
 }
 
-.btn-main:hover{
-    background:#173657;
+.foto-preview img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #e2e8f0;
+    flex-shrink: 0;
 }
 
-.btn-alt{
-    background:#226d71;
-    color:white;
+.foto-preview-nama {
+    font-size: 13px;
+    color: #334155;
+    word-break: break-all;
 }
 
-.btn-alt:hover{
-    background:#1b575a;
+/* ================= AUTOCOMPLETE ================= */
+
+.autocomplete-wrapper {
+    position: relative;
 }
 
-/* ERROR */
-.error-box{
-    background:#dc2626;
-    color:white;
-    padding:12px;
-    border-radius:12px;
-    margin-bottom:15px;
+.autocomplete-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+    z-index: 60;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.autocomplete-list[hidden] {
+    display: none;
+}
+
+.autocomplete-item {
+    padding: 11px 14px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #1e293b;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.aktif {
+    background: #f0fafa;
+    color: #183e3f;
+}
+
+/* ================= PETA ================= */
+
+.lokasi-opsi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+#mapContainer[hidden] {
+    display: none;
+}
+
+#map {
+    height: 320px;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    z-index: 1;
+}
+
+.map-hint {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #475569;
+}
+
+.koordinat {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.koordinat > div {
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.koordinat-label {
+    display: block;
+    font-size: 12px;
+    color: #475569;
+    margin-bottom: 2px;
+}
+
+.koordinat-nilai {
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* ================= KOORDINAT MANUAL =================
+   Fallback saat peta / GPS gagal. Disembunyikan sebagai <details>
+   supaya pelapor yang tidak butuh tidak melihat angka koordinat,
+   tapi tetap punya jalan keluar yang benar-benar bisa diketik.
+   ====================================================== */
+
+.koordinat-manual {
+    margin-top: 12px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #fff;
+}
+
+/* dibuka paksa oleh form.js ketika peta gagal */
+.koordinat-manual[open] {
+    border-style: solid;
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.koordinat-manual-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    border-radius: 12px;
+    list-style: none;
+}
+
+.koordinat-manual-summary::-webkit-details-marker {
+    display: none;
+}
+
+.koordinat-manual-summary::after {
+    content: '\25BE';
+    margin-left: auto;
+    color: #94a3b8;
+    transition: transform 0.15s ease;
+}
+
+.koordinat-manual[open] .koordinat-manual-summary::after {
+    transform: rotate(180deg);
+}
+
+.koordinat-manual-summary:hover {
+    background: #f8fafc;
+}
+
+.koordinat-manual[open] .koordinat-manual-summary:hover {
+    background: #fef3c7;
+}
+
+.koordinat-manual > .field-help {
+    padding: 0 14px;
+    margin: 0 0 10px;
+}
+
+.koordinat-manual-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 10px;
+    padding: 0 14px 14px;
+}
+
+.koordinat-input {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 14px;
+    color: #0f172a;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+.koordinat-input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.koordinat-input[aria-invalid='true'] {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+/* ================= ERROR ================= */
+
+.error-box {
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 4px solid #dc2626;
+    border-radius: 12px;
+    color: #991b1b;
+}
+
+.error-box-judul {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.error-box ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.error-box li {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 640px) {
+    .card {
+        padding: 18px 16px;
+        border-radius: 16px;
+    }
+
+    .header img {
+        width: 38px;
+        height: 38px;
+    }
+
+    .header h2 {
+        font-size: 18px;
+    }
+
+    .lokasi-opsi .btn {
+        flex: 1 1 100%;
+    }
+
+    #map {
+        height: 260px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }

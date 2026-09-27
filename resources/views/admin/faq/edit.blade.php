@@ -1,6 +1,17 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit FAQ — SEROJAP')
+@php
+    /*
+     * Controller mengirim `$mode` untuk `create` maupun `edit`, tapi
+     * halaman ini sebelumnya selalu mengedit. Akibatnya, siapa pun yang
+     * membuka /admin/manajemen-faq/create akan mendapat form yang
+     * mengirim ke route `update` dengan `id_faq` null.
+     */
+    $mode = $mode ?? 'edit';
+    $sedangEdit = $mode === 'edit';
+@endphp
+
+@section('title', ($sedangEdit ? 'Edit FAQ' : 'Tambah FAQ') . ' — SEROJAP')
 
 @section('content')
 <div class="max-w-2xl mx-auto">
@@ -10,7 +21,7 @@
 
         <a
             href="{{ route('admin.manajemen-faq.index') }}"
-            class="text-[#2657c1] text-sm hover:underline flex items-center gap-2 font-medium"
+            class="text-[#2657c1] text-sm hover:underline flex items-center gap-2 py-1 font-medium"
         >
 
             <svg
@@ -33,7 +44,7 @@
         </a>
 
         <h1 class="text-2xl font-bold text-gray-900 mt-3">
-            Edit FAQ
+            {{ $sedangEdit ? 'Edit FAQ' : 'Tambah FAQ' }}
         </h1>
 
         <p class="text-gray-500 text-sm">
@@ -199,13 +210,17 @@
 
             {{-- FORM --}}
             <form
-                action="{{ route('admin.manajemen-faq.update', $faq->id_faq) }}"
+                action="{{ $sedangEdit
+                    ? route('admin.manajemen-faq.update', $faq->id_faq)
+                    : route('admin.manajemen-faq.store') }}"
                 method="POST"
                 onsubmit="return confirmUpdateFaq(event, this)"
             >
 
                 @csrf
-                @method('PUT')
+                @if ($sedangEdit)
+                    @method('PUT')
+                @endif
 
                 {{-- PERTANYAAN --}}
                 <div class="mb-4">
@@ -280,7 +295,7 @@
                         type="submit"
                         class="flex-1 bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]"
                     >
-                        Simpan Perubahan
+                        {{ $sedangEdit ? 'Simpan Perubahan' : 'Simpan FAQ' }}
                     </button>
 
                     <a

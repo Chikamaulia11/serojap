@@ -34,6 +34,21 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Prepare data for validation.
+     *
+     * Email dibersihkan di sini supaya `Budi@Gmail.com` tetap bisa login
+     * dan tidak ditolak dengan pesan "harus huruf kecil".
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('email')) {
+            $this->merge([
+                'email' => mb_strtolower(trim((string) $this->input('email'))),
+            ]);
+        }
+    }
+
+    /**
      * Attempt to authenticate the request's credentials.
      *
      * @throws ValidationException
@@ -46,8 +61,21 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-    'email' => 'Email atau password tidak sesuai.',
-]);
+                'email' => 'Email atau kata sandi tidak sesuai.',
+            ]);
+        }
+
+        // Akun yang dinonaktifkan oleh super admin harus ditolak di sini,
+        // sebelum controller sempat membuat sesi.
+        if (! Auth::user()?->bisaLogin()) {
+            Auth::guard('web')->logout();
+
+            $this->session?->invalidate();
+            $this->session?->regenerateToken();
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun ini sudah dinonaktifkan. Hubungi super admin untuk mengaktifkan kembali.',
+            ]);
         }
 
         RateLimiter::clear($this->throttleKey());

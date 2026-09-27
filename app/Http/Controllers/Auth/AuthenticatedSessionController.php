@@ -24,21 +24,25 @@ class AuthenticatedSessionController extends Controller
         'login' => [
             'role' => 'pelapor',
             'dashboard' => 'dashboard',
+            'halaman' => 'login',
             'pesan' => 'Akun ini bukan akun pelapor.',
         ],
         'login.post' => [
             'role' => 'pelapor',
             'dashboard' => 'dashboard',
+            'halaman' => 'login',
             'pesan' => 'Akun ini bukan akun pelapor.',
         ],
         'login.admin.post' => [
             'role' => 'admin',
             'dashboard' => 'admin.dashboard',
+            'halaman' => 'login.admin',
             'pesan' => 'Akun ini bukan akun admin.',
         ],
         'login.superadmin.post' => [
             'role' => 'super_admin',
             'dashboard' => 'superadmin.dashboard',
+            'halaman' => 'login.superadmin',
             'pesan' => 'Akun ini bukan akun super admin.',
         ],
     ];
@@ -106,7 +110,7 @@ class AuthenticatedSessionController extends Controller
         // =========================
         if ($aturan !== null) {
             if (! $user->hasRole($aturan['role'])) {
-                return $this->logoutAndBack($request, $aturan['pesan']);
+                return $this->logoutAndBack($request, $aturan['halaman'], $aturan['pesan']);
             }
 
             return redirect()->route($aturan['dashboard']);
@@ -123,7 +127,7 @@ class AuthenticatedSessionController extends Controller
     // =========================
     // LOGOUT DAN KEMBALI KE LOGIN
     // =========================
-    private function logoutAndBack(Request $request, string $message): RedirectResponse
+    private function logoutAndBack(Request $request, string $halaman, string $message): RedirectResponse
     {
         Auth::guard('web')->logout();
 
@@ -131,11 +135,31 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return back()
+        // Pesan harus lewat `withErrors(['email' => ...])`, bukan
+        // `->with('error', ...)`.
+        //
+        // Alasannya: ketiga halaman login (/login, /login/admin,
+        // /login/superadmin) menampilkan error lewat
+        // `<x-input-error :messages="$errors->get('email')" />`, dan
+        // `x-auth-session-status` membaca `session('status')`.
+        // TIDAK ADA satu pun yang membaca `session('error')` di halaman
+        // login -- key itu hanya dibaca `layouts/app.blade.php` dan
+        // beberapa view admin/superadmin.
+        //
+        // Jadi versi lama: orang yang salah klik "/login/admin" lalu
+        // dikembalikan dengan diam, tanpa penjelasan sama sekali.
+        //
+        // PENTING: jangan pakai `back()` di sini. `invalidate()` di atas
+        // melakukan `flush()`, jadi key `_previous.url` ikut terhapus --
+        // `back()` lalu jatuh ke fallback "/" yang tidak menampilkan
+        // pesan apa pun, dan hasilnya jadi tidak konsisten: browser yang
+        // mengirim header `Referer` kena, yang tidak tidak. Karena area
+        // login-nya sudah diketahui dari `PETA_LOGIN`, redirect eksplisit
+        // saja.
+        return redirect()
+            ->route($halaman)
             ->withInput($request->only('email'))
-            ->withErrors([
-                'email' => $message,
-            ]);
+            ->withErrors(['email' => $message]);
     }
 
     // =========================
@@ -143,12 +167,47 @@ class AuthenticatedSessionController extends Controller
     // =========================
     public function destroy(Request $request): RedirectResponse
     {
+        // Dibaca sebelum session di-invalidate: `redirect` datang dari
+        // body POST, bukan dari session, tapi membaca lebih dulu membuat
+        // urutannya jelas.
+        $tujuan = $this->tujuanSetelahLogout($request);
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect($tujuan);
+    }
+
+    /**
+     * Ke mana pengguna dikirim setelah logout.
+     *
+     * Halaman 403 memuat tombol "Ganti Akun": logout dulu, baru
+     * tampilkan halaman login area mereka. Kalau tujuan tidak dikenal,
+     * tetap beranda.
+     *
+     * Input `redirect` tidak dipercaya buta. Kalau diteruskan apa
+     * adanya, `POST /logout?redirect=https://phishing.example` jadi
+     * open redirect: link logout yangownersk sendirian bisa mengirim
+     * orang ke domain lain. Karena itu hanya path halaman login milik
+     * aplikasi sendiri yang diterima, dan sisanya jatuh ke beranda.
+     */
+    private function tujuanSetelahLogout(Request $request): string
+    {
+        $diminta = $request->input('redirect');
+
+        if (! is_string($diminta) || $diminta === '') {
+            return '/';
+        }
+
+        $halamanLogin = [
+            route('login'),
+            route('login.admin'),
+            route('login.superadmin'),
+        ];
+
+        return in_array($diminta, $halamanLogin, true) ? $diminta : '/';
     }
 }

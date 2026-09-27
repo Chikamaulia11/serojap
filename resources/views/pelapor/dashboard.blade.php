@@ -1,30 +1,27 @@
 @extends('layouts.app')
 
+@section('title', 'Dashboard')
+@section('deskripsi', 'Laporkan kerusakan jalan Kabupaten Purwakarta dan pantau progres penanganannya secara online.')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+@endpush
+
 @section('content')
-
-<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-
-<script>
-    function go(id) {
-        const target = document.getElementById(id);
-
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    }
-</script>
 
 <div class="dashboard">
 
     <!-- ================= HERO ================= -->
     <section class="hero reveal" id="dashboard">
 
-        <div class="hero-bg">
-            <img src="{{ asset('assets/pelapor/images/utama.webp') }}">
-        </div>
+              <div class="hero-bg">
+                  {{-- Dekoratif: picture-as-background di bawah overlay gelap
+                       88%/72%, sementara teks hero (nama, judul, aksi) sudah
+                       menyediakan makna yang sebenarnya. Screen reader tidak
+                       perlu membacakan gambar ini. --}}
+                  <img src="{{ asset('assets/pelapor/images/utama.webp') }}" alt="" aria-hidden="true">
+              </div>
+
 
         <div class="hero-overlay"></div>
 
@@ -50,25 +47,21 @@
                     Purwakarta yang lebih aman.
                 </p>
 
-                <!-- 
+                {{-- Tombol hero sengaja memakai route(), bukan anchor
+                     ke section. Section "laporan" dan "riwayat" berada
+                     jauh di bawah halaman, jadi pengguna harus menggulir
+                     jauh-jauh hanya untuk sampai ke tombol. --}}
                 <div class="hero-buttons">
 
-                    <button
-                        onclick="go('laporan')"
-                        class="btn-primary glow"
-                    >
+                    <a href="{{ route('laporan.create') }}" class="btn-primary glow">
                         Buat Laporan
-                    </button>
+                    </a>
 
-                    <button
-                        onclick="go('riwayat')"
-                        class="btn-secondary"
-                    >
+                    <a href="{{ route('laporan.my-report') }}" class="btn-secondary">
                         Lihat Riwayat
-                    </button>
+                    </a>
 
-                </div> 
-                -->
+                </div>
 
             </div>
 
@@ -121,7 +114,7 @@
 
                     <div style="padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 4px solid #075985;">
                         <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">
-                            1. User submits report
+                            1. Laporan dikirim
                         </h4>
                         <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">
                             Pengguna mengirimkan laporan lengkap dengan lokasi, jenis kerusakan, dan foto pendukung melalui sistem.
@@ -130,7 +123,7 @@
 
                     <div style="padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 4px solid #075985;">
                         <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">
-                            3. Report processed
+                            3. Laporan diproses
                         </h4>
                         <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">
                             Tim melakukan verifikasi, pengecekan lokasi, dan indentifikasi pengaduan.
@@ -139,7 +132,7 @@
 
                     <div style="padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 4px solid #075985;">
                         <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">
-                            2. Report received
+                            2. Laporan diterima
                         </h4>
                         <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">
                             Laporan masuk, tercatat dalam sistem, dan pelapor dapat langsung memantau status awal aduan tersebut melalui menu Riwayat.
@@ -148,7 +141,7 @@
 
                     <div style="padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 4px solid #075985;">
                         <h4 style="margin: 0 0 5px 0; font-size: 15px; font-weight: 600; color: #0f172a;">
-                            4. Work completed
+                            4. Perbaikan selesai
                         </h4>
                         <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">
                             Perbaikan selesai dilaksanakan, pengguna bisa melihat foto hasilnya langsung di menu Riwayat.
@@ -210,7 +203,7 @@
                     </div>
 
                     <a
-                        href="/report"
+                        href="{{ route('laporan.create') }}"
                         class="btn-primary big glow"
                         style="display: inline-block; padding: 12px 28px; background-color: #0d9488; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2); transition: all 0.3s ease; text-align: center;"
                         onmouseover="this.style.backgroundColor='#0f766e'; this.style.transform='translateY(-2px)';"
@@ -283,78 +276,64 @@
                     </p>
 
                     @php
+                        /*
+                         * Logika lama: satu status dapat 100%, empat lainnya
+                         * 0%. Jadi laporan yang sudah SELESAI menampilkan
+                         * "Diterima 0%, Diproses 0%, Selesai 100%" -- terlihat
+                         * seperti tidak ada progres sama sekali.
+                         *
+                         * Sekarang dihitung bertahap: tahap yang sudah
+                         * dilewati ikut terisi.
+                         */
                         $statusTerakhir = $reports->first()?->latestStatus?->status;
-                        $persenDiterima = $statusTerakhir == 'diterima' ? 100 : 0;
-                        $persenDiproses = $statusTerakhir == 'diproses' ? 100 : 0;
-                        $persenSelesai = $statusTerakhir == 'selesai' ? 100 : 0;
-                        $persenDitolak = $statusTerakhir == 'ditolak' ? 100 : 0;
+                        $urutan = \App\Support\StatusPeta::alur();
+
+                        // -1 = belum ada laporan sama sekali.
+                        $tahap = $statusTerakhir ? array_search($statusTerakhir, $urutan, true) : -1;
+
+                        $persen = static function (string $status) use ($urutan, $tahap): int {
+                            $posisi = array_search($status, $urutan, true);
+
+                            return $posisi !== false && $posisi <= $tahap ? 100 : 0;
+                        };
                     @endphp
+
+                    @if ($statusTerakhir === null)
+                        <p class="text-sm text-slate-600">
+                            Kamu belum mengirim laporan. Setelah mengirim, progresnya
+                            akan tampil di sini.
+                        </p>
+                    @elseif ($statusTerakhir === 'ditolak')
+                        <p class="text-sm text-rose-700">
+                            Laporan terakhir kamu ditolak. Buka
+                            <a href="{{ route('laporan.my-report') }}" class="underline font-semibold">Riwayat Saya</a>
+                            untuk melihat alasannya.
+                        </p>
+                    @endif
 
                     <div class="progress-group">
 
-                        <div class="progress-item">
+                        @foreach ([
+                            ['diterima', 'Diterima', 'blue'],
+                            ['diproses', 'Diproses', 'orange'],
+                            ['selesai', 'Selesai', 'green'],
+                        ] as [$kunci, $judul, $warna])
+                            <div class="progress-item">
 
-                            <div class="progress-top">
-                                <span>Diterima</span>
-                                <span>{{ $persenDiterima }}%</span>
+                                <div class="progress-top">
+                                    <span>{{ $judul }}</span>
+                                    <span>{{ $persen($kunci) }}%</span>
+                                </div>
+
+                                <div class="progress-bar">
+                                    <div
+                                        class="progress-fill {{ $warna }}"
+                                        style="width: {{ $persen($kunci) }}%;"
+                                    ></div>
+                                </div>
+
                             </div>
-
-                            <div class="progress-bar">
-                                <div
-                                    class="progress-fill blue"
-                                    style="width: {{ $persenDiterima }}%;"
-                                ></div>
-                            </div>
-
-                        </div>
-
-                        <div class="progress-item">
-
-                            <div class="progress-top">
-                                <span>Diproses</span>
-                                <span>{{ $persenDiproses }}%</span>
-                            </div>
-
-                            <div class="progress-bar">
-                                <div
-                                    class="progress-fill orange"
-                                    style="width: {{ $persenDiproses }}%;"
-                                ></div>
-                            </div>
-
-                        </div>
-
-                        <div class="progress-item">
-
-                            <div class="progress-top">
-                                <span>Selesai</span>
-                                <span>{{ $persenSelesai }}%</span>
-                            </div>
-
-                            <div class="progress-bar">
-                                <div
-                                    class="progress-fill green"
-                                    style="width: {{ $persenSelesai }}%;"
-                                ></div>
-                            </div>
-
-                        </div>
-
-                        <div class="progress-item">
-
-                            <div class="progress-top">
-                                <span>Ditolak</span>
-                                <span>{{ $persenDitolak }}%</span>
-                            </div>
-
-                            <div class="progress-bar">
-                                <div
-                                    class="progress-fill red"
-                                    style="width: {{ $persenDitolak }}%;"
-                                ></div>
-                            </div>
-
-                        </div>
+                        @endforeach
 
                     </div>
 
@@ -366,31 +345,28 @@
 
                 @forelse($reports as $r)
 
-                    @php
-                        $status = $r->statusTerbaru->status ?? 'diterima';
-                    @endphp
-
+                    {{-- `statusTerbaru->status ?? 'diterima'` di sini
+                         memaksa menampilkan "Diterima" untuk laporan yang
+                         belum punya baris status sama sekali -- itu
+                         memalsukan data. `null` lebih jujur, dan
+                         StatusPeta menampilkannya sebagai "Menunggu". --}}
                     <div class="riwayat-item">
 
                         <div class="riwayat-top">
 
-                            <div>
+                            <div class="min-w-0">
 
-                                <b>
+                                <b class="block truncate">
                                     {{ $r->alamat }}
                                 </b>
 
                                 <small>
-                                    {{ $r->created_at->format('d M Y') }}
+                                    {{ $r->created_at?->format('d M Y') }}
                                 </small>
 
                             </div>
 
-                            <div class="status {{ strtolower($status) }}">
-
-                                {{ ucfirst($status) }}
-
-                            </div>
+                            <x-status-badge :status="$r->latestStatus?->status" />
 
                         </div>
 
@@ -403,11 +379,7 @@
                         <div class="riwayat-top">
 
                             <div>
-
-                                <b>
-                                    Belum ada laporan
-                                </b>
-
+                                <b>Belum ada laporan</b>
                             </div>
 
                         </div>
@@ -416,7 +388,7 @@
 
                 @endforelse
 
-                <a href="/my-report" class="btn-primary">
+                <a href="{{ route('laporan.my-report') }}" class="btn-primary">
                     Lihat Semua Riwayat
                 </a>
 
@@ -462,18 +434,21 @@
 
         <div class="faq-bubble-grid" id="faqGrid">
 
-            @forelse($faqs as $index => $f)
+            @forelse($faqs as $f)
 
-                <div
-                    class="faq-item faq-bubble-item {{ $index >= 6 ? 'extra-faq' : '' }}"
-                    style="{{ $index >= 6 ? 'display: none;' : '' }}"
-                >
+                {{-- Semua 8 FAQ yang dikirim controller ditampilkan.
+                     Versi lama menyembunyikan item ke-7 dan ke-8 dengan
+                     `style="display: none"` dan hanya bisa memunculkannya
+                     lewat tombol yang isinya cuma membuka 2 item itu saja
+                     tanpa akses ke daftar lengkap. --}}
+                <div class="faq-item faq-bubble-item">
 
                     <div
                         class="faq-bubble-card"
                         onclick="toggleFaqBubble(this)"
                         role="button"
                         tabindex="0"
+                        aria-expanded="false"
                     >
 
                         <div class="faq-bubble-top">
@@ -505,23 +480,24 @@
             @empty
 
                 <div class="faq-empty">
-                    Belum ada pertanyaan FAQ yang ditambahkan.
+                    Belum ada pertanyaan yang ditambahkan. Sementara itu, kamu
+                    bisa <a href="{{ route('pelapor.faq') }}" class="underline font-semibold">browse pusat bantuan</a>.
                 </div>
 
             @endforelse
 
         </div>
 
-        @if($faqs->count() > 6)
+        {{-- Controller mengambil 8 FAQ teratas. Item ke-7 dan ke-8
+             disembunyikan lewat inline style dan hanya bisa dibuka
+             dengan tombol "Lihat Pertanyaan Lainnya" yang tidak
+             bisa di-expand. Di sini selalu ada tautan ke halaman
+             FAQ lengkap supaya tidak ada 2 FAQ yang mustahil dibaca. --}}
+        @if($faqs->isNotEmpty())
             <div class="faq-more-wrapper">
-                <button
-                    type="button"
-                    class="faq-more-btn"
-                    id="btnMoreFaq"
-                    onclick="showMoreFaq()"
-                >
-                    Lihat Pertanyaan Lainnya
-                </button>
+                <a href="{{ route('pelapor.faq') }}" class="btn-secondary">
+                    Lihat Semua Pertanyaan
+                </a>
             </div>
         @endif
 

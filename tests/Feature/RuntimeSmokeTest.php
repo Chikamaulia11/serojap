@@ -6,6 +6,7 @@ use App\Models\TabelFaq;
 use App\Models\TabelStatus;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 /**
@@ -164,5 +165,105 @@ class RuntimeSmokeTest extends TestCase
 
         $this->get('/admin/laporan')->assertRedirect();
         $this->get('/superadmin/accounts')->assertRedirect();
+    }
+
+    public function test_halaman_404_menautkan_dashboard_sesuai_role(): void
+    {
+        $this->buatDemo();
+
+        // Tamu: hanya ada jalan kembali ke beranda.
+        $this->get('/tidak-ada-halaman-ini')
+            ->assertNotFound()
+            ->assertSee('Halaman tidak ditemukan')
+            ->assertSee(route('beranda'))
+            ->assertDontSee('Ke Dashboard');
+
+        // Endpoint login dipisah per role. Kalau semua_role dikirim ke
+        // `/login`, request admin/superadmin tidak akan terautentikasi,
+        // dan test ini akan salah menyimpulkan link 404-nya rusak.
+        foreach ([
+            ['/login', 'pelapor@serojap.test', 'dashboard'],
+            ['/login/admin', 'admin@serojap.test', 'admin.dashboard'],
+            ['/login/superadmin', 'superadmin@serojap.test', 'superadmin.dashboard'],
+        ] as [$loginPath, $email, $routeName]) {
+            $this->post($loginPath, [
+                'email' => $email,
+                'password' => 'password',
+            ])->assertRedirect(route($routeName));
+
+            $this->get('/tidak-ada-halaman-ini')
+                ->assertNotFound()
+                ->assertSee('Ke Dashboard')
+                ->assertSee(route($routeName));
+
+            $this->post('/logout');
+        }
+    }
+
+    public function test_ganti_akun_di_403_logout_dulu_lalu_masuk_ke_login_sebelumnya(): void
+    {
+        // Halaman 403 tidak terjangkau lewat alur normal: akses
+        // wrong-role justru dialihkan ke dashboard sendiri, bukan
+        // `abort(403)`. Jadi test ini mendaftarkan route yang memaksa
+        // 403, dengan middleware `web` supaya session hidup -- persis
+        // kondisi yang membuat `auth()` di view terisi.
+        Route::middleware('web')->get('/__uji-403', function () {
+            abort(403);
+        });
+
+        $this->buatDemo();
+
+        $this->post('/login/admin', [
+            'email' => 'admin@serojap.test',
+            'password' => 'password',
+        ])->assertRedirect(route('admin.dashboard'));
+
+        $halaman = $this->get('/__uji-403');
+
+        $halaman->assertForbidden();
+        $halaman->assertSee('Akses ditolak');
+
+        // Bentuknya harus form POST ke logout, bukan `<a>` ke halaman
+        // login. Versi `<a>` itu bug-nya: `/login/admin` dipagari
+        // middleware `guest`, jadi user yang masih login dipantul balik
+        // ke dashboard-nya sendiri dan tombolnya tidak melakukan apa pun.
+        $halaman->assertSee('action="'.e(route('logout')).'"', false);
+        $halaman->assertSee('name="redirect" value="'.e(route('login.admin')).'"', false);
+        $halaman->assertSee('<button type="submit"', false);
+
+        $response = $this->post('/logout', [
+            'redirect' => route('login.admin'),
+        ]);
+
+        // Bukan pantul balik: benar-benar logout, lalu mendarat di
+        // halaman login area yang sama.
+        $response->assertRedirect(route('login.admin'));
+        $this->assertGuest('web');
+
+        // Dan halaman tujuan benar-benar bisa dirender -- kalau masih
+        // ada session sisa, middleware `guest` akan memantul lagi.
+        $this->get('/login/admin')
+            ->assertOk()
+            ->assertSee('Administrator Serojap Purwakarta');
+    }
+
+    public function test_logout_menolak_tujuan_yang_bukan_halaman_login_milik_sendiri(): void
+    {
+        // `redirect` datang dari input pengguna. Kalau diteruskan apa
+        // adanya, `POST /logout?redirect=https://phishing.example`
+        // menjadi open redirect -- link logout milik aplikasi ini
+        // sendiri bisa dipakai mengarahkan orang ke domain lain.
+        $this->buatDemo();
+
+        $this->post('/login/admin', [
+            'email' => 'admin@serojap.test',
+            'password' => 'password',
+        ]);
+
+        $this->post('/logout', [
+            'redirect' => 'https://phishing.example/yml',
+        ])->assertRedirect('/');
+
+        $this->assertGuest('web');
     }
 }

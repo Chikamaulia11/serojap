@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +16,25 @@ Route::middleware('guest')->group(function () {
         ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store']);
+
+    // =========================
+    // ATUR ULANG KATA SANDI
+    //
+    // Tanpa route ini, halaman login tidak menampilkan tautan
+    // "Lupa kata sandi?" dan warga yang lupa kata sandi tidak punya
+    // jalan pemulihan akun.
+    // =========================
+    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+        ->name('password.request');
+
+    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+        ->name('password.email');
+
+    Route::get('reset-password/{token}', [PasswordResetController::class, 'edit'])
+        ->name('password.reset');
+
+    Route::post('reset-password', [PasswordResetController::class, 'update'])
+        ->name('password.store');
 });
 
 Route::middleware('auth')->group(function () {

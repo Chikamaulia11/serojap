@@ -4,11 +4,10 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to bottom, #f8fafc, #eef2f7);
-}
-
+/* Layout utama sudah menentukan font dan background di
+   layouts/app.blade.php. Rule body di sini tadinya menimpanya,
+   sehingga /report dan /my-report tiba-tiba memakai font Poppins
+   dan gradien berbeda dari halaman lain. */
 .content {
     padding: 20px;
 }
@@ -53,6 +52,7 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-height: 44px;
     padding: 8px 14px;
     border-radius: 12px;
     font-size: 14px;
@@ -73,6 +73,85 @@ body {
     color: #ffffff;
 }
 
+/* Aksi di sisi kanan navbar: tombol menu, profil, keluar. */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #226d71;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.nav-cta:hover {
+    background: #1d5a5d;
+}
+
+.nav-logout-form {
+    display: inline;
+    margin: 0;
+}
+
+.nav-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #b91c1c;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-logout:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+/* Tautan lompat ke konten: hanya terlihat saat keyboard dipakai. */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 200;
+    padding: 12px 20px;
+    background: #1d5a5d;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 0 0 12px 0;
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    left: 0;
+}
+
+.nav-item:focus-visible,
+.nav-cta:focus-visible,
+.nav-logout:focus-visible,
+.hamburger:focus-visible,
+.nav-profile:focus-visible {
+    outline: 2px solid #226d71;
+    outline-offset: 2px;
+}
+
 .nav-profile {
     display: flex;
     align-items: center;
@@ -82,8 +161,8 @@ body {
 }
 
 .nav-profile img {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -96,8 +175,16 @@ body {
 
 .hamburger {
     display: none;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
     cursor: pointer;
-    font-size: 24px;
+    font-size: 22px;
+    line-height: 1;
 }
 
 .mobile-menu {
@@ -115,11 +202,29 @@ body {
     z-index: 90;
 }
 
-.mobile-menu a {
-    padding: 12px;
+.mobile-menu a,
+.mobile-menu button {
+    display: block;
+    width: 100%;
+    padding: 14px 12px;
+    text-align: left;
     text-decoration: none;
-    color: #555;
+    color: #334155;
+    font-size: 15px;
+    font-family: inherit;
+    background: transparent;
+    border: 0;
     border-radius: 8px;
+    cursor: pointer;
+}
+
+.mobile-menu form {
+    margin: 0;
+}
+
+.mobile-menu button:hover {
+    background: #fef2f2;
+    color: #b91c1c;
 }
 
 .mobile-menu a:hover {
@@ -365,19 +470,25 @@ body {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .nav-menu {
         display: none;
     }
 
     .hamburger {
-        display: block;
+        display: inline-flex;
     }
 
     .nav-profile span {
         display: none;
     }
 
+    .nav-cta {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
     .footer-container {
         padding: 44px 24px 24px;
     }
