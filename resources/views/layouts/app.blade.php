@@ -6,14 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>SEROJAP</title>
+    <title>@yield('title', 'Beranda') &middot; SEROJAP</title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
+    <meta name="description" content="@yield('deskripsi', 'Sistem Pelaporan Kerusakan Jalan Kabupaten Purwakarta. Laporkan kerusakan jalan, pantau progres penanganannya secara online.')">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+
+    {{-- CSS khusus halaman. Ditaruh di head, bukan di dalam body,
+         supaya tidak ada kedipan layout dan cascade-nya bisa
+         diprediksi. --}}
+    @stack('styles')
 
     <style>
         body {
@@ -301,48 +309,109 @@
 
 <body>
 
+    {{-- Flash message global: dipakai semua halaman pelapor. --}}
+    @if (session('success') || session('error') || session('status'))
+        <div class="container mx-auto px-4 sm:px-6 pt-4 space-y-2" aria-live="polite">
+            @if (session('success'))
+                <x-flash-message type="success">{{ session('success') }}</x-flash-message>
+            @endif
+
+            @if (session('error'))
+                <x-flash-message type="error">{{ session('error') }}</x-flash-message>
+            @endif
+
+            @if (session('status'))
+                <x-flash-message type="warning">{{ session('status') }}</x-flash-message>
+            @endif
+        </div>
+    @endif
+
+    <a href="#konten-utama" class="skip-link">Lompat ke konten utama</a>
+
     <div class="navbar">
 
-        <a href="{{ route('dashboard') }}#dashboard" class="nav-left">
-            <img src="{{ asset('logo.png') }}">
+        <a href="{{ route('dashboard') }}" class="nav-left">
+            <img src="{{ asset('logo.png') }}" alt="Logo SEROJAP">
             <span>SEROJAP</span>
         </a>
 
-        <div class="nav-menu">
-            <a href="{{ route('dashboard') }}#dashboard" class="nav-item">Dashboard</a>
-            <a href="{{ route('dashboard') }}#prosedur" class="nav-item">Prosedur</a>
-            <a href="{{ route('dashboard') }}#laporan" class="nav-item">Laporan</a>
-            <a href="{{ route('dashboard') }}#riwayat" class="nav-item">Riwayat</a>
-            <a href="{{ route('dashboard') }}#faq" class="nav-item">FAQ</a>
-        </div>
+        <nav class="nav-menu" aria-label="Navigasi utama">
+            {{-- Menu menuju halaman sungguhan, bukan anchor ke section di
+                 dashboard. Sebelumnya "Prosedur" dan "FAQ" melompat ke
+                 anchor, sehingga halaman /prosedur dan /pusat-bantuan
+                 yang sudah dibuat tidak pernah bisa dibuka. --}}
+            <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
+            <a href="{{ route('laporan.create') }}" class="nav-item {{ request()->routeIs('laporan.create') ? 'active' : '' }}">Buat Laporan</a>
+            <a href="{{ route('laporan.my-report') }}" class="nav-item {{ request()->routeIs('laporan.my-report') ? 'active' : '' }}">Riwayat Saya</a>
+            <a href="{{ route('prosedur') }}" class="nav-item {{ request()->routeIs('prosedur') ? 'active' : '' }}">Prosedur</a>
+            <a href="{{ route('pelapor.faq') }}" class="nav-item {{ request()->routeIs('pelapor.faq') ? 'active' : '' }}">Pusat Bantuan</a>
+        </nav>
 
-        <div style="display:flex; align-items:center; gap:15px;">
-            <div class="hamburger" onclick="toggleMenu()">☰</div>
+        <div class="nav-actions">
+            <button type="button" class="hamburger" onclick="toggleMenu()"
+                aria-label="Buka menu navigasi" aria-controls="mobileMenu" aria-expanded="false">
+                <span aria-hidden="true">☰</span>
+            </button>
 
-            @if(auth()->check())
-                <a href="{{ route('profile.edit') }}" class="nav-profile">
-                    <img src="{{ auth()->user()->foto_profil
-                        ? asset('storage/' . auth()->user()->foto_profil)
-                        : 'https://i.pravatar.cc/100' }}">
+            @auth
+                  {{-- Fallback avatar memakai aset LOKAL. Sebelumnya fallback
+                       ini `https://i.pravatar.cc/100`, yaitu layanan pihak
+                       ketiga: setiap kunjungan halaman mengirim IP pengguna ke
+                       luar, dan begitu service-nya_down atau perangkat sedang
+                       offline, navbar menampilkan gambar rusak. Aset lokal yang
+                       sama sudah dipakai `profile/edit.blade.php`. --}}
+                  <a href="{{ route('profile.edit') }}" class="nav-profile">
+                      <img src="{{ auth()->user()->foto_profil
+                          ? asset('storage/' . auth()->user()->foto_profil)
+                          : asset('assets/pelapor/images/avatar-1.jpg') }}"
+                          alt="Foto profil {{ auth()->user()->name }}"
+                          width="40" height="40" loading="lazy">
+
 
                     <span>{{ auth()->user()->name }}</span>
                 </a>
-            @endif
+
+                {{-- Logout. Sebelumnya satu-satunya tombol logout ada di
+                     halaman profil, tidak pernah di navbar -- artinya
+                     pengguna tidak bisa keluar dari halaman mana pun
+                     selain profil. --}}
+                <form method="POST" action="{{ route('logout') }}" class="nav-logout-form">
+                    @csrf
+                    <button type="submit" class="nav-logout">Keluar</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="nav-item">Masuk</a>
+                <a href="{{ route('register') }}" class="nav-cta">Daftar</a>
+            @endauth
         </div>
 
     </div>
 
     <div id="mobileMenu" class="mobile-menu">
-        <a href="{{ route('dashboard') }}#dashboard">Dashboard</a>
-        <a href="{{ route('dashboard') }}#prosedur">Prosedur</a>
-        <a href="{{ route('dashboard') }}#laporan">Laporan</a>
-        <a href="{{ route('dashboard') }}#riwayat">Riwayat</a>
-        <a href="{{ route('dashboard') }}#faq">FAQ</a>
+        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <a href="{{ route('laporan.create') }}">Buat Laporan</a>
+        <a href="{{ route('laporan.my-report') }}">Riwayat Saya</a>
+        <a href="{{ route('prosedur') }}">Prosedur</a>
+        <a href="{{ route('pelapor.faq') }}">Pusat Bantuan</a>
+
+        @auth
+            <a href="{{ route('profile.edit') }}">Profil Saya</a>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full text-left">Keluar</button>
+            </form>
+        @else
+            <a href="{{ route('login') }}">Masuk</a>
+            <a href="{{ route('register') }}">Daftar</a>
+        @endauth
     </div>
+
+    <main id="konten-utama">
 
     <div class="content">
         @yield('content')
     </div>
+    </main>
 
     <!-- ================= FOOTER ================= -->
     <footer class="footer-section">
@@ -357,7 +426,7 @@
                     <div class="footer-brand-head">
 
                         <div class="footer-logo-box">
-                            <img src="{{ asset('assets/pelapor/images/logo-serojap.png') }}" alt="Logo SEROJAP">
+                            <img src="{{ asset('assets/pelapor/images/logo-serojap.webp') }}" alt="Logo SEROJAP">
                         </div>
 
                         <div>
@@ -406,7 +475,7 @@
                             <div class="footer-mini-icon">✉</div>
                             <div>
                                 <strong>Email Informasi</strong>
-                                <a href="mailto:info@serojap.purwakartakab.go.id">
+                                <a href="mailto:info@serojap.purwakartakab.go.id" class="inline-block py-1">
                                     infoserojap@gmail.com
                                 </a>
                             </div>
@@ -458,6 +527,9 @@
     </footer>
 
     <script src="{{ asset('js/navbar.js') }}"></script>
+
+    {{-- Script khusus halaman (dialog, peta, dsb). --}}
+    @stack('scripts')
 
 </body>
 

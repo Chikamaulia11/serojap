@@ -144,7 +144,39 @@
             border-radius: 22px !important;
         }
 
-        @media (max-width: 1024px) {
+        /*
+         * Sidebar super admin sebelumnya hanya menyusut jadi 235px
+         * di bawah 1024px dan tidak pernah disembunyikan. Di HP
+         * selebar ~360px, 235px menutup hampir dua pertiga layar
+         * tanpa ada tombol untuk menutupnya.
+         *
+         * Sekarang jadi drawer: di bawah `md` sidebar meluncur
+         * keluar layar dan konten memakai lebar penuh.
+         */
+        @media (max-width: 767px) {
+            .superadmin-sidebar {
+                width: 260px;
+                transform: translateX(-100%);
+                transition: transform 0.2s ease;
+                box-shadow: 8px 0 24px rgba(15, 23, 42, 0.12);
+            }
+
+            /* ditulis inline oleh Alpine saat drawer dibuka */
+            .superadmin-sidebar.terbuka {
+                transform: translateX(0);
+            }
+
+            .superadmin-main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .superadmin-content {
+                padding: 16px;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
             .superadmin-sidebar {
                 width: 235px;
             }
@@ -159,18 +191,53 @@
             }
         }
     </style>
+
+    @stack('styles')
 </head>
 
-<body class="text-slate-800 antialiased">
+<body class="text-slate-800 antialiased"
+      x-data="{ sidebarTerbuka: false }"
+      x-on:keydown.escape.window="sidebarTerbuka = false">
+
+    <!-- Top bar khusus layar kecil -->
+    <div class="md:hidden sticky top-0 z-40 flex items-center gap-3 h-14 px-4 bg-white border-b border-slate-200">
+        <button
+            type="button"
+            class="inline-flex items-center justify-center w-10 h-10 -ml-1 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+            x-on:click="sidebarTerbuka = ! sidebarTerbuka"
+            x-bind:aria-expanded="sidebarTerbuka ? 'true' : 'false'"
+            aria-controls="superadminSidebar"
+            aria-label="Buka menu navigasi"
+        >
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+
+        <span class="font-bold text-blue-700 tracking-wide">SEROJAP</span>
+    </div>
+
+    <!-- Lapisan gelap di belakang drawer -->
+    <div
+        class="md:hidden fixed inset-0 z-40 bg-slate-900/40"
+        x-show="sidebarTerbuka"
+        x-cloak
+        x-on:click="sidebarTerbuka = false"
+        aria-hidden="true"
+    ></div>
 
     <!-- Sidebar -->
-    <aside class="superadmin-sidebar fixed top-0 left-0 h-screen z-50 flex flex-col overflow-y-auto">
+    <aside
+        id="superadminSidebar"
+        class="superadmin-sidebar fixed top-0 left-0 h-screen z-50 flex flex-col overflow-y-auto"
+        x-bind:class="sidebarTerbuka ? 'terbuka' : ''"
+    >
 
         <!-- Brand -->
         <div class="px-5 py-5 border-b border-slate-200">
             <div class="flex items-center gap-3">
                 <div class="w-11 h-11 rounded-2xl bg-white shadow-md shadow-blue-100 border border-slate-100 flex items-center justify-center overflow-hidden">
-                    <img src="{{ asset('assets/pelapor/images/logo-serojap.png') }}"
+                    <img src="{{ asset('assets/pelapor/images/logo-serojap.webp') }}"
                          alt="Serojap"
                          class="w-8 h-8 object-contain">
                 </div>
@@ -278,5 +345,6 @@
         });
     </script>
 
+    @stack('scripts')
 </body>
 </html>

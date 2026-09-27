@@ -68,10 +68,15 @@ class TabelStatus extends Model
     ========================= */
     public function admin()
     {
+        // `withTrashed()` wajib di sini. Gunaanya bukan untuk menulis,
+        // tapi untuk MENAMPILKAN: riwayat status adalah jejak audit
+        // yang tidak boleh ikut hilang hanya karena akun petugasnya
+        // nanti dinonaktifkan. Tanpa ini, kolom "oleh ..." pada
+        // timeline pelapor akan kosong untuk laporan lama.
         return $this->belongsTo(
             User::class,
             'user_id'
-        );
+        )->withTrashed();
     }
 
     /* =========================
@@ -79,9 +84,6 @@ class TabelStatus extends Model
     ========================= */
     public function user()
     {
-        return $this->belongsTo(
-            User::class,
-            'user_id'
-        );
+        return $this->admin();
     }
 }

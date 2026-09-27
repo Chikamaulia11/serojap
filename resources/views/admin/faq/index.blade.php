@@ -204,13 +204,58 @@
         
         {{-- SISI KIRI: DAFTAR FAQ --}}
         <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-            <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50">
-                <h2 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    ❓ Daftar FAQ <span class="bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-xs">{{ $faqs->count() }}</span>
-                </h2>
+            <div class="px-5 py-4 border-b border-gray-200 bg-gray-50/50 space-y-3">
+
+                {{-- `total()`, bukan `count()`.
+                     `$faqs` sekarang Paginator: `count()` mengembalikan
+                     jumlah item DI HALAMAN INI (maks 20), jadi begitu
+                     admin punya lebih dari 20 FAQ, angka di badge
+                     selalu tertahan di 20 dan tidak pernah naik lagi. --}}
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                        Daftar FAQ
+                        <span class="bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-xs">{{ $faqs->total() }}</span>
+                    </h2>
+
+                    {{-- Route `create` dan `show` terdaftar dari
+                         `Route::resource`, tapi sebelumnya tidak pernah
+                         punya pintu masuk dari UI: halaman create tidak
+                         bisa dicapai dan show selalu 500 karena view-nya
+                         belum ada. --}}
+                    <a href="{{ route('admin.manajemen-faq.create') }}"
+                       class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
+                        Tambah FAQ
+                    </a>
+                </div>
+
+                {{-- Tanpa form ini + paginasi di bawah, seluruh FAQ
+                     setelah 20 item pertama TIDAK PERNAH bisa dibuka
+                     atau diedit, karena tidak ada jalan menuju mereka. --}}
+                <form method="GET" action="{{ route('admin.manajemen-faq.index') }}" class="flex gap-2">
+                    <label for="faq-search" class="sr-only">Cari pertanyaan atau jawaban</label>
+
+                    <input type="search"
+                           name="search"
+                           id="faq-search"
+                           value="{{ request('search') }}"
+                           placeholder="Cari pertanyaan atau jawaban..."
+                           maxlength="100"
+                           class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+
+                    <button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
+                        Cari
+                    </button>
+
+                    @if (request('search'))
+                        <a href="{{ route('admin.manajemen-faq.index') }}"
+                           class="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                            Reset
+                        </a>
+                    @endif
+                </form>
             </div>
 
-            <div class="p-5 max-h-[70vh] overflow-y-auto">
+            <div class="p-5">
                 @forelse($faqs as $faq)
                     <div class="border border-gray-200 rounded-lg p-4 mb-3 bg-white hover:border-blue-300 transition-colors shadow-sm">
                         <div class="flex items-start justify-between gap-4">
@@ -224,6 +269,11 @@
 
                             <div class="flex gap-2 flex-shrink-0">
                                 {{-- Tombol Edit mengarah ke halaman edit terpisah --}}
+                                <a href="{{ route('admin.manajemen-faq.show', $faq->id_faq) }}"
+                                   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 text-gray-700 bg-gray-50 hover:bg-gray-100 transition">
+                                   Lihat
+                                </a>
+
                                 <a href="{{ route('admin.manajemen-faq.edit', $faq->id_faq) }}" 
                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 transition">
                                    Edit
@@ -241,12 +291,28 @@
                     </div>
                 @empty
                     <div class="text-center py-10">
-                        <div class="text-4xl mb-3">📂</div>
-                        <div class="font-semibold text-gray-900">Belum ada FAQ</div>
-                        <div class="text-gray-500 text-sm mt-1">Gunakan form di sebelah kanan untuk menambah.</div>
+                        <div class="text-4xl mb-3" aria-hidden="true">
+                            {{ request('search') ? '🔎' : '📂' }}
+                        </div>
+
+                        <div class="font-semibold text-gray-900">
+                            {{ request('search') ? 'Tidak ada FAQ yang cocok' : 'Belum ada FAQ' }}
+                        </div>
+
+                        <div class="text-gray-500 text-sm mt-1">
+                            {{ request('search')
+                                ? 'Coba kata kunci lain.'
+                                : 'Gunakan form di sebelah kanan untuk menambah.' }}
+                        </div>
                     </div>
                 @endforelse
             </div>
+
+            @if ($faqs->hasPages())
+                <nav class="px-5 py-4 border-t border-gray-200" role="navigation" aria-label="Navigasi halaman FAQ">
+                    {{ $faqs->onEachSide(1)->links() }}
+                </nav>
+            @endif
         </div>
 
         {{-- SISI KANAN: FORM TAMBAH --}}

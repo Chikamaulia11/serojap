@@ -15,15 +15,74 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/vendors/mdi/css/materialdesignicons.min.css') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @stack('styles')
 </head>
-<body class="bg-white font-sans text-slate-800 antialiased">
+<body class="bg-white font-sans text-slate-800 antialiased"
+      x-data="{ sidebarTerbuka: false }"
+      x-on:keydown.escape.window="sidebarTerbuka = false">
 
     <!-- Sidebar -->
-    <aside class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-slate-200 flex flex-col z-50 overflow-y-auto">
+    {{--
+        Sidebar admin sebelumnya `fixed w-60` tanpa handling mobile
+        sama sekali: di HP selebar ~360px, sidebar 240px menutup
+        hampir dua pertiga layar, tidak punya apa pun untuk
+        menutupnya, dan konten utama tetap terdorong `ml-60`.
+
+        Sekarang jadi drawer: tersembunyi di layar kecil, menjadi
+        sidebar tetap mulai breakpoint `md`, dan bisa dibuka lewat
+        tombol hamburger yang punya `aria-expanded` serta
+        `aria-controls` yang menunjuk ke `id` sidebar.
+    --}}
+    <!-- Top bar khusus layar kecil -->
+    <div class="md:hidden sticky top-0 z-40 flex items-center gap-3 h-14 px-4 bg-white border-b border-slate-200">
+        <button
+            type="button"
+            class="inline-flex items-center justify-center w-10 h-10 -ml-1 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2657c1]"
+            x-on:click="sidebarTerbuka = ! sidebarTerbuka"
+            x-bind:aria-expanded="sidebarTerbuka ? 'true' : 'false'"
+            aria-controls="adminSidebar"
+            aria-label="Buka menu navigasi"
+        >
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+
+        <span class="font-bold text-[#2657c1] tracking-wide">SEROJAP</span>
+    </div>
+
+    <!-- Lapisan gelap di belakang drawer -->
+    <div
+        class="md:hidden fixed inset-0 z-40 bg-slate-900/40"
+        x-show="sidebarTerbuka"
+        x-cloak
+        x-on:click="sidebarTerbuka = false"
+        aria-hidden="true"
+    ></div>
+
+    {{--
+        Transform ditulis lewat `x-bind:style`, bukan `x-bind:class`.
+
+        Alasannya `x-bind:class` baru berlaku setelah Alpine start,
+        jadi sebelum itu `<aside>` sama sekali tidak punya
+        `-translate-x-full` dan sidebar ikut melompat ke layar
+        seketika di HP lalu baru menghilang. Dengan inline style,
+        kondisi tertutup sama sekali tidak menghasilkan style --
+        jadi aturan statis `-translate-x-full md:translate-x-0`
+        yang berlaku, dan hanya saat terbuka transform-nya ditulis
+        inline. Tidak ada bentrok antara `-translate-x-full` dan
+        `md:translate-x-0` yang urutan CSS-nya tidak terjamin.
+    --}}
+    <aside
+        id="adminSidebar"
+        class="fixed top-0 left-0 z-50 w-60 h-screen bg-white border-r border-slate-200 flex flex-col overflow-y-auto transition-transform duration-200 -translate-x-full md:translate-x-0"
+        x-bind:style="sidebarTerbuka ? 'transform: translateX(0)' : ''"
+    >
 
         <!-- Brand -->
         <div class="flex items-center gap-2.5 px-5 py-5 border-b border-slate-100">
-            <img src="{{ asset('assets/pelapor/images/logo-serojap.png') }}" alt="Serojap" class="w-10 h-10 rounded-lg object-cover shadow-md">
+            <img src="{{ asset('assets/pelapor/images/logo-serojap.webp') }}" alt="Serojap" class="w-10 h-10 rounded-lg object-cover shadow-md">
             <span class="text-lg font-bold text-[#2657c1] tracking-wide">SEROJAP</span>
         </div>
 
@@ -91,15 +150,27 @@
                 Grafik Statistik
             </a>
 
-            {{-- Manajemen Admin (hanya super admin) --}}
-            @if(auth()->user()->role === 'super_admin')
-                <a href="{{ route('admin.admin-accounts.index') }}"
-                    class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                        {{ request()->routeIs('admin.admin-accounts.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
-                    <i class="mdi mdi-account-multiple-outline text-lg w-5 text-center"></i>
-                    Manajemen Admin
-                </a>
-            @endif
+            {{--
+                "Manajemen Admin" DIHAPUS dari sidebar ini.
+
+                Dua alasan, keduanya independen:
+
+                1. Route `admin.admin-accounts.*` tidak pernah ada --
+                   contasnya (`AdminAccountController`) tidak
+                   terdaftar di routes/web.php dan view-nya juga tidak
+                   pernah dibuat. Kalau blok ini masih di sini dan
+                   pernah dievaluasi, `route()` langsung exception.
+
+                2. Blok ini tidak akan pernah dievaluasi. Letaknya di
+                   `layouts/admin.blade.php`, sedangkan
+                   `AdminMiddleware` selalu mengembalikan super admin
+                   ke `superadmin.dashboard` -- jadi tidak ada super
+                   admin yang pernah melihat layout ini.
+
+                Manajemen akun yang berfungsi ada di
+                `superadmin.accounts.*` dan sudah ditautkan dari
+                dashboard super admin.
+            --}}
 
         </nav>
 
@@ -140,11 +211,11 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="ml-60 flex flex-col min-h-screen">
-        <main class="flex-1 p-8">
+    <div class="md:ml-60 flex flex-col min-h-screen">
+        <main class="flex-1 p-4 sm:p-6 md:p-8">
             @yield('content')
         </main>
-        <footer class="py-4 px-8 text-sm text-slate-400 text-center border-t border-slate-200 bg-white">
+        <footer class="py-4 px-4 sm:px-6 md:px-8 text-sm text-slate-400 text-center border-t border-slate-200 bg-white">
             &copy; {{ date('Y') }} Serojap — Sistem Pelaporan Jalan Rusak
         </footer>
     </div>
@@ -180,5 +251,6 @@
         });
     </script>
 
+    @stack('scripts')
 </body>
 </html>

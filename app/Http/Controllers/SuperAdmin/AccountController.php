@@ -5,30 +5,87 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class AccountController extends Controller
 {
     /**
+     * Role yang boleh dibuat / dikelola dari halaman ini.
+     *
+     * `super_admin` sengaja TIDAK ada di daftar ini supaya tidak ada
+     * jalur UI untuk membuat akun super admin baru, dan supaya akun
+     * super admin tidak bisa diedit atau dinonaktifkan lewat halaman
+     * ini. Satu-satunya super admin yang sah dibuat lewat seeder.
+     */
+    private const ROLE_TERMURAH = [
+        User::ROLE['admin'],
+        User::ROLE['pelapor'],
+    ];
+
+    /**
      * Halaman daftar akun admin dan pelapor.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'role' => ['nullable', Rule::in(self::ROLE_TERMURAH)],
+            'status' => ['nullable', Rule::in(['aktif', 'nonaktif'])],
+        ], [], [
+            'search' => 'pencarian',
+            'role' => 'role',
+            'status' => 'status',
+        ]);
+
+        $perHalaman = 15;
+
         $users = User::query()
-            ->whereIn('role', ['admin', 'pelapor'])
+            ->withTrashed()
+            ->whereIn('role', self::ROLE_TERMURAH)
+            ->when($request->search, function ($query) use ($request) {
+                $search = trim($request->search);
+
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('posisi', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->role, fn ($query) => $query->where('role', $request->role))
+            ->when($request->status === 'nonaktif', fn ($query) => $query->where(fn ($q) => $q->where('is_active', false)->orWhereNotNull('deleted_at')))
+            ->when($request->status === 'aktif', fn ($query) => $query->where('is_active', true)->whereNull('deleted_at'))
             ->orderByDesc('id')
-            ->get();
+            ->paginate($perHalaman)
+            ->withQueryString();
 
-        $admins = $users->where('role', 'admin');
+        /*
+         * Angka di kartu ringkasan harus dihitung terpisah dari
+         * `$users->count()`.
+         *
+         * `$users` itu Paginator, jadi `count()`-nya mengembalikan
+         * jumlah item DI HALAMAN INI SAJA (15), bukan jumlah seluruh
+         * akun. Kalau kartu ringkasan memakainya, begitu pengguna
+         * membuka halaman 2 angka "Total Admin" ikut turun -- dan
+         * begitu juga saat pencarian atau filter aktif, karena
+         * jumlahnya ikut terpotong. Yang tampil di sini adalah
+         * seluruh data, bukan hasil filter.
+         *
+         * `withTrashed()` dipakai supaya akun yang dinonaktifkan
+         * tetap dihitung: datanya masih ada dan masih bisa dipulihkan.
+         */
+        $semua = fn () => User::withTrashed()->whereIn('role', self::ROLE_TERMURAH);
 
-        $pelapors = $users->where('role', 'pelapor');
+        $ringkasan = [
+            'admin' => $semua()->where('role', User::ROLE['admin'])->count(),
+            'pelapor' => $semua()->where('role', User::ROLE['pelapor'])->count(),
+            'aktif' => $semua()->where('is_active', true)->whereNull('deleted_at')->count(),
+            'nonaktif' => $semua()->where(fn ($q) => $q->where('is_active', false)->orWhereNotNull('deleted_at'))->count(),
+        ];
 
-        return view('superadmin.accounts.index', compact(
-            'users',
-            'admins',
-            'pelapors'
-        ));
+        $ringkasan['total'] = $ringkasan['admin'] + $ringkasan['pelapor'];
+
+        return view('superadmin.accounts.index', compact('users', 'ringkasan'));
     }
 
     /**
@@ -36,7 +93,9 @@ class AccountController extends Controller
      */
     public function create()
     {
-        return view('superadmin.accounts.create');
+        return view('superadmin.accounts.create', [
+            'daftarRole' => self::ROLE_TERMURAH,
+        ]);
     }
 
     /**
@@ -48,7 +107,7 @@ class AccountController extends Controller
         $validated = $request->validate([
             'role' => [
                 'required',
-                Rule::in(['admin', 'pelapor']),
+                Rule::in(self::ROLE_TERMURAH),
             ],
 
             'nama' => [
@@ -63,7 +122,13 @@ class AccountController extends Controller
                 'string',
                 'email',
                 'max:255',
-                'unique:users,email',
+                Rule::unique('users', 'email'),
+            ],
+
+            'posisi' => [
+                'nullable',
+                'string',
+                'max:255',
             ],
 
             'password' => [
@@ -72,13 +137,21 @@ class AccountController extends Controller
                 'min:8',
                 'confirmed',
             ],
+        ], [], [
+            'role' => 'jabatan',
+            'nama' => 'nama',
+            'email' => 'email',
+            'posisi' => 'unit kerja',
+            'password' => 'kata sandi',
         ]);
 
-        User::create([
-            'name' => $validated['nama'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => $validated['role'],
+        $this->pastikanEmailBisaDipakai($validated['email']);
+
+        User::withRole($validated['role'], [
+            'name' => trim($validated['nama']),
+            'email' => mb_strtolower($validated['email']),
+            'password' => $validated['password'],
+            'posisi' => $validated['posisi'] ?? null,
         ]);
 
         return redirect()
@@ -93,12 +166,15 @@ class AccountController extends Controller
     {
         $this->ensureManageableAccount($account);
 
-        return view('superadmin.accounts.edit', compact('account'));
+        return view('superadmin.accounts.edit', [
+            'account' => $account,
+            'daftarRole' => self::ROLE_TERMURAH,
+        ]);
     }
 
     /**
      * Update akun.
-     * type profile  = update nama, email, role.
+     * type profile  = update nama, email, jabatan, role.
      * type password = update password saja.
      */
     public function update(Request $request, User $account)
@@ -115,16 +191,12 @@ class AccountController extends Controller
                     'min:8',
                     'confirmed',
                 ],
-
-                'password_confirmation' => [
-                    'required',
-                    'string',
-                    'min:8',
-                ],
+            ], [], [
+                'password' => 'kata sandi',
             ]);
 
             $account->update([
-                'password' => Hash::make($validated['password']),
+                'password' => $validated['password'],
             ]);
 
             return redirect()
@@ -135,7 +207,7 @@ class AccountController extends Controller
         $validated = $request->validate([
             'role' => [
                 'required',
-                Rule::in(['admin', 'pelapor']),
+                Rule::in(self::ROLE_TERMURAH),
             ],
 
             'nama' => [
@@ -152,13 +224,29 @@ class AccountController extends Controller
                 'max:255',
                 Rule::unique('users', 'email')->ignore($account->id),
             ],
+
+            'posisi' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+        ], [], [
+            'role' => 'jabatan',
+            'nama' => 'nama',
+            'email' => 'email',
+            'posisi' => 'unit kerja',
         ]);
 
+        $this->pastikanEmailBisaDipakai($validated['email'], $account->id);
+
         $account->update([
-            'name' => $validated['nama'],
-            'email' => $validated['email'],
-            'role' => $validated['role'],
+            'name' => trim($validated['nama']),
+            'email' => mb_strtolower($validated['email']),
+            'posisi' => $validated['posisi'] ?? null,
         ]);
+
+        // Role lewat forceFill, bukan mass assignment.
+        $account->forceFill(['role' => $validated['role']])->save();
 
         return redirect()
             ->route('superadmin.accounts.index')
@@ -166,17 +254,57 @@ class AccountController extends Controller
     }
 
     /**
-     * Hapus akun admin atau pelapor.
+     * Nonaktifkan akun.
+     *
+     * Soft delete, bukan hard delete: laporan dan riwayat status milik
+     * pelapor adalah data aduan publik yang tidak boleh ikut terhapus
+     * karena akunnya dinonaktifkan. Data tetap bisa dipulihkan lewat
+     * `restore()`.
      */
     public function destroy(User $account)
     {
         $this->ensureManageableAccount($account);
 
+        $jumlahLaporan = $account->reports()->count();
+        $jumlahRiwayat = $account->statuses()->count();
+
+        $account->forceFill(['is_active' => false])->save();
         $account->delete();
 
         return redirect()
             ->route('superadmin.accounts.index')
-            ->with('success', 'Akun berhasil dihapus.');
+            ->with('success', sprintf(
+                'Akun %s dinonaktifkan. %d laporan dan %d riwayat status tetap tersimpan dan bisa dipulihkan.',
+                $account->email,
+                $jumlahLaporan,
+                $jumlahRiwayat
+            ));
+    }
+
+    /**
+     * Aktifkan kembali akun yang dinonaktifkan.
+     */
+    public function restore(User $account)
+    {
+        $this->ensureManageableAccount($account);
+
+        $email = $account->email;
+
+        $tabrakan = User::withTrashed()
+            ->where('email', $email)
+            ->whereKeyNot($account->id)
+            ->exists();
+
+        if ($tabrakan) {
+            return back()->with('error', 'Email tersebut sudah dipakai akun lain, akun tidak bisa diaktifkan.');
+        }
+
+        $account->restore();
+        $account->forceFill(['is_active' => true])->save();
+
+        return redirect()
+            ->route('superadmin.accounts.index')
+            ->with('success', 'Akun berhasil diaktifkan kembali.');
     }
 
     /**
@@ -186,8 +314,31 @@ class AccountController extends Controller
      */
     private function ensureManageableAccount(User $account): void
     {
-        if (! in_array($account->role, ['admin', 'pelapor'], true)) {
+        if (! in_array($account->role, self::ROLE_TERMURAH, true)) {
             abort(404);
         }
+    }
+
+    /**
+     * Soft delete melepas batasan unique pada kolom email, jadi email
+     * milik akun nonaktif bisa dipakai akun lain. Kalau akun nonaktif
+     * itu nanti dipulihkan, emailnya harus kembali milik dia.
+     */
+    private function pastikanEmailBisaDipakai(string $email, ?int $kecualiId = null): void
+    {
+        $email = mb_strtolower($email);
+
+        $tabrakan = User::withTrashed()
+            ->where('email', $email)
+            ->when($kecualiId, fn ($q) => $q->whereKeyNot($kecualiId))
+            ->exists();
+
+        if (! $tabrakan) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'email' => 'Email ini masih dipakai akun yang dinonaktifkan. Aktifkan kembali akun tersebut, atau ganti email yang dipakai.',
+        ]);
     }
 }

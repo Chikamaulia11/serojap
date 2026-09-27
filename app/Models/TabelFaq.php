@@ -11,15 +11,25 @@ class TabelFaq extends Model
 
     // WAJIB: user_id harus masuk ke sini!
     protected $fillable = [
-        'user_id', 
+        'user_id',
         'pertanyaan',
         'jawaban',
         'urutan',
     ];
 
-    // Opsional: Relasi agar Anda bisa tahu siapa admin yang posting FAQ
+    protected $casts = [
+        'urutan' => 'integer',
+    ];
+
+    // Relasi ke admin yang menulis FAQ ini.
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Alias supaya view tidak perlu tahu nama aslinya.
+    public function admin()
+    {
+        return $this->user()->withTrashed();
     }
 }

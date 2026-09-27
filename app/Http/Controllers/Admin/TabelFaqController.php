@@ -1,19 +1,33 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 use App\Models\TabelFaq;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class TabelFaqController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $faqs = TabelFaq::orderBy('urutan', 'asc')->get();
+        $faqs = TabelFaq::with('admin')
+            ->when($request->search, function ($query) use ($request) {
+                $search = trim($request->search);
+
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('pertanyaan', 'like', "%{$search}%")
+                        ->orWhere('jawaban', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('urutan')
+            ->orderBy('id_faq')
+            ->paginate(20)
+            ->withQueryString();
+
         return view('admin.faq.index', compact('faqs'));
     }
 
@@ -22,7 +36,14 @@ class TabelFaqController extends Controller
      */
     public function create()
     {
-        //
+        $faq = new TabelFaq([
+            'urutan' => $this->urutanBerikutnya(),
+        ]);
+
+        return view('admin.faq.edit', [
+            'faq' => $faq,
+            'mode' => 'create',
+        ]);
     }
 
     /**
@@ -30,90 +51,124 @@ class TabelFaqController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'pertanyaan' => 'required|string|max:255',
-            'jawaban'    => 'required|string',
-            'urutan'     => 'nullable|integer|min:1|unique:tabel_faq,urutan', 
+        $validated = $request->validate([
+            'pertanyaan' => ['required', 'string', 'max:255'],
+            'jawaban' => ['required', 'string', 'max:5000'],
+            'urutan' => ['nullable', 'integer', 'min:1', 'max:999'],
         ], [
-        'urutan.unique' => 'Angka urutan tersebut sudah digunakan! Silakan gunakan nomor urut lain.',
-       ]);
-
-       if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $urutan = $request->urutan;
-        if (is_null($urutan)) {
-            $maxUrutan = TabelFaq::max('urutan') ?? 0; 
-            $urutan = $maxUrutan + 1;
-        }
-
-        TabelFaq::create([
-            'user_id'    => auth()->id(), 
-            'pertanyaan' => $request->pertanyaan,
-            'jawaban'    => $request->jawaban,
-            'urutan'     => $urutan,
+            'urutan.unique' => 'Angka urutan tersebut sudah dipakai FAQ lain.',
+        ], [
+            'pertanyaan' => 'pertanyaan',
+            'jawaban' => 'jawaban',
+            'urutan' => 'urutan',
         ]);
 
-        return redirect()->back()->with('success', 'Pertanyaan FAQ berhasil ditambahkan!');
+        $this->pastikanUrutanBebas($validated['urutan'] ?? null);
+
+        TabelFaq::create([
+            'user_id' => auth()->id(),
+            'pertanyaan' => trim($validated['pertanyaan']),
+            'jawaban' => trim($validated['jawaban']),
+            'urutan' => $validated['urutan'] ?? $this->urutanBerikutnya(),
+        ]);
+
+        return redirect()
+            ->route('admin.manajemen-faq.index')
+            ->with('success', 'Pertanyaan FAQ berhasil ditambahkan.');
     }
+
     /**
      * Display the specified resource.
      */
-    public function show(TabelFaq $tabelFaq)
+    public function show(TabelFaq $faq)
     {
-        //
+        $faq->load('admin');
+
+        return view('admin.faq.show', ['tabelFaq' => $faq]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(TabelFaq $faq)
     {
-        $faq = TabelFaq::findOrFail($id);
-        return view('admin.faq.edit', compact('faq'));
+        return view('admin.faq.edit', [
+            'faq' => $faq,
+            'mode' => 'edit',
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, TabelFaq $faq)
     {
-       $faq = TabelFaq::findOrFail($id);
-       $validator = Validator::make($request->all(), [
-            'pertanyaan' => 'required|string|max:255',
-            'jawaban'    => 'required|string',
-            'urutan'     => 'nullable|integer|min:1|unique:tabel_faq,urutan,' . $id . ',id_faq', 
+        $validated = $request->validate([
+            'pertanyaan' => ['required', 'string', 'max:255'],
+            'jawaban' => ['required', 'string', 'max:5000'],
+            'urutan' => ['nullable', 'integer', 'min:1', 'max:999'],
         ], [
-            'urutan.unique' => 'Angka urutan tersebut sudah digunakan! Silakan gunakan nomor urut lain.',
+            'urutan.unique' => 'Angka urutan tersebut sudah dipakai FAQ lain.',
+        ], [
+            'pertanyaan' => 'pertanyaan',
+            'jawaban' => 'jawaban',
+            'urutan' => 'urutan',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput()
-                ->with('error', $validator->errors()->first('urutan'));
-        }
-        
+        $this->pastikanUrutanBebas($validated['urutan'] ?? null, $faq->id_faq);
+
         $faq->update([
-            'pertanyaan' => $request->pertanyaan,
-            'jawaban' => $request->jawaban,
-            'urutan' => $request->urutan ?? $faq->urutan,
+            'pertanyaan' => trim($validated['pertanyaan']),
+            'jawaban' => trim($validated['jawaban']),
+            'urutan' => $validated['urutan'] ?? $faq->urutan,
         ]);
 
-        return redirect()->route('admin.manajemen-faq.index')->with('success', 'Data FAQ berhasil diperbarui!');
+        return redirect()
+            ->route('admin.manajemen-faq.index')
+            ->with('success', 'Data FAQ berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(TabelFaq $faq)
     {
-        $faq = TabelFaq::findOrFail($id);
         $faq->delete();
 
-        return redirect()->back()->with('success', 'FAQ berhasil dihapus!');
+        return redirect()
+            ->route('admin.manajemen-faq.index')
+            ->with('success', 'FAQ berhasil dihapus.');
+    }
+
+    /**
+     * Urutan berikutnya yang belum dipakai.
+     */
+    private function urutanBerikutnya(): int
+    {
+        return ((int) TabelFaq::max('urutan')) + 1;
+    }
+
+    /**
+     * Validasi urutan di level aplikasi.
+     *
+     * Kolom `urutan` tidak punya unique index di database, jadi dua
+     * request bersamaan bisa lolos pengecekan ini dan menghasilkan
+     * urutan duplikat yang merusak urutan di halaman publik.
+     */
+    private function pastikanUrutanBebas(?int $urutan, ?int $kecualiId = null): void
+    {
+        if ($urutan === null) {
+            return;
+        }
+
+        $dipakai = TabelFaq::where('urutan', $urutan)
+            ->when($kecualiId, fn ($query) => $query->whereKeyNot($kecualiId))
+            ->exists();
+
+        if ($dipakai) {
+            throw ValidationException::withMessages([
+                'urutan' => 'Urutan ' . $urutan . ' sudah dipakai FAQ lain. Pilih nomor lain atau biarkan kosong untuk otomatis.',
+            ]);
+        }
     }
 }

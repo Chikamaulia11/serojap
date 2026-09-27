@@ -165,14 +165,15 @@
                         @php
                             $isHidden = ($idx >= $showLimit);
 
-                            $status = $item->statusTerbaru?->status ?? 'diterima';
-
-                            $badgeClasses = [
-                                'diterima' => 'bg-emerald-100 text-emerald-700',
-                                'diproses' => 'bg-amber-100 text-amber-700',
-                                'selesai'  => 'bg-purple-100 text-purple-700',
-                                'ditolak'  => 'bg-red-100 text-red-700',
-                            ][$status] ?? 'bg-gray-100 text-gray-700';
+                            /*
+                             * Peta warna TIDAK ditulis ulang di sini.
+                             * Sebelumnya view ini punya salinan sendiri
+                             * (`diterima` hijau, `selesai` ungu) yang
+                             * berbeda dari `StatusPeta` (biru / emerald),
+                             * jadi laporan yang sama tampil beda antara
+                             * daftar admin dan timeline pelapor.
+                             */
+                            $status = $item->statusTerbaru?->status;
                         @endphp
 
                         <tr class="hover:bg-gray-50 transition {{ $isHidden ? 'hidden' : '' }}" data-row>
@@ -227,9 +228,7 @@
 
                             <td class="px-6 py-4">
 
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badgeClasses }}">
-                                    {{ ucfirst($status) }}
-                                </span>
+                                <x-status-badge :status="$status" />
 
                             </td>
 
@@ -252,12 +251,25 @@
 
                             <td colspan="6" class="px-6 py-12 text-center">
 
+                                {{-- Bedakan "belum ada laporan sama sekali" dari "filter tidak cocok".
+                                     Tanpa ini, pengguna yang sudah menyaring lalu mendapat nol hasil
+                                     disuruh mencari laporan yang sebenarnya ada: menyesatkan, dan
+                                     membuat mereka mengira datanya hilang. Pola yang sama dipakai
+                                     `admin/faq/index`, `pelapor/riwayat`, dan
+                                     `superadmin/accounts`. --}}
+                                @php
+                                    $adaFilter = trim((string) request('search')) !== ''
+                                        || request('status') !== null;
+                                @endphp
+
                                 <p class="text-gray-900 font-medium">
-                                    Belum ada laporan
+                                    {{ $adaFilter ? 'Tidak ada laporan yang cocok' : 'Belum ada laporan' }}
                                 </p>
 
                                 <p class="text-gray-500 text-sm">
-                                    Laporan yang masuk akan muncul di sini
+                                    {{ $adaFilter
+                                        ? 'Coba kata kunci lain atau kosongkan filter status.'
+                                        : 'Laporan yang masuk akan muncul di sini' }}
                                 </p>
 
                             </td>

@@ -5,9 +5,19 @@
 @section('content')
 
 @php
-    $totalAdmin = \App\Models\User::where('role', 'admin')->count();
-    $totalPelapor = \App\Models\User::where('role', 'pelapor')->count();
-    $totalAkun = $totalAdmin + $totalPelapor;
+    /*
+     * Dulu halaman ini menjalankan tiga `User::where(...)->count()`
+     * langsung di dalam Blade. Selain boros (tiga query ekstra di
+     * setiap load), semua query itu mengabaikan akun yang sudah
+     * di-nonaktifkan, sementara controller di sebelahnya sudah
+     * menghitungnya dengan benar lewat `withTrashed()`. Sekarang
+     * view murni menampilkan, dan angkanya tetap dari satu sumber.
+     */
+    $akun = $akun ?? ['total' => 0, 'aktif' => 0, 'nonaktif' => 0, 'admin' => 0, 'pelapor' => 0, 'superAdmin' => 0];
+    $ringkasanLaporan = $ringkasanLaporan ?? null;
+    $laporanTerbaru = $laporanTerbaru ?? collect();
+    $faqTerbaru = $faqTerbaru ?? collect();
+    $petugasAktif = $petugasAktif ?? 0;
 @endphp
 
 <style>
@@ -292,17 +302,17 @@
                 <div class="hero-stats">
 
                     <div class="hero-stat">
-                        <strong>{{ $totalAdmin }}</strong>
+                        <strong>{{ $akun['admin'] }}</strong>
                         <span>Admin</span>
                     </div>
 
                     <div class="hero-stat">
-                        <strong>{{ $totalPelapor }}</strong>
+                        <strong>{{ $akun['pelapor'] }}</strong>
                         <span>Pelapor</span>
                     </div>
 
                     <div class="hero-stat">
-                        <strong>{{ $totalAkun }}</strong>
+                        <strong>{{ $akun['total'] }}</strong>
                         <span>Akun</span>
                     </div>
 
@@ -325,7 +335,7 @@
             <p class="summary-label">Kelola Admin</p>
 
             <h2 class="summary-title">
-                {{ $totalAdmin }} Admin
+                {{ $akun['admin'] }} Admin
             </h2>
 
         </div>
@@ -338,7 +348,7 @@
             <p class="summary-label">Kelola Pelapor</p>
 
             <h2 class="summary-title">
-                {{ $totalPelapor }} Pelapor
+                {{ $akun['pelapor'] }} Pelapor
             </h2>
         </div>
 
@@ -401,6 +411,111 @@
         </div>
 
     </div>
+
+    {{-- ================================================================
+         Ringkasan laporan + aktivitas terbaru.
+         Data ini sudah diambil controller, tapi belum pernah ditampilkan,
+         jadi query-nya sia-sia. Sekarang dipakai.
+    ================================================================ --}}
+    @if ($ringkasanLaporan)
+        <div class="summary-grid" style="margin-top:24px;">
+
+            @php
+                /*
+                 * Angka saja, TANPA link.
+                 *
+                 * Versi sebelumnya membungkus tiap kartu ini dengan
+                 * `route('admin.laporan.index', ...)`. Lima kartu, satu
+                 * tujuan -- dan `AdminMiddleware` selalu mengembalikan
+                 * super admin ke `superadmin.dashboard` begitu menyentuh
+                 * URL area admin. Jadi setiap klik memantul balik ke
+                 * halaman yang sama, tidak pernah membuka daftar
+                 * laporan, dan tidak ada cara lain untuk super admin
+                 * sampai ke sana.
+                 *
+                 * Super admin memang sengaja ditahan di luar area admin,
+                 * jadi angka di sini bersifat laporan-baca, bukan
+                 * pintasan navigasi.
+                 */
+                $kartu = [
+                    'Total Laporan' => $ringkasanLaporan['total'],
+                    'Diterima' => $ringkasanLaporan['diterima'],
+                    'Diproses' => $ringkasanLaporan['diproses'],
+                    'Selesai' => $ringkasanLaporan['selesai'],
+                    'Ditolak' => $ringkasanLaporan['ditolak'],
+                ];
+            @endphp
+
+            @foreach ($kartu as $judul => $angka)
+                <div class="summary-card">
+                    <p class="summary-label">{{ $judul }}</p>
+                    <h2 class="summary-title">{{ $angka }}</h2>
+                </div>
+            @endforeach
+
+        </div>
+    @endif
+
+    <div class="action-grid" style="margin-top:24px;">
+
+        <div class="action-card">
+            <p class="summary-label">Laporan Terbaru</p>
+
+            @forelse ($laporanTerbaru as $laporan)
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid #f1f5f9;">
+                    <div style="min-width:0;">
+                        <p style="margin:0; font-size:14px; font-weight:600; color:#0f172a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            {{ $laporan->alamat }}
+                        </p>
+                        <p style="margin:2px 0 0; font-size:12px; color:#64748b;">
+                            {{ $laporan->created_at?->format('d M Y, H:i') }}
+                        </p>
+                    </div>
+                    <x-status-badge :status="$laporan->latestStatus?->status" />
+                </div>
+            @empty
+                <p style="font-size:14px; color:#64748b; margin-top:8px;">Belum ada laporan masuk.</p>
+            @endforelse
+        </div>
+
+        <div class="action-card">
+            <p class="summary-label">FAQ Terbaru</p>
+
+            @forelse ($faqTerbaru as $faq)
+                <div style="padding:12px 0; border-bottom:1px solid #f1f5f9;">
+                    <p style="margin:0; font-size:14px; font-weight:600; color:#0f172a;">
+                        {{ $faq->pertanyaan }}
+                    </p>
+                    <p style="margin:2px 0 0; font-size:12px; color:#64748b;">
+                        {{ $faq->admin?->name ?? 'Admin tidak tersedia' }}
+                        &middot; urutan {{ $faq->urutan }}
+                    </p>
+                </div>
+            @empty
+                <p style="font-size:14px; color:#64748b; margin-top:8px;">Belum ada FAQ.</p>
+            @endforelse
+        </div>
+
+    </div>
+
+    {{-- Petugas yang belum menyentuh laporan apa pun dalam 30 hari. --}}
+    @if ($petugasAktif === 0)
+        <div class="dark-card" style="margin-top:24px;">
+            <div style="position:relative; z-index:2;">
+                <p style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:#bfdbfe;">
+                    Perhatian
+                </p>
+                <h2 style="font-size:20px; font-weight:800; margin-top:8px;">
+                    Tidak ada admin yang aktif menangani laporan.
+                </h2>
+                <p style="font-size:14px; color:#cbd5e1; line-height:1.7; margin-top:10px;">
+                    Tidak ada satu pun akun admin aktif yang mengubah status
+                    laporan dalam 30 hari terakhir. Periksa daftar akun --
+                    mungkin akunnya sudah dinonaktifkan tanpa disengaja.
+                </p>
+            </div>
+        </div>
+    @endif
 
 </div>
 

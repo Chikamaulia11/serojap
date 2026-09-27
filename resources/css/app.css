@@ -17,3 +17,88 @@
 .neon-glow-teal {
     box-shadow: 0 10px 50px rgba(20, 184, 166, 0.4);
 }
+
+/* =========================================================
+   KOMPONEN BERSAMA
+   =========================================================
+
+   Dulu `.btn` / `.field-input` hanya ada di `public/css/form.css`,
+   padahal dipakai juga di halaman lain. Akibatnya tombol di riwayat
+   dan dashboard pelapor kehilangan warna sama sekali, dan setiap
+   halaman harus menebak class mana yang sedang aktif.
+
+   Sekarang didefinisikan sekali di sini. Nilai warna diambil dari
+   palet yang sudah lolos kontras WCAG AA di atas latar putih.
+========================================================= */
+
+@layer components {
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 min-h-[44px] px-[18px] py-[11px]
+               rounded-xl border-0 font-sans text-sm font-semibold cursor-pointer
+               transition-colors;
+    }
+
+    .btn:focus-visible {
+        @apply outline outline-2 outline-offset-2 outline-slate-900;
+    }
+
+    .btn:disabled {
+        @apply opacity-60 cursor-not-allowed;
+    }
+
+    .btn-primary {
+        @apply bg-[#1d5a5d] text-white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        @apply bg-[#183e3f];
+    }
+
+    .btn-secondary {
+        @apply bg-teal-50 text-[#1a4a4c] border border-[#abe5e4];
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+        @apply bg-teal-100;
+    }
+
+    .field-input {
+        @apply block w-full min-h-[44px] px-[14px] py-[11px] rounded-xl
+               border border-slate-300 bg-white font-sans text-[15px] leading-normal
+               text-slate-900 transition;
+    }
+
+    .field-input::placeholder {
+        @apply text-slate-500;
+    }
+
+    .field-input:focus {
+        @apply outline-none border-[#226d71] ring-[3px] ring-[#226d71]/20;
+    }
+
+    .field-input[aria-invalid='true'] {
+        @apply border-red-600 bg-red-50;
+    }
+
+    /* Paginasi Breeze masih memakai gaya link biru bawaan. */
+    .pagination {
+        @apply flex flex-wrap items-center justify-center gap-1;
+    }
+}
+
+/*
+ * Alpine.js
+ * =========================
+ * Elemen beratribut `x-cloak` (mis. pratinjau nama/ukuran file pada
+ * form admin) TIDAK BOLEH terlihat sebelum Alpine selesai inisialisasi.
+ * Tanpa aturan ini, elemen tersebut tampil apa adanya lalu baru
+ * "berhilang" sebentar setelah Alpine start -- keterangan file kosong
+ * melayang di atas form.
+ *
+ * `!important` dipakai karena beberapa utility class Alpine sendiri
+ * (mis. `x-show` yang menulis `display: none` lewat inline style)
+ * berbalik urutan dengan aturan ini.
+ */
+[x-cloak] {
+    display: none !important;
+}

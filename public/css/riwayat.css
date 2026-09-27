@@ -1,91 +1,193 @@
-body {
-    font-family: 'Poppins', sans-serif;
-    background: #f5f7fa;
-    padding: 20px;
+/* =========================================================
+   RIWAYAT LAPORAN PELAPOR
+   =========================================================
+
+   Hanya berisi yang TIDAK bisa ditulis dengan utility class Tailwind:
+   perilaku <dialog> dan garis vertikal timeline.
+
+   `body` sengaja tidak ditulis di sini. File lama menimpa font dan
+   latar global navbar, jadi /my-report tampil berbeda dari halaman lain.
+========================================================= */
+
+.detail-dialog {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    max-width: min(640px, calc(100vw - 2rem));
+    width: 100%;
+    max-height: calc(100dvh - 2rem);
+    overflow: visible;
 }
 
-/* HEADER */
-.title {
-    font-size: 24px;
-    color: #1f4674;
-    margin-bottom: 20px;
+.detail-dialog::backdrop {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(2px);
 }
 
-/* CARD LIST */
-.list {
+.detail-panel {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 2rem);
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.3);
+}
+
+.detail-kepala {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.detail-tutup {
     display: grid;
-    gap: 15px;
-}
-
-/* CARD */
-.card-report {
-    background: white;
-    padding: 15px 20px;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #334155;
     cursor: pointer;
-    transition: 0.2s;
-    border-left: 6px solid #226d71;
+    transition: background 0.15s ease;
 }
 
-.card-report:hover {
-    transform: translateY(-3px);
+.detail-tutup:hover {
+    background: #f1f5f9;
 }
 
-/* STATUS */
-.status {
-    font-size: 13px;
-    font-weight: 500;
-    color: #226d71;
+.detail-tutup:focus-visible {
+    outline: 2px solid #0f172a;
+    outline-offset: 2px;
 }
 
-/* POPUP */
-.popup {
-    position: fixed;
-    top: 0;
-    left: 0;
+.detail-isi {
+    padding: 20px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.detail-foto {
     width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    background: #f1f5f9;
 }
 
-/* POPUP BOX */
-.popup-content {
-    background: white;
-    width: 90%;
-    max-width: 500px;
-    padding: 25px;
-    border-radius: 18px;
-    animation: fadeIn 0.3s ease;
+.detail-daftar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0 0 20px;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
 }
 
-.popup-content h3 {
-    color: #1f4674;
-    margin-bottom: 10px;
+.detail-daftar dt {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #64748b;
+    margin-bottom: 3px;
 }
 
-.popup-content p {
-    margin: 8px 0;
+.detail-daftar dd {
+    margin: 0;
+    font-size: 14px;
+    color: #0f172a;
+    word-break: break-word;
 }
 
-/* BUTTON */
-.btn-close {
-    margin-top: 15px;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    background: #1f4674;
-    color: white;
-    border-radius: 10px;
-    cursor: pointer;
+.tautan-peta {
+    color: #1d5a5d;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
 
-/* ANIMASI */
-@keyframes fadeIn {
-    from {opacity: 0; transform: scale(0.9);}
-    to {opacity: 1; transform: scale(1);}
+.detail-bagian {
+    margin-top: 20px;
+}
+
+.detail-bagian h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+/* ================= TIMELINE ================= */
+
+.timeline {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 26px;
+}
+
+/* Garis penghubung antar titik, di belakang titik-titiknya. */
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: #e2e8f0;
+}
+
+.timeline > li {
+    position: relative;
+    padding-bottom: 18px;
+}
+
+.timeline > li:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-titik {
+    position: absolute;
+    left: -26px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    box-shadow: 0 0 0 3px #ffffff;
+}
+
+@media (max-width: 480px) {
+    .detail-dialog {
+        max-width: 100vw;
+        max-height: 100dvh;
+        width: 100vw;
+    }
+
+    .detail-panel {
+        max-height: 100dvh;
+        border-radius: 0;
+    }
+
+    .detail-isi,
+    .detail-kepala {
+        padding: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+    }
 }

@@ -51,4 +51,155 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    public function test_admin_can_authenticate_using_the_admin_login_screen(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this->post('/login/admin', [
+            'email' => $admin->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($admin);
+        $response->assertRedirect(route('admin.dashboard', absolute: false));
+    }
+
+    public function test_super_admin_can_authenticate_using_the_super_admin_login_screen(): void
+    {
+        $superAdmin = User::factory()->superAdmin()->create();
+
+        $response = $this->post('/login/superadmin', [
+            'email' => $superAdmin->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($superAdmin);
+        $response->assertRedirect(route('superadmin.dashboard', absolute: false));
+    }
+
+    public function test_pelapor_cannot_log_in_through_the_admin_login_screen(): void
+    {
+    // Catatan: test ini SENGAJA tidak memakai `->from()`.
+    //
+    // `AuthenticatedSessionController::logoutAndBack()` memanggil
+    // `session()->invalidate()`, yang menjalankan `flush()` sehingga key
+    // `_previous.url` ikut terhapus. Kalau redirect-nya `back()`, di
+    // test selalu jatuh ke URL dari `->from()`, tapi di permintaan nyata
+    // yang tidak mengirim `Referer` ia jatuh ke "/" yang tidak
+    // menampilkan pesan apa pun.
+    //
+    // Jadi test ini menguji redirect EXPLICIT ke halaman login yang
+    // sesuai, bukan andalkan `back()`.
+        $pelapor = User::factory()->pelapor()->create();
+
+        $response = $this
+            ->post('/login/admin', [
+                'email' => $pelapor->email,
+                'password' => 'password',
+            ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login/admin');
+        $response->assertSessionHasErrors([
+            'email' => 'Akun ini bukan akun admin.',
+        ]);
+    }
+
+    public function test_admin_cannot_log_in_through_the_pelapor_login_screen(): void
+    {
+    // Catatan: test ini SENGAJA tidak memakai `->from()`.
+    //
+    // `AuthenticatedSessionController::logoutAndBack()` memanggil
+    // `session()->invalidate()`, yang menjalankan `flush()` sehingga key
+    // `_previous.url` ikut terhapus. Kalau redirect-nya `back()`, di
+    // test selalu jatuh ke URL dari `->from()`, tapi di permintaan nyata
+    // yang tidak mengirim `Referer` ia jatuh ke "/" yang tidak
+    // menampilkan pesan apa pun.
+    //
+    // Jadi test ini menguji redirect EXPLICIT ke halaman login yang
+    // sesuai, bukan andalkan `back()`.
+        $admin = User::factory()->admin()->create();
+
+        $response = $this
+            ->post('/login', [
+                'email' => $admin->email,
+                'password' => 'password',
+            ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors([
+            'email' => 'Akun ini bukan akun pelapor.',
+        ]);
+    }
+
+    public function test_pelapor_cannot_log_in_through_the_super_admin_login_screen(): void
+    {
+    // Catatan: test ini SENGAJA tidak memakai `->from()`.
+    //
+    // `AuthenticatedSessionController::logoutAndBack()` memanggil
+    // `session()->invalidate()`, yang menjalankan `flush()` sehingga key
+    // `_previous.url` ikut terhapus. Kalau redirect-nya `back()`, di
+    // test selalu jatuh ke URL dari `->from()`, tapi di permintaan nyata
+    // yang tidak mengirim `Referer` ia jatuh ke "/" yang tidak
+    // menampilkan pesan apa pun.
+    //
+    // Jadi test ini menguji redirect EXPLICIT ke halaman login yang
+    // sesuai, bukan andalkan `back()`.
+        $pelapor = User::factory()->pelapor()->create();
+
+        $response = $this
+            ->post('/login/superadmin', [
+                'email' => $pelapor->email,
+                'password' => 'password',
+            ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login/superadmin');
+        $response->assertSessionHasErrors([
+            'email' => 'Akun ini bukan akun super admin.',
+        ]);
+    }
+
+    public function test_admin_cannot_log_in_through_the_super_admin_login_screen(): void
+    {
+    // Catatan: test ini SENGAJA tidak memakai `->from()`.
+    //
+    // `AuthenticatedSessionController::logoutAndBack()` memanggil
+    // `session()->invalidate()`, yang menjalankan `flush()` sehingga key
+    // `_previous.url` ikut terhapus. Kalau redirect-nya `back()`, di
+    // test selalu jatuh ke URL dari `->from()`, tapi di permintaan nyata
+    // yang tidak mengirim `Referer` ia jatuh ke "/" yang tidak
+    // menampilkan pesan apa pun.
+    //
+    // Jadi test ini menguji redirect EXPLICIT ke halaman login yang
+    // sesuai, bukan andalkan `back()`.
+        $admin = User::factory()->admin()->create();
+
+        $response = $this
+            ->post('/login/superadmin', [
+                'email' => $admin->email,
+                'password' => 'password',
+            ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login/superadmin');
+        $response->assertSessionHasErrors([
+            'email' => 'Akun ini bukan akun super admin.',
+        ]);
+    }
+
+    public function test_email_yang_gagal_login_kemudian_ada_di_input_kembali(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this
+            ->post('/login', [
+                'email' => $admin->email,
+                'password' => 'password',
+            ]);
+
+        $response->assertSessionHasInput('email', $admin->email);
+    }
 }

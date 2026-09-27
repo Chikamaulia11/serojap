@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PublicController;
 use App\Http\Controllers\ReportController;
 
 use App\Http\Controllers\Admin\LaporanController;
@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\AdminProfileController;
 
 use App\Http\Controllers\SuperAdmin\AccountController;
+use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 
 use App\Http\Controllers\Pelapor\FaqController;
 
@@ -23,9 +24,10 @@ use App\Http\Middleware\SuperAdminMiddleware;
 /* =========================
    LANDING PAGE
 ========================= */
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get(
+    '/',
+    [PublicController::class, 'home']
+)->name('beranda');
 
 /* =========================
    AUTH (GUEST)
@@ -44,21 +46,6 @@ Route::middleware('guest')->group(function () {
         '/login',
         [AuthenticatedSessionController::class, 'store']
     )->name('login.post');
-
-    // =========================
-    // REGISTER PELAPOR
-    // Pelapor tetap boleh registrasi sendiri.
-    // Admin dan super admin tidak registrasi sendiri.
-    // =========================
-    Route::get(
-        '/register',
-        [RegisteredUserController::class, 'create']
-    )->name('register');
-
-    Route::post(
-        '/register',
-        [RegisteredUserController::class, 'store']
-    );
 
     // =========================
     // LOGIN ADMIN
@@ -89,16 +76,6 @@ Route::middleware('guest')->group(function () {
 });
 
 /* =========================
-   LOGOUT
-========================= */
-Route::post(
-    '/logout',
-    [AuthenticatedSessionController::class, 'destroy']
-)
-    ->middleware('auth')
-    ->name('logout');
-
-/* =========================
    PROTECTED (PELAPOR)
 ========================= */
 Route::middleware([
@@ -119,7 +96,12 @@ Route::middleware([
     Route::post(
         '/report',
         [ReportController::class, 'store']
-    )->name('laporan.store');
+    )
+        // Batasi spam submit laporan, tidak memengaruhi navigasi halaman lain.
+        // Hitunganattempt dilakukan di controller agar percobaan gagal
+        // validasi tidak ikut menghabiskan kuota.
+        ->middleware('throttle:20,1')
+        ->name('laporan.store');
 
     Route::get(
         '/my-report',
@@ -220,6 +202,30 @@ Route::middleware([
             'edit' => 'manajemen-faq.edit',
             'update' => 'manajemen-faq.update',
             'destroy' => 'manajemen-faq.destroy',
+        ])->parameters([
+            // WAJIB. Tanpa baris ini, `Route::resource('manajemen-faq', ...)`
+            // membuat URI `/admin/manajemen-faq/{manajemen_faq}/edit`.
+            // `->names([...])` hanya menimpa NAMA route, bukan nama
+            // parameter di URI.
+            //
+            // Akibatnya: implicit route model binding mencari parameter
+            // bernama `manajemen_faq`, sementara controller-nya
+            // `show(TabelFaq $faq)`. Tidak ada yang cocok, jadi
+            // `ImplicitRouteBinding` melewatkannya dan container
+            // mengembalikan instance `TabelFaq` KOSONG. Halaman show
+            // lalu "berhasil" dirender dengan model tanpa id, dan
+            // `route('admin.manajemen-faq.edit', $tabelFaq->id_faq)`
+            // meledak:
+            //
+            //   Missing required parameter for [Route: admin.manajemen-faq.edit]
+            //   [URI: admin/manajemen-faq/{manajemen_faq}/edit]
+            //
+            // `edit($id)`, `update(..., $id)`, dan `destroy($id)` punya
+            // masalah serupa: `$id` tidak akan pernah terisi.
+            //
+            // Setelah ini URI-nya jadi `{faq}` dan cocok dengan
+            // `TabelFaq $faq` di controller.
+            'manajemen-faq' => 'faq',
         ]);
 
     });
@@ -236,9 +242,8 @@ Route::middleware([
     ->name('superadmin.')
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('superadmin.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])
+            ->name('dashboard');
 
         Route::resource(
             'accounts',
@@ -251,6 +256,33 @@ Route::middleware([
                 'show',
             ]);
 
+        // Aktifkan kembali akun yang sebelumnya dinonaktifkan.
+        //
+        // `withTrashed()` itu WAJIB di sini. Tanpa itu, route model
+        // binding hanya mencari user yang belum di-soft-delete, jadi
+        // `User $account` akan selalu lempar ModelNotFoundException
+        // (404) tepat untuk akun yang justru sedang dipulihkan --
+        // tombol "Aktifkan Kembali" di halaman daftar tidak akan pernah
+        // bisa bekerja.
+        Route::patch('/accounts/{account}/restore', [AccountController::class, 'restore'])
+            ->withTrashed()
+            ->name('accounts.restore');
+
     });
 
 require __DIR__ . '/auth.php';
+
+/*
+    Halaman 404 dirender lewat route, bukan lewat exception handler.
+
+    Tanpa ini, URL yang tidak cocok apa pun dilempar 404 oleh router
+    SEBELUM middleware group `web` jalan. Group itu yang menjalankan
+    `StartSession`, jadi `auth()` selalu null di halaman 404 -- dan
+    link "Ke Dashboard" sesuai role di `errors/404.blade.php` diam-diam
+    tidak pernah muncul untuk siapa pun, apa pun role-nya.
+
+    Status HTTP tetap 404; yang berubah hanya view mana yang dipakai.
+    Login wrong-role tetap dialihkan ke dashboard sendiri, bukan ke sini.
+*/
+Route::fallback(fn () => response()->view('errors.404', [], 404));
+

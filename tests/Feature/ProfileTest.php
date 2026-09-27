@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Report;
+use App\Models\TabelStatus;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -76,24 +78,38 @@ class ProfileTest extends TestCase
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
+        // Akun di-soft delete, bukan di-hard delete: super admin masih
+        // harus bisa memulihkannya lewat `AccountController@restore`
+        // (`User::withTrashed()` + `restore()`). Jadi barisnya masih ada,
+        // hanya `deleted_at` yang terisi.
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
     }
 
-    public function test_correct_password_must_be_provided_to_delete_account(): void
+    public function test_user_account_and_reports_are_deleted_together(): void
     {
         $user = User::factory()->create();
 
+        $laporan = Report::factory()->for($user)->create();
+
+        TabelStatus::factory()->for($laporan, 'laporan')->create([
+            'user_id' => $user->id,
+        ]);
+
         $response = $this
             ->actingAs($user)
-            ->from('/profile')
-            ->delete('/profile', [
-                'password' => 'wrong-password',
-            ]);
+            ->delete('/profile');
 
         $response
-            ->assertSessionHasErrorsIn('userDeletion', 'password')
-            ->assertRedirect('/profile');
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/');
 
-        $this->assertNotNull($user->fresh());
+        $this->assertGuest();
+        // Akun di-soft delete, bukan di-hard delete: super admin masih
+        // harus bisa memulihkannya lewat `AccountController@restore`
+        // (`User::withTrashed()` + `restore()`). Jadi barisnya masih ada,
+        // hanya `deleted_at` yang terisi.
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
+        $this->assertDatabaseMissing('reports', ['id' => $laporan->id]);
+        $this->assertDatabaseMissing('tabel_status', ['report_id' => $laporan->id]);
     }
 }

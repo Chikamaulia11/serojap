@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -69,5 +70,45 @@ class PasswordResetTest extends TestCase
 
             return true;
         });
+    }
+
+    public function test_akun_nonaktif_tidak_bisa_kehidupkan_lagi_lewat_tautan_reset(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $user->forceFill(['is_active' => false])->save();
+
+        $this->post('/forgot-password', ['email' => $user->email]);
+
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+            $this->post('/reset-password', [
+                'token' => $notification->token,
+                'email' => $user->email,
+                'password' => 'password',
+                'password_confirmation' => 'password',
+            ])->assertSessionHasErrors('email');
+
+            // Kuncinya: kata sandi lama harus tetap berlaku.
+            $this->assertTrue(Hash::check('password', $user->fresh()->password));
+
+            return true;
+        });
+    }
+
+    public function test_akun_soft_deleted_tidak_bisa_reset_kata_sandi(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $user->delete();
+
+        // Pesannya tetap generik supaya halaman ini tidak bisa dipakai
+        // menebak email mana yang punya akun.
+        $this->post('/forgot-password', ['email' => $user->email])
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('status');
+
+        Notification::assertNothingSent();
     }
 }
