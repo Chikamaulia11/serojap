@@ -41,7 +41,9 @@ class ReportSubmissionTest extends TestCase
             ->from(route('laporan.create'))
             ->post(route('laporan.store'), $this->dataLaporan());
 
-        $response->assertRedirect(route('laporan.create'));
+        // Setelah sukses, pengguna diarahkan ke Riwayat Laporan supaya
+        // bisa langsung memantau nomor referensinya.
+        $response->assertRedirect(route('laporan.my-report'));
         $response->assertSessionHas('success');
 
         $this->assertDatabaseCount('reports', 1);
@@ -123,10 +125,18 @@ class ReportSubmissionTest extends TestCase
             ]));
 
         $response->assertSessionHasErrors('foto');
-        $this->assertContains(
-            'Ukuran foto maksimal 5120 kilobyte (5MB).',
-            $this->semuaPesanValidasi()
+
+        // Pesannya boleh berubah kalimatnya, tapi wajib menyebut batas 5 MB
+        // supaya pengguna paham kenapa foto ditolak.
+        $this->assertNotEmpty(
+            array_filter(
+                $this->semuaPesanValidasi(),
+                fn (string $pesan): bool => str_contains($pesan, '5 MB')
+            ),
+            'Pesan validasi foto harus menyebut batas 5 MB. Pesan aktual: '
+                .implode(' | ', $this->semuaPesanValidasi())
         );
+
         $this->assertDatabaseCount('reports', 0);
     }
 
@@ -195,16 +205,49 @@ class ReportSubmissionTest extends TestCase
             'keterangan',
         ]);
 
-        $errors = session('errors')->getBag('default')->all();
+        // `MessageBag::all()` mengembalikan daftar pesan yang diratakan,
+        // jadi untuk lookup per-field harus pakai `getMessages()`.
+        $errors = session('errors')->getBag('default')->getMessages();
 
-        $this->assertContains('Nama pelapor wajib diisi.', $errors);
-        $this->assertContains(
-            'Foto kerusakan jalan wajib diunggah.',
-            $errors
-        );
-        $this->assertContains(
-            'Keterangan kerusakan wajib diisi.',
-            $errors
+        $wajib = ['nama', 'foto', 'alamat', 'latitude', 'longitude', 'keterangan'];
+
+        foreach ($wajib as $field) {
+            $this->assertNotEmpty(
+                $errors[$field] ?? [],
+                "Field {$field} harus punya pesan validasi."
+            );
+        }
+
+        // Yang diuji di sini adalah bahasanya, bukan kalimat persisnya:
+        // pesan boleh diubah kalimatnya, tapi tidak boleh jatuh ke bawaan
+        // Laravel yang berbahasa Inggris.
+        $polaInggris = [
+            'field is required',
+            'must be an image',
+            'may not be greater than',
+            'must be a number',
+            'at least',
+        ];
+
+        foreach ($errors as $field => $messages) {
+            foreach ($messages as $message) {
+                $this->assertNotEmpty(trim($message), "Pesan untuk {$field} tidak boleh kosong.");
+
+                foreach ($polaInggris as $pola) {
+                    $this->assertStringNotContainsStringIgnoringCase(
+                        $pola,
+                        $message,
+                        "Pesan untuk {$field} masih bahasa Inggris: {$message}"
+                    );
+                }
+            }
+        }
+
+        // Nama custom attribute harus terpakai, supaya yang tampil
+        // "nama pelapor", bukan "nama".
+        $this->assertStringContainsString(
+            'nama pelapor',
+            strtolower($errors['nama'][0] ?? '')
         );
     }
 
@@ -229,9 +272,151 @@ class ReportSubmissionTest extends TestCase
     {
         $admin = User::factory()->admin()->create();
 
-        $this->actingAs($admin)
-            ->get(route('laporan.create'))
-            ->assertRedirect(route('login'));
+        // `PelaporMiddleware` mengarahkan admin ke dashboard admin-nya
+        // sendiri, bukan logout.
+        $response = $this->actingAs($admin)
+            ->get(route('laporan.create'));
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $response->assertSessionHas('error');
+    }
+
+    /**
+     * =================================================================
+     * TASK A - PEMBUKTIAN DESAIN RATE LIMIT 2 LAPIS
+     *
+     * Rate limit submit laporan sengaja dibuat dua lapis:
+     *
+     *   1. `throttle:20,1` sebagai middleware di route -> pagar luar,
+     *      menahan request mentah sebanyak apa pun.
+     *   2. Limiter manual 5/menit di controller -> baru dihitung
+     *      SETELAH validasi lolos, jadi laporan yang BENAR-BENAR
+     *      terkirim saja yang dihitung.
+     *
+     * Test di bawah mengunci kedua lapis itu. Tanpa test ini, refactor
+     * berikutnya bisa dengan sengaja atau tidak mengembalikan
+     * `throttle` ke posisi lama (sebelum controller) dan tidak ada yang
+     * sadar, karena user yang salah upload foto lalu kena 429 tanpa
+     * tahu kenapa.
+     * =================================================================
+     */
+
+    public function test_percobaan_gagal_validasi_tidak_menghitung_limiter(): void
+    {
+        Storage::fake('public');
+
+        $pelapor = User::factory()->pelapor()->create();
+
+        // 7 kali: cukup melewati batas 5/menit kalau limiter ikut menghitung
+        // request yang gagal validasi.
+        for ($i = 1; $i <= 7; $i++) {
+            $response = $this->actingAs($pelapor)
+                ->post(route('laporan.store'), [
+                    'nama' => 'Budi Santoso',
+                    'foto' => $this->fileGambar('jalan.jpg'),
+                    'alamat' => 'Jl. Raya Purwakarta',
+                    'latitude' => '-6.558',
+                    'longitude' => '107.760',
+                    // Terlalu pendek -> gagal validasi `min:10`.
+                    'keterangan' => 'lubang',
+                ]);
+
+            $this->assertNotSame(
+                429,
+                $response->getStatusCode(),
+                "Percobaan ke-{$i} tidak boleh kena rate limit: validasi gagal "
+                    .'duluan, jadi belum ada laporan yang terkirim.'
+            );
+
+            $response->assertSessionHasErrors('keterangan');
+        }
+
+        $this->assertDatabaseCount('reports', 0);
+
+        // Kalau limiter tidak ikut menghitung request gagal, attempt
+        // ke-6 (yang valid) masih harus lolos -- ini bukti langsung
+        // bahwa kuota tidak terpakai oleh 7 percobaan gagal di atas.
+        $berhasil = $this->actingAs($pelapor)
+            ->post(route('laporan.store'), $this->dataLaporan());
+
+        $berhasil->assertRedirect(route('laporan.my-report'));
+        $this->assertDatabaseCount('reports', 1);
+    }
+
+    public function test_laporan_valid_ke_enam_kenai_limiter_manual_bukan_middleware(): void
+    {
+        Storage::fake('public');
+
+        $pelapor = User::factory()->pelapor()->create();
+
+        for ($i = 1; $i <= 5; $i++) {
+            $response = $this->actingAs($pelapor)
+                ->post(route('laporan.store'), $this->dataLaporan([
+                    'keterangan' => 'Laporan ke-' . $i . ', jalan berlubang berbahaya.',
+                ]));
+
+            $this->assertNotSame(429, $response->getStatusCode(), "Laporan ke-{$i} seharusnya lolos.");
+        }
+
+        // Laporan ke-6: kena limiter manual, BUKAN `throttle` middleware.
+        $keenam = $this->actingAs($pelapor)
+            ->post(route('laporan.store'), $this->dataLaporan([
+                'keterangan' => 'Laporan ke-6, jalan berlubang berbahaya.',
+            ]));
+
+        $keenam->assertStatus(429);
+
+        // Penanda limiter manual: pesannya Bahasa Indonesia dan menyebut
+        // jumlah detik menunggu. 429 dari middleware `throttle` bawaan
+        // Laravel selalu bertuliskan "Too Many Attempts." dan sengaja
+        // disembunyikan oleh resources/views/errors/429.blade.php.
+        $keenam->assertSee('Terlalu banyak laporan dikirim dari perangkat ini');
+        $keenam->assertDontSee('Too Many Attempts.');
+
+        $this->assertDatabaseCount('reports', 5);
+    }
+
+    public function test_throttle_route_tetap_jalan_sebagai_pagar_luar(): void
+    {
+        Storage::fake('public');
+
+        $pelapor = User::factory()->pelapor()->create();
+
+        // Data sengaja dibuat INVALID supaya limiter manual tidak pernah
+        // tersentuh. Dengan begitu 20 request ini murni dihitung
+        // middleware `throttle:20,1` di route.
+        $kirimInvalid = function () use ($pelapor) {
+            return $this->actingAs($pelapor)
+                ->post(route('laporan.store'), [
+                    'nama' => 'Budi Santoso',
+                    'foto' => $this->fileGambar('jalan.jpg'),
+                    'alamat' => 'Jl. Raya Purwakarta',
+                    'latitude' => '-6.558',
+                    'longitude' => '107.760',
+                    'keterangan' => 'lubang',
+                ]);
+        };
+
+        for ($i = 1; $i <= 20; $i++) {
+            $response = $kirimInvalid();
+
+            $this->assertNotSame(
+                429,
+                $response->getStatusCode(),
+                "Request ke-{$i} masih di bawah pagar luar 20/menit."
+            );
+        }
+
+        // Request ke-21 kena middleware `throttle` -> 429.
+        $response = $kirimInvalid();
+        $response->assertStatus(429);
+
+        // 429 middleware tidak boleh menampilkan pesan Bahasa Indonesia
+        // milik limiter manual, karena itu datang dari tempat lain.
+        $response->assertDontSee('Terlalu banyak laporan dikirim dari perangkat ini');
+        $response->assertSee('Terlalu banyak permintaan');
+
+        $this->assertDatabaseCount('reports', 0);
     }
 
     public function test_submit_laporan_dibatasi_rate_limit(): void

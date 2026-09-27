@@ -255,6 +255,69 @@ Workflow akan merah bila ada test yang gagal.
 
 ---
 
+## Catatan Desain yang Disengaja
+
+Behavior di bawah ini **sengaja** begitu dan terlihat seperti bug. Jangan
+"perbaiki" tanpa membaca dulu bagian ini.
+
+### 1. Rate limit submit laporan itu dua lapis, bukan `throttle` biasa
+
+`POST /report` punya dua pembatas dengan tugas berbeda:
+
+| Lapis | Letak | Batas | Yang dihitung |
+| --- | --- | --- | --- |
+| Pagar luar | Middleware `throttle:20,1` di route | 20 request / menit | **Semua** request, termasuk yang gagal validasi |
+| Anti-spam | `RateLimiter` manual di `ReportController@store` | 5 laporan / menit per user+IP | **Hanya laporan yang benar-benar tersimpan** |
+
+Kalau `throttle:5,1` dipasang langsung di route, setiap percobaan gagal
+validasi ikut menghabiskan kuota. Coba-coba orang yang sedang memperbaiki satu
+field saja bisa langsung kena HTTP 429 tanpa tahu kenapa. Karena itu lapis
+manual dipanggil **setelah** `$request->validate()` selesai, dan
+`RateLimiter::hit()` hanya jalan kalau insert-nya benar-benar berhasil.
+
+Tiga test di `ReportSubmissionTest` mengunci perilaku ini — lihat
+`test_percobaan_gagal_validasi_tidak_menghitung_limiter`,
+`test_laporan_valid_ke_enam_kenai_limiter_manual_bukan_middleware`, dan
+`test_throttle_route_tetap_jalan_sebagai_pagar_luar`.
+
+### 2. Login dengan role salah diarahkan ke dashboard sendiri, bukan logout
+
+Middleware role (`AdminMiddleware`, `PelaporMiddleware`,
+`SuperAdminMiddleware`) tidak melakukan logout saat role-nya tidak cocok.
+Pengguna diarahkan ke dashboard sesuai role-nya sendiri, lengkap dengan
+pesan penjelas di `session('error')`. Alasannya, kejadian itu hampir selalu
+karena orang **salah klik** — membuka `/admin/laporan` padahal ia pelapor —
+bukan karena sesi yang diretas. Mem-logout pengguna karena salah klik akan
+membuat mereka harus login ulang dan menutupi fakta bahwa halaman itu memang
+bukan untuknya.
+
+Bedakan dengan dua kasus yang **memang** melakukan logout: belum login, dan
+akunnya dinonaktifkan (`bisaLogin()` false).
+
+### 3. `User` memakai `SoftDeletes`, bukan hard delete
+
+Akun yang dihapus dari halaman profil hanya diberi `deleted_at`. Barisnya
+tetap ada karena `SuperAdmin\AccountController@restore()` memakainya untuk
+menghidupkan kembali akun (`User::withTrashed()` lalu `restore()`), dan
+`unique(['email', 'deleted_at'])` ada supaya tidak bentrok dengan akun aktif.
+
+Yang di-*hard* delete tetap data yang tidak perlu diaudit: laporan, riwayat
+status di `tabel_status`, dan file fotonya. Jadi test profil memakai
+`assertSoftDeleted`, bukan `assertNull($user->fresh())`.
+
+### 4. Submit laporan sukses diarahkan ke "Riwayat Laporan", bukan balik ke form
+
+Setelah laporan tersimpan, pengguna diarahkan ke `laporan.my-report`, bukan
+kembali ke form kosong. Alasannya, begitu submit berhasil pengguna justru
+membutuhkan **nomor referensi** untuk memantau progres — dan nomor itu
+ditampilkan di halaman riwayat, lengkap dengan status dan fotonya.
+
+Kembali ke form akan terasa seperti submit-nya gagal
+padahal sudah berhasil, dan memaksa pengguna membuka menu lain untuk
+mencari nomornya.
+
+---
+
 ## Catatan Teknis
 
 Beberapa hal yang perlu diketahui saat mengembangkan project ini:
@@ -263,20 +326,14 @@ Beberapa hal yang perlu diketahui saat mengembangkan project ini:
   tertentu saja (`id`, `alamat`, `keterangan`, `created_at`), sehingga
   `nama_pelapor`, `foto`, dan `user_id` tidak pernah masuk ke view publik. Ada
   test yang menjaga hal ini (`PublicLandingPageTest`).
-- **Rate limit.** `throttle:5,1` hanya dipasang pada `POST /report`, bukan pada
-  seluruh middleware group `pelapor`, supaya navigasi halaman lain tidak terganggu.
 - **Dukungan multi-driver.** Test & CI memakai SQLite, sedangkan produksi memakai
   MySQL. Karena itu query yang spesifik MySQL (misalnya penyesuaian `ENUM`) sudah
-  dibuat(driver-aware). Bila menambah query baru, hindari fungsi yang hanya ada
+  dibuat driver-aware. Bila menambah query baru, hindari fungsi yang hanya ada
   di MySQL tanpa perlu menangani driver lain secara manual.
-- **Penghapusan akun.** `ProfileController@destroy` menghapus akun beserta seluruh
-  laporan, riwayat status, dan file fotonya. Saat ini tidak ada konfirmasi
-  kata sandi pada alur ini.
-- **View yang belum ada.** Beberapa controller masih mereferensikan view yang belum
-  dibuat, sehingga halamannya akan error sampai view-nya ditambahkan:
-  - `Pelapor\FaqController@index` → `resources/views/pelapor/faq.blade.php`
-  - route `/prosedur` → `resources/views/pelapor/prosedur.blade.php`
-  - `Admin\AdminAccountController` → `resources/views/admin/admin-accounts/*` (controller ini belum dipakai route mana pun)
+- **Penghapusan akun.** `ProfileController@destroy` menghapus laporan, riwayat
+  status, dan file fotonya secara permanen, lalu menandai akunnya dengan
+  `deleted_at` (lihat [poin 3](#3-user-memakai-softdeletes-bukan-hard-delete)).
+  Saat ini tidak ada konfirmasi kata sandi pada alur ini.
 
 ---
 
