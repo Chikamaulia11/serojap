@@ -140,7 +140,13 @@
     .summary-card {
         position: relative;
         overflow: hidden;
-        background: white;
+        /* `background: white` diganti `--surface`.
+         *
+         * Tulisan dan border sudah pakai token, tapi latarnya tetap putih.
+         * Di mode dark kartu jadi putih dengan teks terang: rasio 1.12:1,
+         * jadi isinya nyaris tak terlihat. `white` justru satu-satunya
+         * warna yang tidak ikut berubah saat tema diganti. */
+        background: var(--surface);
         border: 1px solid var(--line);
         border-radius: 24px;
         padding: 22px;
@@ -193,7 +199,13 @@
     }
 
     .action-card {
-        background: white;
+        /* `background: white` diganti `--surface`.
+         *
+         * Tulisan dan border sudah pakai token, tapi latarnya tetap putih.
+         * Di mode dark kartu jadi putih dengan teks terang: rasio 1.12:1,
+         * jadi isinya nyaris tak terlihat. `white` justru satu-satunya
+         * warna yang tidak ikut berubah saat tema diganti. */
+        background: var(--surface);
         border: 1px solid var(--line);
         border-radius: 24px;
         padding: 24px;
@@ -247,7 +259,13 @@
         gap: 8px;
         padding: 12px 18px;
         border-radius: 16px;
-        background: white;
+        /* `background: white` diganti `--surface`.
+         *
+         * Tulisan dan border sudah pakai token, tapi latarnya tetap putih.
+         * Di mode dark kartu jadi putih dengan teks terang: rasio 1.12:1,
+         * jadi isinya nyaris tak terlihat. `white` justru satu-satunya
+         * warna yang tidak ikut berubah saat tema diganti. */
+        background: var(--surface);
         border: 1px solid var(--line);
         color: var(--ink);
         font-size: 14px;

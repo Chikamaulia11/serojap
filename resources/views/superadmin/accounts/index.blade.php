@@ -362,7 +362,7 @@
 
                             <div class="flex items-center gap-4 min-w-0">
 
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] text-white flex items-center justify-center font-extrabold text-sm flex-shrink-0 overflow-hidden shadow-md shadow-blue-100">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-grad-to)] text-white flex items-center justify-center font-extrabold text-sm flex-shrink-0 overflow-hidden shadow-md shadow-blue-100">
                                     @if($account->foto_profil)
                                         <img src="{{ asset('storage/' . $account->foto_profil) }}"
                                              alt="Foto Profil"

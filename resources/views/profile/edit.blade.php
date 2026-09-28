@@ -115,7 +115,10 @@
 }
 
 .logout-btn{
-    background:white;
+    /* `background: white` -> `--surface`, alasan yang sama seperti
+     * kartu di `superadmin/dashboard.blade.php`: di mode dark
+     * latar putih tidak bisa membaca teks terang. */
+    background: var(--surface);
     color:var(--danger);
 
     padding:14px 24px;
@@ -144,7 +147,10 @@
 /* CARD */
 
 .profile-card{
-    background:white;
+    /* `background: white` -> `--surface`, alasan yang sama seperti
+     * kartu di `superadmin/dashboard.blade.php`: di mode dark
+     * latar putih tidak bisa membaca teks terang. */
+    background: var(--surface);
 
     border-radius:30px;
 

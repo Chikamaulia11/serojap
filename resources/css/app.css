@@ -106,6 +106,59 @@
 
     .field-input::placeholder {
         color: var(--ink-soft);
+        opacity: 1;
+    }
+
+    /* Placeholder bawaan browser diberi `opacity` di
+     * bawah 1, jadi teksnya selalu lebih tipis dari `--ink-soft` yang
+     * sudah dihitung kontrasnya. `opacity: 1` di atas mengembalikan
+     * nilai penuh supaya angka yang diukur audit sama persis dengan
+     * yang dihitung token. */
+    .field-input::-webkit-input-placeholder {
+        color: var(--ink-soft);
+    }
+
+    .field-input::-moz-placeholder {
+        color: var(--ink-soft);
+        opacity: 1;
+    }
+
+    /* Dropdown native (`<select>`) memakai warna sistem, bukan token
+     * tema, jadi di mode light teks pilihannya hampir tak terlihat
+     * dan di mode dark panel opsi-nya tetap putih. */
+    .field-input option,
+    .field-input optgroup {
+        background-color: var(--surface);
+        color: var(--ink);
+    }
+
+    /* Reset bawaan browser dan Bootstrap tidak boleh luput: ini yang
+     * menimpa `color` dari `-internal-light-dark()`. */
+    .field-input:disabled,
+    .field-input[readonly] {
+        background-color: color-mix(in srgb, var(--surface) 60%, var(--bg));
+        color: var(--ink-soft);
+        cursor: not-allowed;
+    }
+
+    /* Checkbox dan radio: aksen native browser (biru) tidak mengikuti
+     * palet 26 warna, jadi `accent-color` yang mengarahkan ke
+     * `--accent`. */
+    .field-input[type='checkbox'],
+    .field-input[type='radio'] {
+        accent-color: var(--accent);
+    }
+
+    /* Autofill Chrome memberi latar biru-kuning internal yang
+     * menimpa `background-color` dan hanya bisa dilawan lewat
+     * `-webkit-box-shadow` (bukan `!background-color`). */
+    .field-input:-webkit-autofill,
+    .field-input:-webkit-autofill:hover,
+    .field-input:-webkit-autofill:focus {
+        -webkit-text-fill-color: var(--ink);
+        caret-color: var(--ink);
+        -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+        box-shadow: 0 0 0 1000px var(--surface) inset;
     }
 
     /*
@@ -121,8 +174,15 @@
         box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
     }
 
-    .field-input[aria-invalid='true'] {
-        @apply border-red-600 bg-red-50;
+    /* State error memakai `--danger*`, bukan `red-600`/`red-50`:
+     * warna Tailwind selalu terang, jadi di mode dark field error
+     * berubah jadi merah muda di atas merah muda, kehilangan makna
+     * dan kontrasnya jatuh di bawah ambang. */
+    .field-input[aria-invalid='true'],
+    .field-invalid {
+        border-color: var(--danger);
+        background-color: var(--danger-tint);
+        color: var(--ink);
     }
 
     /* Paginasi Breeze masih memakai gaya link biru bawaan. */

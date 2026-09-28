@@ -314,8 +314,37 @@ async function main() {
             } catch { /* abaikan */ }
         }
         child.kill();
-        await sleep(300);
-        rmSync(profile, { recursive: true, force: true });
+
+        /* Tunggu proses benar-benar berhenti SEBELUM menghapus
+         * profilnya.
+         *
+         * `Browser.close` hanya meminta keluar; Chrome masih memegang
+         * berkas profil (leveldb, `SingletonLock`) selama beberapa
+         * ratus milidetik. `sleep(300)` yang lama tidak cukup saat
+         * audit penuh 75 kombinasi -- `rmSync` lokal soal
+         * `EPERM: Permission denied` dan satu job ikut gagal karena
+         * cleanup-nya, bukan karena auditnya. */
+        if (child.exitCode === null && child.signalCode === null) {
+            const berhenti = new Promise((done) => {
+                child.once('exit', done);
+                child.once('close', done);
+            });
+            child.kill();
+            await Promise.race([berhenti, sleep(5000)]);
+        }
+
+        /* Penghapusannya: kalau Windows masih memegang berkas, coba lagi
+         * sebentar. Kegagalan membersihkan temp tidak invalidate
+         * hasil audit, jadi error-nya ditelan, bukan dilempar. */
+        for (let i = 0; i < 10; i += 1) {
+            try {
+                rmSync(profile, { recursive: true, force: true });
+                break;
+            } catch {
+                if (i === 9) break;
+                await sleep(200);
+            }
+        }
     }
 
     process.stdout.write(JSON.stringify(results));

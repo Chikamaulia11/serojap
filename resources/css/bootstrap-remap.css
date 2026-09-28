@@ -73,3 +73,71 @@ html[data-accent] .bg-light { background-color: var(--surface-2) !important; }
 /* --- Teks --- */
 html[data-accent] .text-muted { color: var(--ink-soft) !important; }
 html[data-accent] .text-dark { color: var(--ink) !important; }
+
+/* =========================================================
+   TEKS PUTIH DI ATAS LATAR AKSEN
+   =========================================================
+
+   19 tombol memakai pasangan `bg-[var(--accent)] ... text-white`.
+   Di mode light itu benar: aksen gelap, teks putih. Di mode dark
+   aksen justru TERANG (amber jadi #e0a24d, teal #4ba3a8), jadi
+   teks putih di atasnya jatuh ke 1.07:1 -- tombolnya ada tapi
+   labelnya tak terbaca, persis di 6 mode dark.
+
+   `text-white` di sini berarti "kontras terhadap `--accent`",
+   bukan "putih". `--on-accent` sudah embody itu: putih di mode
+   light, gelap di mode dark. Di mode dark nilainya #0d1415, yang
+   di atas #e0a24d menghasilkan 8.62:1.
+
+   Hanya tombol LATAR AKsen yang dicocokkan. `text-white` lain
+   (di atas `bg-slate-900`, `bg-blue-600`, `bg-indigo-600`) tetap
+   putih -- warna latar hardcoded itu tidak berubah saat tema
+   diganti, jadi memetakannya ke token akan salah di mode light.
+
+   `--accent-deep` SENGAJA TIDAK ikut dicocokkan di sini, dan itu
+   bukan kelalaian. Nilainya gelap di kedua mode:
+
+       teal  light #153e41 / dark #0e2b2d
+       amber light #6b3e08 / dark #6b3e08
+
+   Jadi `bg-[var(--accent-deep)] text-white` sudah benar apa adanya
+   dan harus tetap putih. Dulu selector-nya ikut masuk daftar, dan
+   itu menciptakan 36 kegagalan baru di mode dark: `--on-accent`
+   dark adalah #0d1415, jadi teks gelap jatuh di atas #0e2b2d --
+   1.16:1. Menghapus satu baris itu mengembalikan 36 kasus.
+
+   Tombol yang latarnya `bg-[var(--accent-deep)]` tapi HOVER-nya
+   `hover:bg-[var(--accent)]` tidak bisa ditangani dari sini:
+   warna teks harus ikut berubah saat hover, sedangkan remap ini
+   statis. Tiga view itu sudah ditulis eksplisit dengan
+   `hover:text-[var(--on-accent)]`. */
+html[data-accent] .bg-\[var\(--accent\)\].text-white,
+html[data-accent] .bg-\[var\(--accent\)\] > .text-white {
+    color: var(--on-accent) !important;
+}
+
+/* =========================================================
+   LINK LOGOUT ADMIN
+   =========================================================
+
+   `text-red-500` ditulis langsung, jadi warnanya terkunci ke
+   #ef4444 dan tidak pernah ikut berubah saat tema diganti:
+
+       di mode light  3.76:1  (butuh 4.5)
+       di mode dark   4.26:1  (butuh 4.5)
+
+   `red-50` sebagai latar hover lebih parah: di mode dark itu
+   #fef2f2, jadi hover-nya justru menaikkan luminance sementara
+   teksnya tetap merah muda. `--danger-tint` mengikuti mode, jadi
+   pasangan ini benar di keduanya.
+
+   Remap ini berada di `admin.blade.php` dan tidak pernah dimuat
+   di landing page, tapi tetap ditulis di sini supaya semua
+   override token untuk utility tercatat di satu file. */
+#adminLogoutButton {
+    color: var(--danger) !important;
+}
+
+#adminLogoutButton:hover {
+    background-color: var(--danger-tint) !important;
+}

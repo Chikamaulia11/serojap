@@ -187,7 +187,7 @@
             <a href="{{ route('admin.profile.index') }}"
                 class="flex items-center gap-2.5 rounded-lg p-2 hover:bg-slate-50 transition">
 
-                <div class="w-9 h-9 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                <div class="w-9 h-9 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-grad-to)] rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
                     @if(auth()->user()->foto_profil)
                         <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
                              alt="Profil"

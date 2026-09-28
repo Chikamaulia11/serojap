@@ -288,8 +288,21 @@
             font-size: 12.5px;
         }
 
+        /* `color` WAJIB ditulis di sini, bukan cuma `margin`.
+         *
+         * `public/css/navbar.css` sudah punya `.footer-bottom p {
+         * color: var(--ink-soft) }` -- dituliskannya saat footer masih
+         * terang. Footer sekarang gradien gelap di KEDUA mode, jadi
+         * `--ink-soft` mode light (rgb(91,106,104)) jatuh tepat di
+         * atas pita gelap: rasio 2.06:1. Rule di navbar.css tidak
+         * pernah ditimpa karena blok ini hanya mengatur `margin`, dan
+         * `<style>` inline tidak menang kalau memang tidak punya
+         * deklarasi yang sama.
+         *
+         * `strong` di bawah sudah putih; ini untuk teks sisanya. */
         .footer-bottom p {
             margin: 0;
+            color: inherit;
         }
 
         .footer-bottom strong {

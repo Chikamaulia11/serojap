@@ -64,7 +64,7 @@
 
             <button
                 type="submit"
-                class="bg-[var(--accent-deep)] hover:bg-[var(--accent)] text-white font-medium rounded-lg text-sm px-5 py-2.5 transition"
+                class="bg-[var(--accent-deep)] hover:bg-[var(--accent)] hover:text-[var(--on-accent)] text-white font-medium rounded-lg text-sm px-5 py-2.5 transition"
             >
                 Filter
             </button>

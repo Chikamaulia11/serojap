@@ -160,6 +160,29 @@ html[data-mode-resolved="light"] {
     /* Aksen mode light gelap, jadi teks di atasnya putih. */
     --on-accent: #ffffff;
 
+    /* Gradien avatar inisial: `from --accent` ke turunan aksen.
+     *
+     * Di mode light kedua stop gelap (aksen #226d71 ke deep #153e41),
+     * jadi teks putih aman: 6.01:1 dan 11.68:1.
+     *
+     * Di mode dark arahnya dibalik total: `--accent` terang
+     * (#4ba3a8) sementara `--accent-deep` nyaris hitam (#0e2b2d).
+     * Gradien seperti itu tidak punya SATU warna teks yang cocok di
+     * kedua ujungnya -- putih 2.96:1 di stop terang, teks gelap
+     * 1.24:1 di stop gelap. Inisial jadi tak terbaca di 6 mode dark.
+     *
+     * Stop kedua digeser ke `color-mix()` aksen dengan putih supaya
+     * keduanya tetap terang, lalu teksnya `--on-accent` yang gelap.
+     * Di titik 22% putih teks gelap di atasnya 6.9:1 (amber 8.9:1),
+     * jauh di atas ambang.
+     *
+     * Mode light TIDAK bisa pakai campuran yang sama: teksnya putih,
+     * jadi kedua stop harus gelap. Yang dipakai `--accent-deep` --
+     * semua aksen punya putih di atasnya 9.06:1 (amber) sampai
+     * 12.44:1 (purple). Pengecualian amber handled oleh `--on-accent`
+     * yang di blok amber sudah #0a0a0a. */
+    --accent-grad-to: var(--accent-deep);
+
     /* Tooltip dan kotak gelap lain yang warnanya diambil dari
        `--ink`. Di mode dark `--ink` justru TERANG, jadi teks di
        atasnya harus gelap. Tanpa ini, tooltip Chart.js jadi putih
@@ -178,6 +201,13 @@ html[data-mode-resolved="dark"] {
     --on-accent: #0d1415;
 
     --on-ink: #0d1415;
+
+    /* Lihat catatan `--accent-grad-to` di blok light. Di mode dark
+     * arahnya dibalik: `--accent` sudah terang, jadi stop kedua
+     * dicampur ke PUTIH supaya gradien tidak pernah menyeberangi
+     * dari terang ke gelap. Tanpa ini inisial avatar punya 2.96:1 di
+     * satu ujung dan 1.24:1 di ujung lain. */
+    --accent-grad-to: color-mix(in srgb, var(--accent) 22%, #ffffff);
 }
 
 /* Turunan netral untuk layer remap utilitas Tailwind.
@@ -186,15 +216,35 @@ html[data-mode-resolved="dark"] {
    untuk hover/baris tabel), `--ink-mute` menggantikan
    `placeholder-slate-400` dan teks bobot paling redup.
 
-   Keduanya cukup ditulis SEKALI tanpa per-mode: `color-mix()`
-   menghitung arahnya sendiri dari `--ink`/`--ink-soft` yang sudah
-   berbeda per mode. Di mode light `--ink` gelap, jadi `--surface-2`
-   menjadiAbu-abu muda; di mode dark `--ink` terang, jadi hasilnya
-   abu-abu yang lebih terang dari `--surface`. Menulisnya dua kali
-   per mode hanya menambah tempat yang bisa salah, tanpa manfaat. */
+    Keduanya cukup ditulis SEKALI tanpa per-mode: `color-mix()`
+    menghitung arahnya sendiri dari `--ink`/`--ink-soft` yang sudah
+    berbeda per mode. Di mode light `--ink` gelap, jadi `--surface-2`
+    menjadi abu-abu muda; di mode dark `--ink` terang, jadi hasilnya
+    abu-abu yang lebih terang dari `--surface`. Menulisnya dua kali
+    per mode hanya menambah tempat yang bisa salah, tanpa manfaat.
+
+    Campuran `--ink-mute` dijaga ketat ke arah `--ink-soft`, bukan
+    ke arah permukaan. Token ini WAJIB terbaca: ia menggantikan
+    `text-slate-400` dan `text-gray-400`, yang dipakai untuk label
+    kecil 10-12px, jadi ambangnya 4.5:1 bukan 3:1.)
+
+    Angka 94% di bawah bukan pilihan estetika, itu hasil pencarian
+    ambang. Di mode light `--surface` putih, jadi setiap persen yang
+    ditukar ke putih langsung memotong kontras:
+
+        100%  rgb( 91,106,104)   5.32:1   lolos
+         94%  rgb(101,115,113)   4.64:1   lolos  <- dipakai
+         92%  rgb(104,118,116)   4.45:1   GAGAL
+         72%  rgb(137,148,146)   2.94:1   GAGAL  (nilai lama)
+
+    Di mode dark arahnya justru longgar: 94% masih 6.00:1 di atas
+    `--surface`. Ketidakseimbangan ini tidak bisa dihilangkan --
+    latar terang butuh tinta jauh lebih pekat daripada latar gelap.
+    94% diuji terhadap `--bg` (rgb(247,248,246)) juga, bukan hanya
+    putih, karena teks sering diletakkan di blok `--surface-2`. */
 :root {
     --surface-2: color-mix(in srgb, var(--ink) 5%, var(--surface));
-    --ink-mute: color-mix(in srgb, var(--ink-soft) 72%, var(--surface));
+    --ink-mute: color-mix(in srgb, var(--ink-soft) 94%, var(--surface));
 }
 
 /* =========================================================
