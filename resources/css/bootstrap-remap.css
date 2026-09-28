@@ -1,0 +1,143 @@
+/* =========================================================
+   REMAP UTILITAS BOOTSTRAP KE TOKEN TEMA
+   =========================================================
+
+   Bukan hasil generate, jadi disunting tangan.
+
+   Kenapa file ini perlu padahal `neutral-remap.css` sudah ada:
+
+   `welcome.blade.php` memuat Bootstrap kedua di
+   `public/assets/pelapor/css/index.css`, dan SEMUA utility di
+   sana ditulis dengan `!important`:
+
+       .bg-white    { background-color: rgba(var(--bs-white-rgb), ...) !important }
+       .bg-light    { background-color: rgba(var(--bs-light-rgb), ...) !important }
+       .text-muted  { color: var(--bs-secondary-color) !important }
+       .text-dark   { color: rgba(var(--bs-dark-rgb), ...) !important }
+
+   Remap di `neutral-remap.css` sengaja TIDAK memakai `!important`
+   supaya `style="..."` inline di view masih bisa mengalahkan
+   remap. Tapi aturan `!important` mengalahkan aturan biasa apa
+   pun, berapa pun spesifisitasnya dinaikkan -- jadi di landing
+   page itu remap kalah telak dan warnanya terkunci ke putih/abu
+   Bootstrap.
+
+   Akibatnya terukur, bukan dugaan: `body.bg-white` tetap
+   `rgb(255,255,255)` pada mode dark sementara `--ink` sudah
+   terang, dan section `.bg-light` tetap `rgb(245,245,245)` --
+   teks terang di atasnya kontrasnya 1.03.
+
+   Solusinya di sini: pakai `!important` DAN naikkan
+   spesifisitas lewat `html[data-accent]`, jadi (0,2,1) +
+   important mengalahkan utility Bootstrap (0,1,0) + important.
+   Trade-off-nya jelas dan disengaja -- `style="..."` inline
+   tidak bisa lagi mengalahkan utility ini. Untuk
+   `bg-white`/`bg-light`/`text-muted` itu justru yang
+   diinginkan: tidak ada alasan memaksa latar putih atau teks
+   abu di mode dark.
+
+   Belum ada `!bg-white` di view mana pun, jadi tidak ada yang
+   kehilangan jalan keluar ini.
+   ========================================================= */
+
+/* --- Variabel Bootstrap itu sendiri ---
+ *
+ *Yang lebih umum dari remap per-kelas di bawah:utility yang warnanya dibaca
+ * dari `--bs-*` ikut berubah hanya dengan menimpa variabelnya.
+ *
+ * `--bs-heading-color` adalah contoh yang paling merusak. Bundle itu
+ * menetapkannya ke `#171717`, dan aturan rebuild Bootstrap
+ *
+ *     h6,.h6,h5,.h5,h4,.h4,h3,.h3,h2,.h2,h1,.h1 { color: var(--bs-heading-color) }
+ *
+ * membuat SETIAP `h1`..`h6` dan kelas `.h1`..`.h6` di landing page
+ * memakai warna itu, apa pun yang theme.css sudah tetapkan.
+ * `h3` di dalam kartu "Cara Kerja" karena itu terbaca `rgb(23,23,23)`
+ * di atas `--surface` gelap: kontras 1.12.
+ *
+ * `html[data-accent]` (0,1,1) mengalahkan `:root` (0,1,0), jadi
+ * menimpa di sini benar-benar berlaku.
+ */
+html[data-accent] {
+    --bs-heading-color: var(--ink);
+    --bs-body-color: var(--ink);
+    --bs-body-bg: var(--bg);
+    --bs-secondary-color: var(--ink-soft);
+    --bs-emphasis-color: var(--ink);
+}
+
+/* --- Latar --- */
+html[data-accent] .bg-white { background-color: var(--surface) !important; }
+html[data-accent] .bg-light { background-color: var(--surface-2) !important; }
+
+/* --- Teks --- */
+html[data-accent] .text-muted { color: var(--ink-soft) !important; }
+html[data-accent] .text-dark { color: var(--ink) !important; }
+
+/* =========================================================
+   TEKS PUTIH DI ATAS LATAR AKSEN
+   =========================================================
+
+   19 tombol memakai pasangan `bg-[var(--accent)] ... text-white`.
+   Di mode light itu benar: aksen gelap, teks putih. Di mode dark
+   aksen justru TERANG (amber jadi #e0a24d, teal #4ba3a8), jadi
+   teks putih di atasnya jatuh ke 1.07:1 -- tombolnya ada tapi
+   labelnya tak terbaca, persis di 6 mode dark.
+
+   `text-white` di sini berarti "kontras terhadap `--accent`",
+   bukan "putih". `--on-accent` sudah embody itu: putih di mode
+   light, gelap di mode dark. Di mode dark nilainya #0d1415, yang
+   di atas #e0a24d menghasilkan 8.62:1.
+
+   Hanya tombol LATAR AKsen yang dicocokkan. `text-white` lain
+   (di atas `bg-slate-900`, `bg-blue-600`, `bg-indigo-600`) tetap
+   putih -- warna latar hardcoded itu tidak berubah saat tema
+   diganti, jadi memetakannya ke token akan salah di mode light.
+
+   `--accent-deep` SENGAJA TIDAK ikut dicocokkan di sini, dan itu
+   bukan kelalaian. Nilainya gelap di kedua mode:
+
+       teal  light #153e41 / dark #0e2b2d
+       amber light #6b3e08 / dark #6b3e08
+
+   Jadi `bg-[var(--accent-deep)] text-white` sudah benar apa adanya
+   dan harus tetap putih. Dulu selector-nya ikut masuk daftar, dan
+   itu menciptakan 36 kegagalan baru di mode dark: `--on-accent`
+   dark adalah #0d1415, jadi teks gelap jatuh di atas #0e2b2d --
+   1.16:1. Menghapus satu baris itu mengembalikan 36 kasus.
+
+   Tombol yang latarnya `bg-[var(--accent-deep)]` tapi HOVER-nya
+   `hover:bg-[var(--accent)]` tidak bisa ditangani dari sini:
+   warna teks harus ikut berubah saat hover, sedangkan remap ini
+   statis. Tiga view itu sudah ditulis eksplisit dengan
+   `hover:text-[var(--on-accent)]`. */
+html[data-accent] .bg-\[var\(--accent\)\].text-white,
+html[data-accent] .bg-\[var\(--accent\)\] > .text-white {
+    color: var(--on-accent) !important;
+}
+
+/* =========================================================
+   LINK LOGOUT ADMIN
+   =========================================================
+
+   `text-red-500` ditulis langsung, jadi warnanya terkunci ke
+   #ef4444 dan tidak pernah ikut berubah saat tema diganti:
+
+       di mode light  3.76:1  (butuh 4.5)
+       di mode dark   4.26:1  (butuh 4.5)
+
+   `red-50` sebagai latar hover lebih parah: di mode dark itu
+   #fef2f2, jadi hover-nya justru menaikkan luminance sementara
+   teksnya tetap merah muda. `--danger-tint` mengikuti mode, jadi
+   pasangan ini benar di keduanya.
+
+   Remap ini berada di `admin.blade.php` dan tidak pernah dimuat
+   di landing page, tapi tetap ditulis di sini supaya semua
+   override token untuk utility tercatat di satu file. */
+#adminLogoutButton {
+    color: var(--danger) !important;
+}
+
+#adminLogoutButton:hover {
+    background-color: var(--danger-tint) !important;
+}

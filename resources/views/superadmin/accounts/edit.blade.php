@@ -56,13 +56,14 @@
     .edit-header {
         background:
             linear-gradient(135deg, rgba(255,255,255,.98), rgba(244,249,255,.98)),
-            radial-gradient(circle at right top, rgba(38,87,193,.13), transparent 34%);
+            radial-gradient(circle at right top, color-mix(in srgb, var(--accent) 13%, transparent), transparent 34%);
     }
 
-    .password-note {
-        background:
-            linear-gradient(135deg, rgba(38,87,193,.08), rgba(34,109,113,.08));
-    }
+      .password-note {
+          /* Kedua stop gradien aslinya sudah sama-sama biru admin lama,
+             jadi hasilnya cuma satu warna rata. Cukup pakai satu nilai. */
+          background: color-mix(in srgb, var(--accent) 8%, transparent);
+      }
 
     .form-card {
         transition: .22s ease;
@@ -82,12 +83,12 @@
     .swal2-title-custom {
         font-size: 1.4rem !important;
         font-weight: 700 !important;
-        color: #111827 !important;
+        color: var(--ink) !important;
     }
 
     .swal2-text-custom {
         font-size: 0.95rem !important;
-        color: #6b7280 !important;
+        color: var(--ink-soft) !important;
     }
 
     .swal2-confirm-custom {
@@ -100,13 +101,13 @@
     }
 
     .swal2-confirm-success {
-        background-color: #2657c1 !important;
-        color: #fff !important;
+        background-color: var(--accent) !important;
+        color: var(--on-accent) !important;
     }
 
     .swal2-confirm-teal {
-        background-color: #226d71 !important;
-        color: #fff !important;
+        background-color: var(--accent) !important;
+        color: var(--on-accent) !important;
     }
 </style>
 
@@ -114,7 +115,7 @@
 
     <div>
         <a href="{{ route('superadmin.accounts.index') }}"
-           class="inline-flex items-center gap-2 text-[#2657c1] text-sm hover:underline font-extrabold">
+           class="inline-flex items-center gap-2 text-[var(--accent)] text-sm hover:underline font-extrabold">
             <i class="mdi mdi-arrow-left"></i>
             Kembali ke Manajemen Akun
         </a>
@@ -129,7 +130,7 @@
 
             <div class="flex items-center gap-4 min-w-0">
 
-                <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-[#2657c1] to-[#226d71] flex items-center justify-center text-white font-extrabold text-xl overflow-hidden shadow-lg shadow-blue-100 flex-shrink-0">
+                <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-grad-to)] flex items-center justify-center text-white font-extrabold text-xl overflow-hidden shadow-lg shadow-blue-100 flex-shrink-0">
                     @if($target->foto_profil)
                         <img src="{{ asset('storage/' . $target->foto_profil) }}"
                              alt="Foto Profil"
@@ -141,7 +142,7 @@
 
                 <div class="min-w-0">
 
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#2657c1] text-xs font-extrabold mb-2">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-[var(--accent)] text-xs font-extrabold mb-2">
                         <i class="mdi mdi-account-edit-outline text-base"></i>
                         Edit Akun
                     </div>
@@ -183,7 +184,7 @@
 
             <div class="px-6 py-5 border-b border-slate-200 bg-slate-50/70">
                 <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-blue-50 text-[#2657c1] flex items-center justify-center flex-shrink-0">
+                    <div class="w-10 h-10 rounded-2xl bg-blue-50 text-[var(--accent)] flex items-center justify-center flex-shrink-0">
                         <i class="mdi mdi-card-account-details-outline text-xl"></i>
                     </div>
 
@@ -281,7 +282,7 @@
 
                     <button type="button"
                             onclick="confirmUpdateAccountProfil()"
-                            class="mt-7 w-full inline-flex justify-center items-center gap-2 bg-[#2657c1] hover:bg-[#1f4674] text-white font-extrabold rounded-2xl px-4 py-3 transition shadow-lg shadow-blue-500/20 active:scale-[0.98]">
+                            class="mt-7 w-full inline-flex justify-center items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-deep)] text-white font-extrabold rounded-2xl px-4 py-3 transition shadow-lg shadow-blue-500/20 active:scale-[0.98]">
                         <i class="mdi mdi-content-save-outline"></i>
                         Simpan Profil
                     </button>
@@ -300,7 +301,7 @@
 
             <div class="px-6 py-5 border-b border-slate-200 bg-slate-50/70">
                 <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-teal-50 text-[#226d71] flex items-center justify-center flex-shrink-0">
+                    <div class="w-10 h-10 rounded-2xl bg-teal-50 text-[var(--accent)] flex items-center justify-center flex-shrink-0">
                         <i class="mdi mdi-lock-reset text-xl"></i>
                     </div>
 
@@ -326,7 +327,7 @@
 
                     <div class="password-note rounded-3xl border border-blue-100 p-5 mb-5">
                         <div class="flex gap-3">
-                            <div class="w-10 h-10 rounded-2xl bg-white text-[#226d71] flex items-center justify-center flex-shrink-0">
+                            <div class="w-10 h-10 rounded-2xl bg-white text-[var(--accent)] flex items-center justify-center flex-shrink-0">
                                 <i class="mdi mdi-information-outline text-2xl"></i>
                             </div>
 
@@ -378,7 +379,7 @@
 
                     <button type="button"
                             onclick="confirmUpdateAccountPassword()"
-                            class="mt-7 w-full inline-flex justify-center items-center gap-2 bg-[#226d71] hover:bg-[#1b575a] text-white font-extrabold rounded-2xl px-4 py-3 transition shadow-lg shadow-teal-500/20 active:scale-[0.98]">
+                            class="mt-7 w-full inline-flex justify-center items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-deep)] text-white font-extrabold rounded-2xl px-4 py-3 transition shadow-lg shadow-teal-500/20 active:scale-[0.98]">
                         <i class="mdi mdi-lock-check-outline"></i>
                         Simpan Password
                     </button>
@@ -422,8 +423,8 @@
             confirmButtonText: 'Ya, Simpan',
             cancelButtonText: 'Batal',
             reverseButtons: true,
-            confirmButtonColor: '#2657c1',
-            cancelButtonColor: '#64748b',
+            confirmButtonColor: 'var(--accent)',
+            cancelButtonColor: 'var(--ink-soft)',
             customClass: {
                 popup: 'swal2-popup-custom',
                 title: 'swal2-title-custom',
@@ -454,8 +455,8 @@
             confirmButtonText: 'Ya, Simpan Password',
             cancelButtonText: 'Batal',
             reverseButtons: true,
-            confirmButtonColor: '#226d71',
-            cancelButtonColor: '#64748b',
+            confirmButtonColor: 'var(--accent)',
+            cancelButtonColor: 'var(--ink-soft)',
             customClass: {
                 popup: 'swal2-popup-custom',
                 title: 'swal2-title-custom',
@@ -476,7 +477,7 @@
                 title: 'Data Belum Sesuai',
                 text: 'Periksa kembali data akun yang kamu isi.',
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#2657c1'
+                confirmButtonColor: 'var(--accent)'
             });
         @endif
     });

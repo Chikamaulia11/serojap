@@ -6,8 +6,8 @@
 
 <style>
     .stat-card {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
+        background: var(--surface);
+        border: 1px solid var(--line);
         border-radius: 18px;
         padding: 20px;
         box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
@@ -20,8 +20,8 @@
     }
 
     .chart-card {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
+        background: var(--surface);
+        border: 1px solid var(--line);
         border-radius: 22px;
         padding: 24px;
         box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
@@ -34,13 +34,13 @@
     .chart-title {
         font-size: 16px;
         font-weight: 700;
-        color: #111827;
+        color: var(--ink);
         margin: 0;
     }
 
     .chart-subtitle {
         font-size: 13px;
-        color: #64748b;
+        color: var(--ink-soft);
         margin-top: 4px;
     }
 
@@ -75,8 +75,8 @@
         gap: 14px;
         padding: 12px 14px;
         border-radius: 14px;
-        background: #f8fafc;
-        border: 1px solid #eef2f7;
+        background: var(--bg);
+        border: 1px solid var(--accent-tint);
     }
 
     .legend-left {
@@ -95,14 +95,14 @@
 
     .legend-label {
         font-size: 14px;
-        color: #475569;
+        color: var(--ink-soft);
         font-weight: 600;
     }
 
     .legend-value {
         font-size: 15px;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--ink);
     }
 
     .bar-box {
@@ -271,7 +271,7 @@
 
                     <div class="legend-item">
                         <div class="legend-left">
-                            <span class="legend-dot" style="background:#64748b;"></span>
+                            <span class="legend-dot" style="background:var(--ink-soft);"></span>
                             <span class="legend-label">Baru</span>
                         </div>
 
@@ -280,7 +280,7 @@
 
                     <div class="legend-item">
                         <div class="legend-left">
-                            <span class="legend-dot" style="background:#10b981;"></span>
+                            <span class="legend-dot" style="background:var(--selesai);"></span>
                             <span class="legend-label">Diterima</span>
                         </div>
 
@@ -289,7 +289,7 @@
 
                     <div class="legend-item">
                         <div class="legend-left">
-                            <span class="legend-dot" style="background:#f59e0b;"></span>
+                            <span class="legend-dot" style="background:var(--diproses);"></span>
                             <span class="legend-label">Diproses</span>
                         </div>
 
@@ -298,7 +298,7 @@
 
                     <div class="legend-item">
                         <div class="legend-left">
-                            <span class="legend-dot" style="background:#8b5cf6;"></span>
+                            <span class="legend-dot" style="background:var(--accent);"></span>
                             <span class="legend-label">Selesai</span>
                         </div>
 
@@ -307,7 +307,7 @@
 
                     <div class="legend-item">
                         <div class="legend-left">
-                            <span class="legend-dot" style="background:#ef4444;"></span>
+                            <span class="legend-dot" style="background:var(--danger);"></span>
                             <span class="legend-label">Ditolak</span>
                         </div>
 
@@ -347,116 +347,148 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const donutData = {
-        labels: ['Baru', 'Diterima', 'Diproses', 'Selesai', 'Ditolak'],
-        datasets: [{
-            data: [
-                {{ $baru }},
-                {{ $diterima }},
-                {{ $proses }},
-                {{ $selesai }},
-                {{ $ditolak }}
-            ],
-            backgroundColor: [
-                '#64748b',
-                '#10b981',
-                '#f59e0b',
-                '#8b5cf6',
-                '#ef4444'
-            ],
-            borderWidth: 4,
-            borderColor: '#ffffff',
-            hoverOffset: 8
-        }]
+    /* Chart.js melukis ke <canvas>, dan `fillStyle` di sana TIDAK membaca
+       CSS variable -- `var(--x)` akan diabaikan diam-diam dan grafiknya
+       jadi hitam/putih polos. Jadi warnanya harus diresolvasikan ke
+       warna nyata lewat `SerojapTheme.themeColor()` (lihat
+       `resources/js/theme.js`), yang memakai elemen probe supaya
+       `var()` dan `color-mix()` ikut selesai oleh browser.
+
+       Konsekuensi kedua: warna hanya dibaca SEKALI saat chart dibuat,
+       jadi begitu pengguna mengganti aksen atau light/dark, chart lama
+       masih memakai warna lamanya. Karena itu `drawCharts()` dipanggil
+       ulang lewat `onThemeChange()`. */
+    const themeColor = (n) => window.SerojapTheme.themeColor(n);
+
+    /* Versi transparan dari sebuah token, untuk Mewantikan `rgba()` lama.
+       `themeColor()` sudah mengembalikan bentuk `rgb(r, g, b)`, jadi
+       angkanya tinggal diambil ulang. */
+    const themeAlpha = (n, alpha) => {
+        const parts = themeColor(n).match(/[\d.]+/g);
+        return parts ? `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})` : themeColor(n);
     };
 
-    const barData = {
-        labels: {!! json_encode($labelBulan) !!},
-        datasets: [{
-            label: 'Laporan',
-            data: {!! json_encode($dataBulan) !!},
-            backgroundColor: 'rgba(59,130,246,0.45)',
-            borderColor: '#3b82f6',
-            borderWidth: 2,
-            borderRadius: 8,
-            barThickness: 28,
-            maxBarThickness: 34
-        }]
-    };
+    const $baru = {{ $baru }};
+    const $diterima = {{ $diterima }};
+    const $proses = {{ $proses }};
+    const $selesai = {{ $selesai }};
+    const $ditolak = {{ $ditolak }};
 
-    Chart.defaults.font.family = "'Inter', 'Public Sans', sans-serif";
-    Chart.defaults.color = '#64748b';
-    Chart.defaults.borderColor = '#e5e7eb';
+    let donut = null;
+    let bar = null;
 
-    new Chart(document.getElementById('donutChart'), {
-        type: 'doughnut',
-        data: donutData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '68%',
-            plugins: {
-                legend: {
-                    display: false
+    function drawCharts() {
+        /* `drawCharts()` dipanggil ulang setiap kali tema berubah, dan
+           `new Chart()` pada canvas yang sama akan menumpuk instance lama
+           di atas yang baru tanpa melepaskannya. Akibatnya listener dan
+           animasi menumpuk, dan setelah beberapa kali pergantian tema
+           grafiknya makin berat. Jadi instance sebelumnya dibongkar
+           dulu setiap kali dibangun ulang. */
+        [donut, bar].forEach((c) => {
+            if (c) c.destroy();
+        });
+        donut = null;
+        bar = null;
+
+        const tooltip = () => ({
+            backgroundColor: themeColor('--ink'),
+            titleColor: themeColor('--on-ink'),
+            bodyColor: themeColor('--on-ink'),
+            padding: 12,
+            cornerRadius: 10
+        });
+
+        /* Warna di sini persis mengikuti arti labelnya, bukan warna
+           aksen: ganti tema tidak boleh mengubah makna warna status. */
+        const donutData = {
+            labels: ['Baru', 'Diterima', 'Diproses', 'Selesai', 'Ditolak'],
+            datasets: [{
+                data: [$baru, $diterima, $proses, $selesai, $ditolak],
+                backgroundColor: [
+                    themeColor('--ink-soft'),
+                    themeColor('--diterima'),
+                    themeColor('--diproses'),
+                    themeColor('--selesai'),
+                    themeColor('--ditolak')
+                ],
+                borderWidth: 4,
+                borderColor: themeColor('--surface'),
+                hoverOffset: 8
+            }]
+        };
+
+        const barData = {
+            labels: {!! json_encode($labelBulan) !!},
+            datasets: [{
+                label: 'Laporan',
+                data: {!! json_encode($dataBulan) !!},
+                backgroundColor: themeAlpha('--diterima', 0.45),
+                borderColor: themeColor('--diterima'),
+                borderWidth: 2,
+                borderRadius: 8,
+                barThickness: 28,
+                maxBarThickness: 34
+            }]
+        };
+
+        Chart.defaults.font.family = "'Inter', 'Public Sans', sans-serif";
+        Chart.defaults.color = themeColor('--ink-soft');
+        Chart.defaults.borderColor = themeColor('--line');
+
+        if (donut) donut.destroy();
+        if (bar) bar.destroy();
+
+        donut = new Chart(document.getElementById('donutChart'), {
+            type: 'doughnut',
+            data: donutData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '68%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: tooltip()
                 },
-                tooltip: {
-                    backgroundColor: '#0f172a',
-                    titleColor: '#ffffff',
-                    bodyColor: '#ffffff',
-                    padding: 12,
-                    cornerRadius: 10
-                }
-            },
-            animation: {
-                animateScale: true,
-                animateRotate: true
+                animation: { animateScale: true, animateRotate: true }
             }
-        }
-    });
+        });
 
-    new Chart(document.getElementById('barChart'), {
-        type: 'bar',
-        data: barData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
+        bar = new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: barData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: tooltip()
                 },
-                tooltip: {
-                    backgroundColor: '#0f172a',
-                    titleColor: '#ffffff',
-                    bodyColor: '#ffffff',
-                    padding: 12,
-                    cornerRadius: 10
-                }
-            },
-            scales: {
-                x: {
-                    grid: {
-                        display: false
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { weight: '600' } }
                     },
-                    ticks: {
-                        font: {
-                            size: 12,
-                            weight: '600'
-                        }
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        precision: 0,
-                        stepSize: 1
-                    },
-                    grid: {
-                        color: '#edf2f7'
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0, stepSize: 1 },
+                        grid: { color: themeColor('--accent-tint') }
                     }
                 }
             }
-        }
-    });
+        });
+    }
+
+    function start() {
+        if (!window.SerojapTheme) return;
+        drawCharts();
+        window.SerojapTheme.onThemeChange(drawCharts);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start);
+    } else {
+        start();
+    }
 </script>
 
 @endsection

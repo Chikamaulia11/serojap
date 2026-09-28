@@ -10,9 +10,23 @@ namespace App\Support;
  * di satu halaman dan hijau di halaman lain. Semua view sekarang
  * membaca dari sini sehingga satu status selalu tampil sama.
  *
- * Warna teks dipilih kontrasnya minimal 4.5:1 terhadap latar putih
- * (WCAG AA), dan setiap status juga punya ikon supaya informasi tidak
- * hanya bergantung pada warna.
+ * Kelas yang dikembalikan BUKAN utilitas Tailwind, melainkan kelas
+ * dari `resources/css/status.css` (`.status-badge`, `.status-text`,
+ * dan seterusnya) digabung dengan penanda per status (`.st-diterima`
+ * dan sejenisnya). Alasannya nilai warna diturunkan dari `--diterima`,
+ * `--diproses`, `--selesai`, `--ditolak` di `theme.css`, sehingga:
+ *
+ * - Warnanya sama persis dengan yang dipakai badge status di halaman
+ *   lain yang menulis CSS sendiri, dan
+ * - Tidak ikut berubah saat pengguna mengganti aksen maupun
+ *   light/dark, karena status itu warna fungsional.
+ *
+ * Kalau dulu ditulis `bg-blue-100 text-blue-800 ring-blue-600/20`,
+ * palet Tailwind tidak sama dengan palet status yang disepakati, dan
+ * `bg-blue-100` yang terang membuat badge tidak terbaca di mode dark.
+ *
+ * Setiap status juga punya ikon sendiri supaya informasi tidak hanya
+ * bergantung pada warna.
  */
 class StatusPeta
 {
@@ -34,50 +48,28 @@ class StatusPeta
     {
         $key = isset(self::IKON[$status]) ? $status : 'default';
 
-        $peta = [
-            'diterima' => [
-                'label' => 'Diterima',
-                'badge' => 'bg-blue-100 text-blue-800 ring-1 ring-inset ring-blue-600/20',
-                'text' => 'text-blue-700',
-                'dot' => 'bg-blue-600',
-                'ring' => 'ring-blue-500/30',
-                'bg' => 'bg-blue-50',
-            ],
-            'diproses' => [
-                'label' => 'Diproses',
-                'badge' => 'bg-amber-100 text-amber-900 ring-1 ring-inset ring-amber-600/20',
-                'text' => 'text-amber-700',
-                'dot' => 'bg-amber-600',
-                'ring' => 'ring-amber-500/30',
-                'bg' => 'bg-amber-50',
-            ],
-            'selesai' => [
-                'label' => 'Selesai',
-                'badge' => 'bg-emerald-100 text-emerald-800 ring-1 ring-inset ring-emerald-600/20',
-                'text' => 'text-emerald-700',
-                'dot' => 'bg-emerald-600',
-                'ring' => 'ring-emerald-500/30',
-                'bg' => 'bg-emerald-50',
-            ],
-            'ditolak' => [
-                'label' => 'Ditolak',
-                'badge' => 'bg-rose-100 text-rose-800 ring-1 ring-inset ring-rose-600/20',
-                'text' => 'text-rose-700',
-                'dot' => 'bg-rose-600',
-                'ring' => 'ring-rose-500/30',
-                'bg' => 'bg-rose-50',
-            ],
-            'default' => [
-                'label' => 'Menunggu',
-                'badge' => 'bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-500/20',
-                'text' => 'text-slate-600',
-                'dot' => 'bg-slate-500',
-                'ring' => 'ring-slate-400/30',
-                'bg' => 'bg-slate-50',
-            ],
+        $label = [
+            'diterima' => 'Diterima',
+            'diproses' => 'Diproses',
+            'selesai' => 'Selesai',
+            'ditolak' => 'Ditolak',
+            'default' => 'Menunggu',
         ];
 
-        return ['key' => $key, 'ikon' => self::IKON[$key]] + $peta[$key];
+        // Penanda per status, dipakai bersama oleh kelima kunci gaya di
+        // bawah supaya tiap status hanya ditulis sekali.
+        $st = 'st-' . $key;
+
+        return [
+            'key' => $key,
+            'ikon' => self::IKON[$key],
+            'label' => $label[$key],
+            'badge' => "status-badge {$st}",
+            'text' => "status-text {$st}",
+            'dot' => "status-dot {$st}",
+            'ring' => "status-ring {$st}",
+            'bg' => "status-bg {$st}",
+        ];
     }
 
     /**

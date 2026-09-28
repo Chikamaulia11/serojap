@@ -115,7 +115,7 @@
             </a>
 
             <x-primary-button
-                class="ms-4 bg-[#227474] hover:bg-[#1b5e5e] text-white"
+                class="ms-4 bg-[var(--accent-deep)] hover:bg-[var(--accent-deep)] text-white"
             >
                 {{ __('Register') }}
             </x-primary-button>

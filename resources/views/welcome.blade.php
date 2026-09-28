@@ -8,20 +8,39 @@
     <meta name="description"
         content="Serojap adalah sistem pelaporan jalan rusak Kabupaten Purwakarta. Laporkan kerusakan jalan, pantau status penanganan, dan lihat statistik perbaikan secara terbuka.">
 
+    {{-- Script anti-FOUC harus SESUDAH tag <meta> lengkap, bukan di
+         tengah-tengahnya.
+
+         Dulu `@include` ini duduk di antara `name="description"` dan
+         `content="...">`, jadi tag `<meta>`-nya tidak pernah tertutup
+         waktu include itu dievaluasi. Akibatnya di DOM benar-benar:
+
+           1. Isi script jadi TEKS VISIBEL di dalam `<body>` --
+              1039 karakter, mulai `(function () { var ACCENTS = ...`,
+              tinggi 138px di paling atas halaman. Itulah yang
+              terbaca sebagai "teks function aneh".
+           2. `<html>` TIDAK pernah dapat `data-accent`/`data-mode`,
+              jadi anti-FOUC tidak berjalan sama sekali di halaman ini.
+
+         Audit tidak pernah menangkapnya karena `theme-audit-inject.js`
+         men-set sendiri atribut tema sebelum mengukur, jadi DOM rusak
+         tadi tidak terlihat dari sisi audit -- hanya dari browser. --}}
+    @include('partials.theme-bootstrap')
+
     <link rel="stylesheet" href="{{ asset('assets/pelapor/css/index.css') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         :root {
-            --teal: #226d71;
-            --teal-dark: #1a5457;
-            --teal-soft: rgba(34, 109, 113, 0.1);
+            --teal: var(--accent);
+            --teal-dark: var(--accent-deep);
+            --teal-soft: color-mix(in srgb, var(--accent) 10%, transparent);
         }
 
         body {
             overflow-x: hidden;
-            background-color: #ffffff;
+            background-color: var(--bg);
         }
 
         /* =========================
@@ -32,16 +51,42 @@
             padding-bottom: 2rem !important;
             position: relative;
             z-index: 1;
-            min-height: 85vh;
+            /* `min-height: 85vh` DIHAPUS.
+             *
+             * Hero dipaksa setinggi 85% tinggi jendela, padahal isinya
+             * cuma 538px: gambar 480px + bingkai, dan kolom teksnya
+             * lebih pendek. Dengan `align-items: center` sisanya dibagi
+             * rata ke atas dan bawah, jadi di 1280x900 ada 227px
+             * kosong di dalam hero dan 99px lagi sebelum kartu
+             * statistik -- 326px tanpa isi, dan itu yang terbaca sebagai
+             * "area kosong tinggi" di screenshot penuh.
+             *
+             * Di 375px tinggi sebenarnya 1165px (dua kolom jadi beruntai),
+             * jadi `min-height` tidak pernah mengikat di mobile --
+             * masalahnya hanya di lebar desktop/tablet.
+             *
+             * Gambarnya sendiri tidak bermasalah: `naturalWidth` 896 dan
+             * `complete` true, jadi ini bukan aset gagal dimuat yang
+             * menyisakan tempat kosong. */
             display: flex;
             align-items: center;
             /* WAJIB: `.gradient-bg` adalah dekorasi 600x600px yang digeser
                ke `left: -100px`, jadi ujungnya berada di 500px. Tanpa
-               `overflow: hidden` di sini, elemen itu ikut lebarkan
+               pemotongan di sini, elemen itu ikut lebarkan
                `scrollWidth` dokumen: di layar 375px (iPhone SE) halaman
                jadi bisa di-scroll ke samping dan seluruh konten geser
-               keluar layar. */
-            overflow: hidden;
+               keluar layar.
+
+               Dipakai `clip`, bukan `hidden`. `hidden` di satu sumbu
+               memaksa sumbu lain jadi `auto`, jadi hero jadi wadah
+               scroll dan panel tema yang terbuka ke bawah ikut terpotong
+               di batasnya -- di 1280px panel di navbar landing page
+               tidak terlihat sama sekali. `overflow-x: clip` +
+               `overflow-y: visible` dip honored, jadi dekorasi
+               tetap terpotong horizontal sementara panel bebas
+               keluar vertikal. */
+            overflow-x: clip;
+            overflow-y: visible;
         }
 
         .gradient-bg {
@@ -50,17 +95,17 @@
             left: -100px;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(34, 109, 113, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+            background: radial-gradient(circle, color-mix(in srgb, var(--accent) 12%, transparent) 0%, rgba(255, 255, 255, 0) 70%);
             z-index: -1;
             pointer-events: none;
         }
 
         .img-frame {
-            background-color: #ffffff;
+            background-color: var(--bg);
             padding: 15px;
             border-radius: 50px;
             box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.15);
-            border: 1px solid #f0f0f0;
+            border: 1px solid var(--line);
             display: inline-block;
             width: 100%;
         }
@@ -73,9 +118,9 @@
         }
 
         .btn-custom-action {
-            background-color: #f1f5f5 !important;
-            color: #4b5563 !important;
-            border: 1px solid #d1dbdb !important;
+            background-color: var(--accent-tint) !important;
+            color: var(--ink-soft) !important;
+            border: 1px solid var(--accent-tint) !important;
             transition: all 0.2s ease-in-out !important;
             padding: 1rem 2.5rem !important;
             font-weight: 700 !important;
@@ -93,38 +138,38 @@
         }
 
         .btn-custom-action:hover {
-            background-color: #e2eaea !important;
-            border-color: #226d71 !important;
-            color: #226d71 !important;
+            background-color: var(--accent-tint) !important;
+            border-color: var(--accent) !important;
+            color: var(--accent) !important;
         }
 
         .btn-custom-action:active {
-            background-color: #226d71 !important;
-            color: #ffffff !important;
+            background-color: var(--accent) !important;
+            color: var(--on-accent) !important;
             transform: scale(0.96);
         }
 
         .dot-green {
             width: 10px;
             height: 10px;
-            background-color: #226d71;
+            background-color: var(--accent);
             border-radius: 50%;
             display: inline-block;
             margin-right: 10px;
         }
 
         .text-teal {
-            color: #226d71 !important;
+            color: var(--accent) !important;
         }
 
         .bg-teal-light {
-            background-color: rgba(34, 109, 113, 0.1) !important;
+            background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important;
         }
 
         .btn-teal-solid {
-            background-color: #226d71 !important;
-            color: #ffffff !important;
-            border: 1px solid #226d71 !important;
+            background-color: var(--accent) !important;
+            color: var(--on-accent) !important;
+            border: 1px solid var(--accent) !important;
             transition: all 0.2s ease-in-out !important;
             padding: 1rem 2.5rem !important;
             font-weight: 700 !important;
@@ -141,9 +186,9 @@
         }
 
         .btn-teal-outline {
-            background-color: #ffffff !important;
-            color: #226d71 !important;
-            border: 1px solid #226d71 !important;
+            background-color: var(--surface) !important;
+            color: var(--accent) !important;
+            border: 1px solid var(--accent) !important;
             transition: all 0.2s ease-in-out !important;
             padding: 1rem 2.5rem !important;
             font-weight: 700 !important;
@@ -154,8 +199,8 @@
         }
 
         .btn-teal-outline:hover {
-            background-color: #226d71 !important;
-            color: #ffffff !important;
+            background-color: var(--accent) !important;
+            color: var(--on-accent) !important;
         }
 
         /* =========================
@@ -177,7 +222,14 @@
             font-weight: 700;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--teal);
+            /* Tint aksen tetap di latar, tapi TEKSnya bukan warna aksen.
+             *
+             * Aksen sebagai teks di atas tint-nya sendiri selalu di
+             * bawah ambang: rose dark 3.99, amber light 3.78. Warna
+             * aksen memang tidak dimaksudkan sebagai tinta; teks 11px di atas
+             * pil 10% bukan tempat memakainya. `--ink` lolos >10:1 di kedua mode
+             * dan identitas aksen tetap terbawa oleh tint-nya. */
+            color: var(--ink);
             background-color: var(--teal-soft);
             border-radius: 50px;
             padding: 0.4rem 1rem;
@@ -186,7 +238,7 @@
 
         .section-title {
             font-weight: 800;
-            color: #111827;
+            color: var(--ink);
             line-height: 1.25;
         }
 
@@ -194,8 +246,8 @@
            STAT BAR
         ========================= */
         .stat-card {
-            background: #ffffff;
-            border: 1px solid #f0f0f0;
+            background: var(--surface);
+            border: 1px solid var(--line);
             border-radius: 24px;
             padding: 1.75rem 1.5rem;
             height: 100%;
@@ -203,8 +255,8 @@
         }
 
         .stat-card:hover {
-            border-color: #cfe0e0;
-            box-shadow: 0 18px 40px -24px rgba(34, 109, 113, 0.45);
+            border-color: var(--accent-tint);
+            box-shadow: 0 18px 40px -24px color-mix(in srgb, var(--accent) 45%, transparent);
             transform: translateY(-3px);
         }
 
@@ -213,29 +265,29 @@
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: #6b7280;
+            color: var(--ink-soft);
             margin-bottom: 0.4rem;
         }
 
         .stat-value {
             font-size: 2.1rem;
             font-weight: 800;
-            color: #111827;
+            color: var(--ink);
             line-height: 1.1;
         }
 
         .stat-suffix {
             font-size: 0.9rem;
             font-weight: 600;
-            color: #6b7280;
+            color: var(--ink-soft);
         }
 
         /* =========================
            CARA KERJA
         ========================= */
         .langkah-card {
-            background: #ffffff;
-            border: 1px solid #f0f0f0;
+            background: var(--surface);
+            border: 1px solid var(--line);
             border-radius: 24px;
             padding: 2rem 1.5rem;
             height: 100%;
@@ -246,8 +298,8 @@
             width: 48px;
             height: 48px;
             border-radius: 50px;
-            background-color: var(--teal);
-            color: #ffffff;
+            background-color: var(--accent);
+            color: var(--on-accent);
             font-weight: 800;
             display: flex;
             align-items: center;
@@ -259,8 +311,8 @@
            LAPORAN PUBLIK
         ========================= */
         .laporan-card {
-            background: #ffffff;
-            border: 1px solid #f0f0f0;
+            background: var(--surface);
+            border: 1px solid var(--line);
             border-radius: 24px;
             padding: 1.5rem;
             height: 100%;
@@ -284,8 +336,8 @@
            FAQ
         ========================= */
         .faq-item {
-            background: #ffffff;
-            border: 1px solid #f0f0f0;
+            background: var(--surface);
+            border: 1px solid var(--line);
             border-radius: 20px;
             padding: 0 1.5rem;
         }
@@ -294,7 +346,7 @@
             cursor: pointer;
             list-style: none;
             font-weight: 700;
-            color: #111827;
+            color: var(--ink);
             padding: 1.15rem 0;
             display: flex;
             align-items: center;
@@ -320,11 +372,11 @@
         }
 
         .faq-item[open] {
-            border-color: #cfe0e0;
+            border-color: var(--accent-tint);
         }
 
         .faq-jawaban {
-            color: #4b5563;
+            color: var(--ink-soft);
             padding-bottom: 1.25rem;
             margin-bottom: 0;
         }
@@ -333,14 +385,14 @@
            CTA PENUTUP
         ========================= */
         .cta-banner {
-            background: linear-gradient(135deg, #226d71 0%, #1a5457 100%);
+            background: linear-gradient(135deg, var(--band-from) 0%, var(--band-to) 100%);
             border-radius: 40px;
             padding: 3.5rem 2rem;
-            color: #ffffff;
+            color: var(--on-band);
         }
 
         .cta-banner .section-title {
-            color: #ffffff;
+            color: var(--on-band);
         }
     </style>
 </head>
@@ -355,9 +407,9 @@
 
                 <div class="col-lg-6">
                     <div
-                        class="d-inline-flex align-items-center bg-teal-light text-teal px-4 py-2 border border-teal-light border-opacity-25 rounded-pill mb-4">
+                        class="d-inline-flex align-items-center bg-teal-light px-4 py-2 border border-teal-light border-opacity-25 rounded-pill mb-4">
                         <span class="dot-green"></span>
-                        <small class="fw-bold text-uppercase tracking-wider" style="font-size: 10px;">Sistem Pelaporan
+                        <small class="fw-bold text-uppercase tracking-wider" style="font-size: 10px; color: var(--ink);">Sistem Pelaporan
                             Purwakarta</small>
                     </div>
 
@@ -379,6 +431,12 @@
                         <a href="{{ route('login') }}" class="btn btn-custom-action">
                             Log In
                         </a>
+
+                        {{-- Picker tema di area tombol. Halaman ini tidak
+                             punya navbar, dan tidak punya menu mobile
+                             juga, jadi satu penempatan ini dipakai di
+                             semua lebar. --}}
+                        @include('partials.theme-picker', ['variant' => 'hero'])
                     </div>
 
                     <p class="text-muted mt-4 mb-0" style="font-size: 0.9rem;">
@@ -621,12 +679,12 @@
                 </p>
                 <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
                     <a href="{{ route('register') }}" class="btn btn-lg fw-bold rounded-pill px-4"
-                        style="background-color:#ffffff; color:#226d71; border:1px solid #ffffff;">
+                        style="background-color:var(--surface); color:var(--accent-ink); border:1px solid var(--line);">
                         Daftar &amp; Lapor
                     </a>
                     <a href="{{ route('login') }}"
                         class="btn btn-lg fw-bold rounded-pill px-4"
-                        style="background-color:transparent; color:#ffffff; border:1px solid rgba(255,255,255,0.7);">
+                        style="background-color:transparent; color:var(--on-band); border:1px solid color-mix(in srgb, var(--on-band) 70%, transparent);">
                         Masuk
                     </a>
                 </div>
@@ -651,7 +709,7 @@
                     title: 'Akun Tidak Ditemukan',
                     text: "{{ session('account_deleted') }}",
                     confirmButtonText: 'Kembali ke Beranda',
-                    confirmButtonColor: '#226d71',
+                    confirmButtonColor: 'var(--accent)',
                     allowOutsideClick: false,
                     allowEscapeKey: false
                 });
@@ -660,6 +718,7 @@
     @endif
 
     <script src="{{ asset('assets/pelapor/js/index.js') }}" defer></script>
-</body>
+
+    </body>
 
 </html>

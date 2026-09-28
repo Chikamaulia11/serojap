@@ -53,35 +53,56 @@ export default {
              * punya CSS -- sebelumnya tidak ada palet primary sama
              * sekali sehingga tombolnya transparent.
              *
-             * primary = teal brand SEROJAP
-             * accent  = biru untuk area admin/super admin
+             * Sekarang semua nama warna brand membaca dari tiga
+             * variable di `resources/css/theme.css`, bukan hex.
+             *
+             * Kenapa ramp-nya sengaja dibuat datar: draft tema yang
+             * disetujui hanya menyediakan tiga nilai per aksen
+             * (`--accent`, `--accent-deep`, `--accent-tint`). Kalau
+             * kita mengarang stop warna di antaranya, kita keluar
+             * dari palet yang sudah direview. Karena itu setiap stop
+             * dipetakan ke salah satu dari tiga nilai itu.
+             *
+             * Konsekuensi yang perlu diketahui: `bg-primary-200`
+             * dan `bg-primary-300` menghasilkan warna yang SAMA.
+             * Jangan memakai angka berbeda dengan maksud "lebih
+             * gelap" atau "lebih terang" -- pakai `brand-deep` dan
+             * `brand-tint` yang namanya memang jujur.
+             *
+             * `primary` dan `accent` masih dipertahankan karena view
+             * yang sudah ada memakainya. Keduanya kini menunjuk ke
+             * sistem yang sama, jadi tidak ada lagi dua warna brand
+             * yang berbeda dalam satu aplikasi.
              */
             colors: {
+                brand: {
+                    tint: 'var(--accent-tint)',
+                    DEFAULT: 'var(--accent)',
+                    deep: 'var(--accent-deep)',
+                },
                 primary: {
-                    50: '#f0fafa',
-                    100: '#d5f2f1',
-                    200: '#abe5e4',
-                    300: '#74d2d1',
-                    400: '#3fb5b5',
-                    500: '#24999a',
-                    600: '#226d71',
-                    700: '#1d5a5d',
-                    800: '#1a4a4c',
-                    900: '#183e3f',
-                    950: '#0a2526',
+                    50: 'var(--accent-tint)',
+                    100: 'var(--accent-tint)',
+                    200: 'var(--accent-tint)',
+                    300: 'var(--accent-tint)',
+                    400: 'var(--accent)',
+                    500: 'var(--accent)',
+                    600: 'var(--accent)',
+                    700: 'var(--accent-deep)',
+                    800: 'var(--accent-deep)',
+                    900: 'var(--accent-deep)',
                 },
                 accent: {
-                    50: '#eef3fd',
-                    100: '#dae5fa',
-                    200: '#bdd1f4',
-                    300: '#92b3ec',
-                    400: '#628ce0',
-                    500: '#3f6ad2',
-                    600: '#2657c1',
-                    700: '#1f4674',
-                    800: '#1d3b61',
-                    900: '#1d3351',
-                    950: '#142139',
+                    50: 'var(--accent-tint)',
+                    100: 'var(--accent-tint)',
+                    200: 'var(--accent-tint)',
+                    300: 'var(--accent)',
+                    400: 'var(--accent)',
+                    500: 'var(--accent)',
+                    600: 'var(--accent)',
+                    700: 'var(--accent-deep)',
+                    800: 'var(--accent-deep)',
+                    900: 'var(--accent-deep)',
                 },
             },
 

@@ -17,7 +17,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 30px;
-    background: #ffffff;
+    background: var(--surface);
     box-shadow: 0 6px 20px rgba(0,0,0,0.05);
     position: sticky;
     top: 0;
@@ -39,7 +39,11 @@
 
 .nav-left span {
     font-weight: 600;
-    color: #1f4674;
+    /* `--accent-deep` gelap di mode light DAN dark, jadi di mode dark
+       ia menghilang di atas `--surface` yang juga gelap. `--accent`
+       kebalikan: gelap di light, terang di dark, jadi selalu terbaca
+       di atas permukaan mana pun. */
+    color: var(--accent);
 }
 
 .nav-menu {
@@ -57,20 +61,23 @@
     border-radius: 12px;
     font-size: 14px;
     font-weight: 500;
-    color: #555;
+    color: var(--ink-soft);
     text-decoration: none;
     cursor: pointer;
     transition: all 0.25s ease;
 }
 
 .nav-item:hover {
-    background: rgba(34,109,113,0.1);
-    color: #226d71;
+    /* 10%, bukan 0.1%. Persen di `color-mix()` dibaca apa adanya,
+       jadi 0.1% berarti hampir transparan dan hover-nya nyaris
+       tidak kelihatan. */
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
 }
 
 .nav-item.active {
-    background: #226d71;
-    color: #ffffff;
+    background: var(--accent);
+    color: var(--on-accent);
 }
 
 /* Aksi di sisi kanan navbar: tombol menu, profil, keluar. */
@@ -88,14 +95,14 @@
     border-radius: 12px;
     font-size: 14px;
     font-weight: 600;
-    color: #ffffff;
-    background: #226d71;
+    color: var(--on-accent);
+    background: var(--accent);
     text-decoration: none;
     transition: background 0.2s ease;
 }
 
 .nav-cta:hover {
-    background: #1d5a5d;
+    background: var(--accent-deep);
 }
 
 .nav-logout-form {
@@ -109,10 +116,10 @@
     justify-content: center;
     min-height: 44px;
     padding: 0 16px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--line);
     border-radius: 12px;
-    background: #ffffff;
-    color: #b91c1c;
+    background: var(--surface);
+    color: var(--danger);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -120,8 +127,8 @@
 }
 
 .nav-logout:hover {
-    background: #fef2f2;
-    border-color: #fecaca;
+    background: var(--danger-tint);
+    border-color: var(--danger-line);
 }
 
 /* Tautan lompat ke konten: hanya terlihat saat keyboard dipakai. */
@@ -131,8 +138,10 @@
     top: 0;
     z-index: 200;
     padding: 12px 20px;
-    background: #1d5a5d;
-    color: #ffffff;
+    /* Latar ikut `--accent` (bukan `--accent-deep`) supaya pasangan
+       dengan `--on-accent` selalu kontras di kedua mode. */
+    background: var(--accent);
+    color: var(--on-accent);
     font-size: 14px;
     font-weight: 600;
     border-radius: 0 0 12px 0;
@@ -148,7 +157,7 @@
 .nav-logout:focus-visible,
 .hamburger:focus-visible,
 .nav-profile:focus-visible {
-    outline: 2px solid #226d71;
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
 }
 
@@ -168,7 +177,7 @@
 }
 
 .nav-profile span {
-    color: #1f2937;
+    color: var(--ink);
     font-size: 14px;
     font-weight: 500;
 }
@@ -179,9 +188,9 @@
     justify-content: center;
     min-width: 44px;
     min-height: 44px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--line);
     border-radius: 12px;
-    background: #ffffff;
+    background: var(--surface);
     cursor: pointer;
     font-size: 22px;
     line-height: 1;
@@ -194,22 +203,35 @@
 .mobile-menu.show {
     display: flex;
     flex-direction: column;
-    background: white;
+    background: var(--surface);
     padding: 10px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.05);
     position: sticky;
-    top: 60px;
+    /* 68px, bukan 60px. `.navbar` setinggi 68px (24px padding atas
+       bawah + tombol setinggi 44px), jadi dengan `top: 60px` baris
+       pertama menu tertutup 8px di belakang navbar. Baris pertama
+       itu sekarang picker, jadi teks "Tema"-nya akan tertutup
+       begitu hamburger dibuka. */
+    top: 68px;
     z-index: 90;
 }
 
-.mobile-menu a,
-.mobile-menu button {
+/* Hanya anak LANGSUNG yang diberi gaya baris menu.
+
+   Sebelumnya selector-nya `.mobile-menu a, .mobile-menu button`,
+   yang ikut menimpa tombol picker: tombol Pemicu ikut jadi
+   `width: 100%; text-align: left` dan hover-nya merah seperti
+   tombol "Keluar", sedangkan keenam swatch serta tiga tombol mode
+   di dalam panel ikut berubah jadi baris menu. Picker dikecualikan
+   lewat `>` supaya hanya tautan nav dan tombol Keluar yang kena. */
+.mobile-menu > a,
+.mobile-menu > form > button {
     display: block;
     width: 100%;
     padding: 14px 12px;
     text-align: left;
     text-decoration: none;
-    color: #334155;
+    color: var(--ink);
     font-size: 15px;
     font-family: inherit;
     background: transparent;
@@ -218,18 +240,18 @@
     cursor: pointer;
 }
 
-.mobile-menu form {
+.mobile-menu > form {
     margin: 0;
 }
 
-.mobile-menu button:hover {
-    background: #fef2f2;
-    color: #b91c1c;
+.mobile-menu > form > button:hover {
+    background: var(--danger-tint);
+    color: var(--danger);
 }
 
-.mobile-menu a:hover {
-    background: rgba(34,109,113,0.1);
-    color: #226d71;
+.mobile-menu > a:hover {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
 }
 
 /* =========================
@@ -237,19 +259,21 @@
 ========================= */
 
 .footer-section {
-    width: 100vw;
+    /* `100vw` + `-50vw` di sini adalah sisa versi lama: `100vw`
+       memasukkan scrollbar vertikal ke hitungannya sehingga
+       section melebar ~15px dan memunculkan scrollbar horizontal.
+       Layout `app` sudah menggantinya dengan `width: 100%`; aturan
+       ini disamakan supaya tidak mengembalikan bug itu kalau
+       markup `.footer-top` dipakai lagi. */
+    width: 100%;
     position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
     margin-top: 70px;
     background:
-        linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-    border-top: 1px solid #e2e8f0;
+        linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+    border-top: 1px solid var(--line);
     border-top-left-radius: 28px;
     border-top-right-radius: 28px;
-    color: #1e293b;
+    color: var(--ink);
     box-sizing: border-box;
     box-shadow: 0 -12px 35px rgba(15, 23, 42, 0.05);
 }
@@ -282,10 +306,13 @@
     object-fit: contain;
     padding: 6px;
     border-radius: 14px;
-    background: #ffffff;
+    background: var(--surface);
     box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
 }
 
+/* Footer live di `layouts/app.blade.php` memakai gradien gelap inline
+   yang menimpa aturan lightness di bawah. Teks putih ini karena itu
+   benar dan harus tetap putih di kedua mode. */
 .footer-brand-head h3 {
     margin: 0;
     font-size: 24px;
@@ -297,13 +324,13 @@
 .footer-brand-head p {
     margin: 3px 0 0;
     font-size: 14px;
-    color: #226d71;
+    color: var(--accent);
     font-weight: 600;
 }
 
 .footer-description {
     max-width: 480px;
-    color: #64748b;
+    color: var(--ink-soft);
     font-size: 14px;
     line-height: 1.8;
     margin: 0;
@@ -321,17 +348,17 @@
     align-items: center;
     padding: 8px 12px;
     border-radius: 999px;
-    background: rgba(34, 109, 113, 0.08);
-    color: #226d71;
+    background: color-mix(in srgb, var(--accent) 0.08%, transparent);
+    color: var(--accent);
     font-size: 12px;
     font-weight: 700;
-    border: 1px solid rgba(34, 109, 113, 0.12);
+    border: 1px solid color-mix(in srgb, var(--accent) 0.12%, transparent);
 }
 
 .footer-column h4 {
     font-size: 15px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--ink);
     margin: 0 0 18px;
     position: relative;
     padding-bottom: 10px;
@@ -345,12 +372,12 @@
     width: 34px;
     height: 3px;
     border-radius: 999px;
-    background: #226d71;
+    background: var(--accent);
 }
 
 .footer-column a {
     display: block;
-    color: #64748b;
+    color: var(--ink-soft);
     text-decoration: none;
     font-size: 14px;
     margin-bottom: 12px;
@@ -358,7 +385,7 @@
 }
 
 .footer-column a:hover {
-    color: #226d71;
+    color: var(--accent);
     transform: translateX(4px);
 }
 
@@ -376,14 +403,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #f1f5f9;
+    background: var(--bg);
     border-radius: 9px;
     font-size: 14px;
 }
 
 .footer-contact-item p {
     margin: 0;
-    color: #64748b;
+    color: var(--ink-soft);
     font-size: 14px;
     line-height: 1.65;
 }
@@ -391,7 +418,7 @@
 .footer-contact-item a {
     display: inline;
     margin: 0;
-    color: #226d71;
+    color: var(--accent);
     font-weight: 600;
 }
 
@@ -400,8 +427,8 @@
     padding: 24px 28px;
     border-radius: 20px;
     background:
-        linear-gradient(135deg, rgba(31, 70, 116, 0.08), rgba(34, 109, 113, 0.08));
-    border: 1px solid rgba(34, 109, 113, 0.12);
+        linear-gradient(135deg, color-mix(in srgb, var(--accent) 0.08%, transparent), color-mix(in srgb, var(--accent) 0.08%, transparent));
+    border: 1px solid color-mix(in srgb, var(--accent) 0.12%, transparent);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -409,12 +436,12 @@
 }
 
 .footer-middle strong {
-    color: #0f172a;
+    color: var(--ink);
     font-size: 15px;
 }
 
 .footer-middle p {
-    color: #64748b;
+    color: var(--ink-soft);
     font-size: 14px;
     line-height: 1.7;
     margin: 6px 0 0;
@@ -422,26 +449,26 @@
 
 .footer-report-btn {
     white-space: nowrap;
-    background: #226d71;
-    color: #ffffff;
+    background: var(--accent);
+    color: var(--on-accent);
     padding: 13px 20px;
     border-radius: 14px;
     text-decoration: none;
     font-size: 14px;
     font-weight: 700;
-    box-shadow: 0 10px 22px rgba(34, 109, 113, 0.18);
+    box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 0.18%, transparent);
     transition: 0.25s ease;
 }
 
 .footer-report-btn:hover {
-    background: #1f4674;
+    background: var(--accent-deep);
     transform: translateY(-2px);
 }
 
 .footer-bottom {
     margin-top: 28px;
     padding-top: 22px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--line);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -451,7 +478,7 @@
 
 .footer-bottom p {
     margin: 0;
-    color: #64748b;
+    color: var(--ink-soft);
     font-size: 13px;
 }
 

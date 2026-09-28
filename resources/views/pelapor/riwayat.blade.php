@@ -38,7 +38,7 @@
                 'diterima' => ['Diterima', $ringkasan['diterima'], 'text-blue-800', 'bg-blue-50', 'border-blue-200'],
                 'diproses' => ['Diproses', $ringkasan['diproses'], 'text-amber-900', 'bg-amber-50', 'border-amber-200'],
                 'selesai' => ['Selesai', $ringkasan['selesai'], 'text-emerald-800', 'bg-emerald-50', 'border-emerald-200'],
-                'ditolak' => ['Ditolak', $ringkasan['ditolak'], 'text-rose-800', 'bg-rose-50', 'border-rose-200'],
+                'ditolak' => ['Ditolak', $ringkasan['ditolak'], 'text-[var(--ditolak-ink)]', 'bg-[var(--ditolak-tint)]', 'border-[var(--line)]'],
             ];
             $statusAktif = (string) request('status', '');
         @endphp
@@ -183,7 +183,7 @@
                                     @endforeach
                                 </ol>
                             @elseif ($status === 'ditolak')
-                                <p class="mt-3 text-xs text-rose-700">
+                                <p class="mt-3 text-xs text-[var(--ditolak-ink)]">
                                     Laporan ini ditolak. Buka detailnya untuk melihat alasannya.
                                 </p>
                             @endif

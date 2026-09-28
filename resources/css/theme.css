@@ -1,0 +1,462 @@
+/* =========================================================
+   SISTEM TEMA SEROJAP
+   =========================================================
+
+   Enam preset warna aksen (teal, biru, hijau, ungu, amber, rose)
+   masing-masing dengan varian Light dan Dark, plus mode "Sistem"
+   yang mengikuti preferensi OS.
+
+   Nilai warna di bawah ini disalin persis dari draft preview yang
+   sudah direview. Jangan menambahkan turunan atau menginterpolasi
+   warna baru di sini -- kalau butuh nuansa lain, turunkan lewat
+   `color-mix()` terhadap `--surface` atau `--bg`, bukan dengan
+   mengarang hex.
+
+   ------------------------------------------------------------
+   CARA PAKAI
+   ------------------------------------------------------------
+   Tanpa atribut apa pun, elemen `<html>` tidak punya `data-accent`
+   maupun `data-mode-resolved`, sehingga TIDAK ADA variable yang
+   terdefinisi dan `var(--accent)` tidak menghasilkan apa pun.
+   Itulah kenapa script anti-FOUC di `<head>` (lihat
+   `layouts/*.blade.php`) wajib ada: dia yang memasang kedua atribut
+   itu sebelum CSS pertama kali di-apply, sekaligus menjadi
+   cadangan memakai `teal` + `system` kalau localStorage kosong atau
+   tidak terbaca.
+
+   ------------------------------------------------------------
+   VARIABLE YANG BUKAN DARI DRAFT
+   ------------------------------------------------------------
+   Dua variable di bawah bukan dari draft, dan sengaja ditambahkan
+   karena draft tidak menyediakannya:
+
+   - `--on-accent` : warna teks di ATAS latar `--accent`. Draft
+     memakai `color:#fff` di beberapa tempat, termasuk
+     `.mode-seg button[data-active="true"]`. Itu benar pada mode
+     light (aksen gelap) tetapi salah pada mode dark, karena
+     aksen dark justru TERANG -- contoh amber dark `#e0a24d`.
+     Teks putih di atasnya tidak terbaca. Tanpa `--on-accent`,
+     tombol mode aktif di mode dark akan nyaris tak terlihat.
+   - `--*-tint`   : latar/badge status, diturunkan dengan
+      `color-mix()` dari warna status terhadap `--surface`, supaya
+      otomatis menyesuaikan mode tanpa hex terpisah per mode.
+   - `--on-danger` : warna teks di atas `--danger`. Bedanya dengan
+      `--*-tint` di atas: `--danger` adalah hex eksplisit per mode,
+      bukan turunan `color-mix()`, dan seperti `--accent` ia berbalik
+      terang/gelap. Di mode dark `--danger` adalah merah muda
+      `#f87171`, jadi tombol konfirmasi hapus tidak boleh tetap
+      berteks putih.
+   - `--surface-2`, `--ink-mute` : turunan netral untuk layer remap
+      utilitas Tailwind (lihat `neutral-remap.css`).
+
+   Warna status sendiri SENGAJA tidak ikut berubah saat aksen
+   diganti: itu warna fungsional, harus konsisten di semua tema.
+   ========================================================= */
+
+/* =========================================================
+   AKSEN
+   ========================================================= */
+
+html[data-accent="teal"][data-mode-resolved="light"] {
+    --accent: #226d71;
+    --accent-deep: #153e41;
+    --accent-tint: #e2eeee;
+}
+
+html[data-accent="teal"][data-mode-resolved="dark"] {
+    --accent: #4ba3a8;
+    --accent-deep: #0e2b2d;
+    --accent-tint: #1b2c2c;
+}
+
+html[data-accent="blue"][data-mode-resolved="light"] {
+    --accent: #2454b8;
+    --accent-deep: #16336f;
+    --accent-tint: #e3ebfa;
+}
+
+html[data-accent="blue"][data-mode-resolved="dark"] {
+    --accent: #6d97e6;
+    --accent-deep: #14213f;
+    --accent-tint: #1c2436;
+}
+
+html[data-accent="green"][data-mode-resolved="light"] {
+    --accent: #1f7a45;
+    --accent-deep: #134a2a;
+    --accent-tint: #e2f1e8;
+}
+
+html[data-accent="green"][data-mode-resolved="dark"] {
+    --accent: #5cbf85;
+    --accent-deep: #12291b;
+    --accent-tint: #1a2a20;
+}
+
+html[data-accent="purple"][data-mode-resolved="light"] {
+    --accent: #6b3fc2;
+    --accent-deep: #3f2273;
+    --accent-tint: #ede6fa;
+}
+
+html[data-accent="purple"][data-mode-resolved="dark"] {
+    --accent: #a883e8;
+    --accent-deep: #251a3d;
+    --accent-tint: #241e32;
+}
+
+html[data-accent="amber"][data-mode-resolved="light"] {
+    --accent: #b06a12;
+    --accent-deep: #6b3e08;
+    --accent-tint: #f7ecd9;
+    /* Satu-satunya kombinasi yang TIDAK lolos dengan teks putih:
+       rasio putih di atas #b06a12 hanya 4.27, di bawah ambang AA 4.5
+       untuk teks normal. `--ink` light (#1c2624) juga gagal (3.64) --
+       amber terang butuh tinta hampir hitam. Diuji di browser untuk
+       12 kombinasi; nilai #0a0a0a menghasilkan 4.63.
+
+       Warnanya sendiri tidak diubah: `--accent`, `--accent-deep`, dan
+       `--accent-tint` tetap persis sesuai draft yang sudah disetujui.
+       Yang disesuaikan hanya `--on-accent`, token turunan milik
+       implementasi ini, dan tugas sistem tema memang mensyaratkan
+       kontras teks tetap terbaca. */
+    --on-accent: #0a0a0a;
+
+    /* Aksen sebagai teks di atas permukaan terang (tombol "Daftar &
+       Lapor" yang berlatar `--surface`): #b06a12 di atas putih 4.27,
+       jadi amber light pakai `--accent-deep`-nya. */
+    --accent-ink: var(--accent-deep);
+}
+
+html[data-accent="amber"][data-mode-resolved="dark"] {
+    --accent: #e0a24d;
+    --accent-deep: #3a2508;
+    --accent-tint: #2c2519;
+}
+
+html[data-accent="rose"][data-mode-resolved="light"] {
+    --accent: #b0245e;
+    --accent-deep: #6b1338;
+    --accent-tint: #f7e2ec;
+}
+
+html[data-accent="rose"][data-mode-resolved="dark"] {
+    --accent: #e06c9a;
+    --accent-deep: #3a1424;
+    --accent-tint: #2c1c22;
+}
+
+/* =========================================================
+   NETRAL
+   ========================================================= */
+
+html[data-mode-resolved="light"] {
+    --bg: #f7f8f6;
+    --surface: #ffffff;
+    --ink: #1c2624;
+    --ink-soft: #5b6a68;
+    --line: #dfe6e4;
+
+    /* Aksen mode light gelap, jadi teks di atasnya putih. */
+    --on-accent: #ffffff;
+
+    /* Gradien avatar inisial: `from --accent` ke turunan aksen.
+     *
+     * Di mode light kedua stop gelap (aksen #226d71 ke deep #153e41),
+     * jadi teks putih aman: 6.01:1 dan 11.68:1.
+     *
+     * Di mode dark arahnya dibalik total: `--accent` terang
+     * (#4ba3a8) sementara `--accent-deep` nyaris hitam (#0e2b2d).
+     * Gradien seperti itu tidak punya SATU warna teks yang cocok di
+     * kedua ujungnya -- putih 2.96:1 di stop terang, teks gelap
+     * 1.24:1 di stop gelap. Inisial jadi tak terbaca di 6 mode dark.
+     *
+     * Stop kedua digeser ke `color-mix()` aksen dengan putih supaya
+     * keduanya tetap terang, lalu teksnya `--on-accent` yang gelap.
+     * Di titik 22% putih teks gelap di atasnya 6.9:1 (amber 8.9:1),
+     * jauh di atas ambang.
+     *
+     * Mode light TIDAK bisa pakai campuran yang sama: teksnya putih,
+     * jadi kedua stop harus gelap. Yang dipakai `--accent-deep` --
+     * semua aksen punya putih di atasnya 9.06:1 (amber) sampai
+     * 12.44:1 (purple). Pengecualian amber handled oleh `--on-accent`
+     * yang di blok amber sudah #0a0a0a. */
+    --accent-grad-to: var(--accent-deep);
+
+    /* Tooltip dan kotak gelap lain yang warnanya diambil dari
+       `--ink`. Di mode dark `--ink` justru TERANG, jadi teks di
+       atasnya harus gelap. Tanpa ini, tooltip Chart.js jadi putih
+       di atas putih. */
+    --on-ink: #ffffff;
+}
+
+html[data-mode-resolved="dark"] {
+    --bg: #12191a;
+    --surface: #1a2323;
+    --ink: #eef3f2;
+    --ink-soft: #a7b6b3;
+    --line: #2b3736;
+
+    /* Aksen mode dark terang, jadi teks di atasnya gelap. */
+    --on-accent: #0d1415;
+
+    --on-ink: #0d1415;
+
+    /* Lihat catatan `--accent-grad-to` di blok light. Di mode dark
+     * arahnya dibalik: `--accent` sudah terang, jadi stop kedua
+     * dicampur ke PUTIH supaya gradien tidak pernah menyeberangi
+     * dari terang ke gelap. Tanpa ini inisial avatar punya 2.96:1 di
+     * satu ujung dan 1.24:1 di ujung lain. */
+    --accent-grad-to: color-mix(in srgb, var(--accent) 22%, #ffffff);
+}
+
+/* Turunan netral untuk layer remap utilitas Tailwind.
+
+   `--surface-2` menggantikan `bg-slate-100` (permukaan tersedikit
+   untuk hover/baris tabel), `--ink-mute` menggantikan
+   `placeholder-slate-400` dan teks bobot paling redup.
+
+    Keduanya cukup ditulis SEKALI tanpa per-mode: `color-mix()`
+    menghitung arahnya sendiri dari `--ink`/`--ink-soft` yang sudah
+    berbeda per mode. Di mode light `--ink` gelap, jadi `--surface-2`
+    menjadi abu-abu muda; di mode dark `--ink` terang, jadi hasilnya
+    abu-abu yang lebih terang dari `--surface`. Menulisnya dua kali
+    per mode hanya menambah tempat yang bisa salah, tanpa manfaat.
+
+    Campuran `--ink-mute` dijaga ketat ke arah `--ink-soft`, bukan
+    ke arah permukaan. Token ini WAJIB terbaca: ia menggantikan
+    `text-slate-400` dan `text-gray-400`, yang dipakai untuk label
+    kecil 10-12px, jadi ambangnya 4.5:1 bukan 3:1.)
+
+    Angka 94% di bawah bukan pilihan estetika, itu hasil pencarian
+    ambang. Di mode light `--surface` putih, jadi setiap persen yang
+    ditukar ke putih langsung memotong kontras:
+
+        100%  rgb( 91,106,104)   5.32:1   lolos
+         94%  rgb(101,115,113)   4.64:1   lolos  <- dipakai
+         92%  rgb(104,118,116)   4.45:1   GAGAL
+         72%  rgb(137,148,146)   2.94:1   GAGAL  (nilai lama)
+
+    Di mode dark arahnya justru longgar: 94% masih 6.00:1 di atas
+    `--surface`. Ketidakseimbangan ini tidak bisa dihilangkan --
+    latar terang butuh tinta jauh lebih pekat daripada latar gelap.
+    94% diuji terhadap `--bg` (rgb(247,248,246)) juga, bukan hanya
+    putih, karena teks sering diletakkan di blok `--surface-2`. */
+:root {
+    --surface-2: color-mix(in srgb, var(--ink) 5%, var(--surface));
+    --ink-mute: color-mix(in srgb, var(--ink-soft) 94%, var(--surface));
+}
+
+/* =========================================================
+   PITA GRADIENT GELAP
+   =========================================================
+
+   Beberapa bidang -- footer, banner CTA, banner profil -- memakai
+   gradien aksen dengan teks putih di atasnya. Kalau gradien itu
+   memakai `--accent` langsung, arah kecerahannya berubah antara mode:
+   light mode aksen gelap (teks putih pas), tapi dark mode aksen justru
+   TERANG, sehingga separuh gradien jadi terang dan teks putih di
+   atasnya tidak terbaca.
+
+   Jadi band ini selalu gelap, di kedua mode, dan teksnya selalu putih:
+
+   - light: `--band-from` = aksen apa adanya, jadi tampilan persis
+     seperti sebelumnya (#226d71 -> #153e41).
+   - dark: aksen dicampur turun ke `--accent-deep` supaya tidak
+     menjadi terang.
+
+   Ketiga property ini hanya perlu satu blok per mode, bukan satu per
+   aksen, karena merujuk `var(--accent)` yang sudah-setting di atas.
+   Resolusi custom property bersifat lazy, jadi urutan blok di sini
+   tidak berpengaruh.
+   ========================================================= */
+
+html[data-mode-resolved="light"] {
+    /* Gradien pita di mode light DIBUAT GELAP, bukan terang.
+     *
+     * Sebelumnya `--band-from` = `--accent` apa adanya, jadi pita CTA
+     * dan gradien footer menyalin warna aksen terang dengan teks putih
+     * di atasnya. Untuk amber light putih di atas #b06a12 hanya 4.27.
+     * Memakai tinta gelap sebagai gantinya tidak menyelesaikan apa pun:
+     * gradiennya bertransisi dari #b06a12 ke #6b3e08, jadi ujungnya
+     * gelap dan tinta gelap hilang di sana (2.19). Tidak ada satu pun
+     * warna teks yang bisa menutup kedua ujung gradien terang-gelap.
+     *
+     * Aksen yang dispesialkan adalah `--accent-deep`, yang di keenam
+     * mode light sudah gelap: putih di atasnya 9.06 (amber) sampai
+     * 12.44 (purple). Ujung kedua digelapkan lagi, jadi teks putih
+     * aman di sepanjang gradien.
+     *
+     * Warna palet tidak disentuh; hanya dua token turunan yang
+     * diturunkan ulang. */
+    --band-from: var(--accent-deep);
+    --band-to: color-mix(in srgb, var(--accent-deep) 70%, #05090a);
+    --on-band: #ffffff;
+
+    /* Aksen yang diperuntukkan sebagai TEKS di atas `--surface`.
+     *
+     * Aksen di mode light sengaja gelap supaya teks putih di atasnya
+     * terbaca -- artinya aksen itu diperuntukkan sebagai latar tombol,
+     * bukan sebagai tinta. Dipakai terbalik (aksen sebagai teks di
+     * atas permukaan terang) hampir selalu lolos, kecuali amber:
+     * #b06a12 di atas putih hanya 4.27. `--accent-ink` adalah selector
+     * untuk "aksen sebagai teks", dan satu-satunya yang perlu
+     * digeser adalah amber light.
+     */
+    --accent-ink: var(--accent);
+}
+
+html[data-mode-resolved="dark"] {
+    --band-from: color-mix(in srgb, var(--accent) 30%, var(--accent-deep));
+    --band-to: var(--accent-deep);
+    --on-band: #ffffff;
+
+    /* Aksen mode dark terang, jadi sebagai teks di atas `--surface`
+       gelap sudah keterbaca tanpa perubahan. */
+    --accent-ink: var(--accent);
+}
+
+/* =========================================================
+   WARNA AKSI DESTRUKTIF
+   =========================================================
+
+   Untuk tombol hapus/keluar/penolakan, bukan untuk status laporan.
+   Diberi token sendiri karena `#b91c1c` yang lama kontrasnya bagus
+   di atas putih, tetapi hampir tidak terbaca di atas `--surface`
+   yang gelap. Dua-duanya bukan warna brand dan tidak ikut berubah
+   saat aksen diganti.
+   ========================================================= */
+
+html[data-mode-resolved="light"] {
+    --danger: #b91c1c;
+    --danger-tint: #fef2f2;
+    --danger-line: #fecaca;
+    --on-danger: #ffffff;
+    --warn: #b45309;
+    --warn-tint: #fffbeb;
+    --warn-line: #f59e0b;
+}
+
+html[data-mode-resolved="dark"] {
+    --danger: #f87171;
+    --danger-tint: color-mix(in srgb, #ef4444 16%, var(--surface));
+    --danger-line: color-mix(in srgb, #ef4444 40%, var(--surface));
+    --on-danger: #1a1010;
+    --warn: #fbbf24;
+    --warn-tint: color-mix(in srgb, #f59e0b 16%, var(--surface));
+    --warn-line: color-mix(in srgb, #f59e0b 45%, var(--surface));
+}
+
+/* =========================================================
+   STATUS LAPORAN
+   =========================================================
+
+   Warna ini FUNGSIONAL, bukan brand: pengguna harus bisa mengenali
+   "diterima" dari "ditolak" tanpa perlu tahu aksen apa yang
+   dipilih. Karena itu tidak ada selector `data-accent` di sini --
+   sengaja, supaya ganti tema tidak ikut menggeser warna status.
+   ========================================================= */
+
+:root {
+    --diterima: #2563eb;
+    --diproses: #c2760f;
+    --selesai: #188a52;
+    --ditolak: #c23a3a;
+}
+
+/* Latar badge/label status, diturunkan dari warna status di atas
+   terhadap `--surface`. `color-mix()` membuat versinya otomatis
+   untuk mode light maupun dark, jadi tidak perlu dua set hex. */
+:root {
+    --diterima-tint: color-mix(in srgb, var(--diterima) 14%, var(--surface));
+    --diproses-tint: color-mix(in srgb, var(--diproses) 14%, var(--surface));
+    --selesai-tint: color-mix(in srgb, var(--selesai) 14%, var(--surface));
+    --ditolak-tint: color-mix(in srgb, var(--ditolak) 14%, var(--surface));
+}
+
+/* Teks status di atas `--*-tint` sendiri perlu variannya sendiri.
+   `--diterima` dan-selainnya sengaja punya SATU nilai untuk semua mode
+   supaya pengguna tetap mengenali warnanya, tapi justru itu yang
+   membuat teksnya gagal di mode dark: tint gelap + warna status
+   medium = kontras di bawah 4.5:1. Dicampur dengan `--ink` membuat
+   warnanya ikut terang/gelap bersama mode, jadi badge tetap
+   terbaca tanpa kehilangan rona statusnya. */
+/* Porsinya berbeda per mode. Di light, `--ink` hampir hitam, jadi
+   sedikit saja sudah cukup untuk menggelapkan teks. Di dark
+   `--ink` hampir putih dan tint-nya gelap, jadi rona status harus
+   lebih banyak ikut tercampur supaya tidak ikut gelap. */
+html[data-mode-resolved="light"] {
+    --diterima-ink: color-mix(in srgb, var(--diterima) 82%, var(--ink));
+    --diproses-ink: color-mix(in srgb, var(--diproses) 82%, var(--ink));
+    --selesai-ink: color-mix(in srgb, var(--selesai) 82%, var(--ink));
+    --ditolak-ink: color-mix(in srgb, var(--ditolak) 82%, var(--ink));
+}
+
+html[data-mode-resolved="dark"] {
+    --diterima-ink: color-mix(in srgb, var(--diterima) 42%, var(--ink));
+    --diproses-ink: color-mix(in srgb, var(--diproses) 42%, var(--ink));
+    --selesai-ink: color-mix(in srgb, var(--selesai) 42%, var(--ink));
+    --ditolak-ink: color-mix(in srgb, var(--ditolak) 42%, var(--ink));
+}
+
+/* =========================================================
+   ALASAN SISTEM
+   =========================================================
+
+   `--line` dipakai untuk border, `--ink-soft` untuk teks sekunder, dan
+   `--surface` untuk kartu. Warna aksen hanya boleh dipakai untuk
+   hal yang benar-benar "merek": tombol utama, link, sorotan
+   aktif, focus ring. Menu, avatar, dan badge netral tetap
+   netral supaya tidak compete dengan warna status.
+   ========================================================= */
+
+/* =========================================================
+   WARNA DASAR CANVAS DAN TEKS
+
+   Ini akar dari semua laporan "teks hitam di atas latar gelap".
+
+   Tanpa aturan di bawah, `body` memakai nilai awal CSS:
+   `color` = hitam dan `background-color` = transparan.
+   Akibatnya:
+
+   1. Setiap elemen yang tidak punya `color` eksplisit -- termasuk
+      judul, label, dan teks paragraf -- mewarisi hitam, lalu
+      diletakkan di atas kartu yang sudah gelap karena
+      `var(--surface)`. Hasilnya hitam di atas gelap.
+   2. `body` yang transparan tidak meneruskan warnanya ke canvas,
+      jadi area di luar kartu tetap putih bahkan di mode dark.
+
+   `background-color` sengaja ditempel di `body`, bukan di
+   `html`: CSS hanya meneruskan background `body` ke canvas kalau
+   `html` sendiri tidak punya background, jadi satu aturan ini
+   sudah cukup menutup seluruh viewport.
+
+   Fallback sengaja TIDAK dipakai. Kalau `data-accent` dan
+   `data-mode-resolved` belum terpasang, `var(--bg)` tidak valid
+   dan properti diabaikan -- bukan berubah jadi hitam. Script
+   anti-FOUC di `<head>` sudah memastikan kedua atribut itu
+   selalu ada sebelum CSS pertama kali di-apply.
+   ========================================================= */
+
+html {
+    color-scheme: light;
+}
+
+html[data-mode-resolved="dark"] {
+    color-scheme: dark;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--ink);
+}
+
+/* CATATAN: tidak ada aturan global untuk `h1`..`h6` di sini.
+
+   Judul otomatis mewarisi `color` dari `body` di atas, jadi sebenarnya
+   tidak perlu apa-apa. Pernah ada aturan `h1, h2, ... { color:
+   var(--ink) }`, dan itu justru merusak footer: heading di dalam
+   `.footer-section` sengaja mewarisi putih dari induknya karena
+   pita footer gelap di kedua mode, dan aturan global menimpanya
+   dengan tinta mode -- membuat teks gelap di atas gradien gelap. */
+

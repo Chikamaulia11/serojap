@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    @include('partials.theme-bootstrap')
+
     <title>@yield('title', 'Serojap Super Admin')</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -28,16 +30,29 @@
 
         body {
             font-family: 'Inter', 'Roboto', 'Poppins', 'Public Sans', sans-serif;
+            /* Warna kilau ikut aksen aktif. Semula `color-mix(in srgb, var(--accent) 8%, transparent)`
+               -- itu biru admin lama, jadi tetap biru meski pengguna memilih
+               aksen lain. `color-mix()` dengan alfa rendah memberi
+               tingkat opasitas yang sama tanpa mengunci warnanya. */
             background:
-                radial-gradient(circle at top right, rgba(38, 87, 193, 0.08), transparent 34%),
-                linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+                radial-gradient(
+                    circle at top right,
+                    color-mix(in srgb, var(--accent) 8%, transparent),
+                    transparent 34%
+                ),
+                var(--accent-tint);
         }
 
         .superadmin-sidebar {
             width: 260px;
+            /* `rgba(255,255,255,.94)` di sini adalah panel putih tembus
+               pandang di atas foto/gradien terang, jadi HARUS tetap putih
+               di kedua mode. Kalau dipetakan ke `var(--surface)`, mode
+               dark menjadikannya gelap dan kontrasnya hilang terhadap foto
+               di belakangnya. Sengaja dibiarkan. */
             background: rgba(255,255,255,0.94);
             backdrop-filter: blur(18px);
-            border-right: 1px solid #e2e8f0;
+            border-right: 1px solid var(--line);
             box-shadow: 8px 0 24px rgba(15, 23, 42, 0.04);
         }
 
@@ -70,18 +85,18 @@
         }
 
         .sidebar-link.active {
-            background: #eaf2ff;
-            color: #2657c1;
-            box-shadow: 0 10px 24px rgba(38, 87, 193, 0.08);
+            background: var(--accent-tint);
+            color: var(--accent);
+            box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 8%, transparent);
         }
 
         .sidebar-link:not(.active) {
-            color: #64748b;
+            color: var(--ink-soft);
         }
 
         .sidebar-link:not(.active):hover {
-            background: #f1f5f9;
-            color: #2657c1;
+            background: var(--bg);
+            color: var(--accent);
         }
 
         .sidebar-icon {
@@ -91,14 +106,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f1f5f9;
-            color: #94a3b8;
+            background: var(--bg);
+            color: var(--ink-mute);
             flex-shrink: 0;
         }
 
         .sidebar-link.active .sidebar-icon {
-            background: #ffffff;
-            color: #2657c1;
+            background: var(--surface);
+            color: var(--accent);
         }
 
         .logout-link {
@@ -111,16 +126,16 @@
             border-radius: 18px;
             font-size: 14px;
             font-weight: 800;
-            color: #ef4444;
-            background: #fff;
-            border: 1px solid #fee2e2;
+            color: var(--danger);
+            background: var(--surface);
+            border: 1px solid var(--danger-tint);
             text-decoration: none;
             transition: 0.25s ease;
             box-shadow: 0 10px 24px rgba(239, 68, 68, 0.05);
         }
 
         .logout-link:hover {
-            background: #fef2f2;
+            background: var(--danger-tint);
             transform: translateY(-2px);
         }
 
@@ -229,7 +244,7 @@
     <!-- Sidebar -->
     <aside
         id="superadminSidebar"
-        class="superadmin-sidebar fixed top-0 left-0 h-screen z-50 flex flex-col overflow-y-auto"
+        class="superadmin-sidebar fixed top-0 left-0 h-screen z-50 flex flex-col"
         x-bind:class="sidebarTerbuka ? 'terbuka' : ''"
     >
 
@@ -243,7 +258,7 @@
                 </div>
 
                 <div>
-                    <div class="text-xl font-extrabold text-[#2657c1] leading-tight">
+                    <div class="text-xl font-extrabold text-[var(--accent)] leading-tight">
                         SEROJAP
                     </div>
 
@@ -261,7 +276,7 @@
             </p>
         </div>
 
-        <nav class="flex-1 px-4 space-y-2">
+        <nav class="flex-1 min-h-0 overflow-y-auto px-4 space-y-2">
 
             <a href="{{ route('superadmin.dashboard') }}"
                class="sidebar-link {{ request()->routeIs('superadmin.dashboard') ? 'active' : '' }}">
@@ -283,6 +298,11 @@
 
         <!-- Logout -->
         <div class="mt-auto px-4 py-4 border-t border-slate-200">
+
+            {{-- Picker tema, di atas Logout. Di layar kecil sidebar ini
+                 yang jadi menu (drawer), jadi satu penempatan ini
+                 melayani desktop dan mobile sekaligus. --}}
+            @include('partials.theme-picker', ['variant' => 'sidebar'])
 
             <a href="#"
                id="superAdminLogoutButton"
@@ -332,8 +352,8 @@
                         showCancelButton: true,
                         confirmButtonText: 'Ya, Logout',
                         cancelButtonText: 'Batal',
-                        confirmButtonColor: '#dc2626',
-                        cancelButtonColor: '#64748b',
+                        confirmButtonColor: 'var(--danger)',
+                        cancelButtonColor: 'var(--ink-soft)',
                         reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -346,5 +366,6 @@
     </script>
 
     @stack('scripts')
+
 </body>
 </html>

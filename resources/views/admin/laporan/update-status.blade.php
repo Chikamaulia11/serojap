@@ -6,7 +6,7 @@
 <div class="max-w-7xl mx-auto">
 
     <nav class="mb-4 text-sm" aria-label="Navigasi remah roti">
-        <a href="{{ route('admin.dashboard') }}" class="text-[#2657c1] hover:underline">&larr; Dashboard</a>
+        <a href="{{ route('admin.dashboard') }}" class="text-[var(--accent)] hover:underline">&larr; Dashboard</a>
         <span class="text-gray-400 mx-1">/</span>
         <span class="text-gray-600">Update Status</span>
     </nav>
@@ -52,7 +52,7 @@
                            maxlength="100"
                            class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-blue-500">
 
-                    <button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-[#2657c1] text-white hover:bg-[#1f4674] transition">
+                    <button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-[var(--accent)] text-white hover:bg-[var(--accent-deep)] transition">
                         Cari
                     </button>
                 </form>
@@ -68,7 +68,7 @@
                     <a href="{{ route('admin.laporan.update-status', ['search' => request('search'), 'laporan' => $item->id]) }}"
                        @class([
                            'block px-5 py-4 transition',
-                           'bg-blue-50 border-l-4 border-[#2657c1]' => $terpilih,
+                           'bg-blue-50 border-l-4 border-[var(--accent)]' => $terpilih,
                            'hover:bg-gray-50 border-l-4 border-transparent' => ! $terpilih,
                        ])
                        @if ($terpilih) aria-current="true" @endif>
@@ -216,7 +216,7 @@
                         <x-submit-button
                             type="submit"
                             loading-text="Menyimpan..."
-                            class="flex-1 bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]"
+                            class="flex-1 bg-[var(--accent)] hover:bg-[var(--accent-deep)] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]"
                         >
                             Simpan Pembaruan
                         </x-submit-button>

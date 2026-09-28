@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    @include('partials.theme-bootstrap')
+
     <title>@yield('title', 'Beranda') &middot; SEROJAP</title>
 
     <meta name="description" content="@yield('deskripsi', 'Sistem Pelaporan Kerusakan Jalan Kabupaten Purwakarta. Laporkan kerusakan jalan, pantau progres penanganannya secara online.')">
@@ -28,21 +30,34 @@
             font-family: 'Inter', 'Public Sans', sans-serif;
             margin: 0;
             padding: 0;
-            background: #f5f7fb;
+            /* Warna dasar halaman diambil dari token netral, bukan
+               `--accent-tint`. `--accent-tint` dicampur dengan
+               `--surface` supaya cocok sebagai latar badge/sorotan;
+               memakainya sebagai canvas membuat seluruh halaman
+              BERWARNA aksen dan, di mode dark, teks yang mewarisi
+               warna awal jadi hitam di atas latar gelap.
+               `color` juga ditulis di sini karena tanpa itu elemen
+               tanpa `color` eksplisit mewarisi hitam. */
+            background: var(--bg);
+            color: var(--ink);
         }
 
         /* ================= FOOTER ================= */
 
         .footer-section {
             margin-top: 70px;
-            width: 100vw;
+            /* Full-bleed memakai `width: 100vw` + `margin-left: -50vw`
+               SEBELUMNYA, dan itu penyebab scrollbar horizontal di
+               dashboard. `100vw` menghitung lebar viewport termasuk
+               scrollbar vertikal, sedangkan area konten hanya
+               `clientWidth`. Selisihnya sekitar 15px, dan itulah yang
+               membuat halaman bisa digeser ke kanan. Karena `<footer>`
+               ini anak langsung `<body>` yang margin-nya 0, `100%`
+               sudah persis selebar area konten -- tanpa `vw` sama
+               sekali, jadi tidak mungkin meluber. */            width: 100%;
             position: relative;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
             background:
-                linear-gradient(135deg, #102a43 0%, #1f4674 48%, #226d71 100%);
+                linear-gradient(135deg, #0b1416 0%, var(--band-to) 45%, var(--band-from) 100%);
             color: #ffffff;
             overflow: hidden;
         }
@@ -225,8 +240,11 @@
         .footer-system-card {
             padding: 18px;
             border-radius: 22px;
-            background: rgba(255, 255, 255, 0.92);
-            color: #1e293b;
+            /* Kaca putih + `color: var(--ink)` berarti teks terang di
+               atas putih pada mode dark. Kacanya diturunkan dari
+               `--surface` supaya ikut mode. */
+            background: color-mix(in srgb, var(--surface) 92%, transparent);
+            color: var(--ink);
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.10);
         }
 
@@ -234,8 +252,11 @@
             display: inline-flex;
             font-size: 11px;
             font-weight: 800;
-            color: #226d71;
-            background: rgba(34, 109, 113, 0.10);
+            color: var(--accent);
+            /* Latar 10% aksen di atas kartu membuat teks aksen kontras
+               1:1. `--accent-tint` menurunkan aksen terhadap
+               `--surface`, jadi selisihnya cukup di kedua mode. */
+            background: var(--accent-tint);
             padding: 6px 10px;
             border-radius: 999px;
             margin-bottom: 10px;
@@ -245,14 +266,14 @@
             margin: 0;
             font-size: 15px;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--ink);
         }
 
         .footer-system-card p {
             margin: 8px 0 0;
             font-size: 12.5px;
             line-height: 1.6;
-            color: #64748b;
+            color: var(--ink-soft);
         }
 
         .footer-bottom {
@@ -267,8 +288,21 @@
             font-size: 12.5px;
         }
 
+        /* `color` WAJIB ditulis di sini, bukan cuma `margin`.
+         *
+         * `public/css/navbar.css` sudah punya `.footer-bottom p {
+         * color: var(--ink-soft) }` -- dituliskannya saat footer masih
+         * terang. Footer sekarang gradien gelap di KEDUA mode, jadi
+         * `--ink-soft` mode light (rgb(91,106,104)) jatuh tepat di
+         * atas pita gelap: rasio 2.06:1. Rule di navbar.css tidak
+         * pernah ditimpa karena blok ini hanya mengatur `margin`, dan
+         * `<style>` inline tidak menang kalau memang tidak punya
+         * deklarasi yang sama.
+         *
+         * `strong` di bawah sudah putih; ini untuk teks sisanya. */
         .footer-bottom p {
             margin: 0;
+            color: inherit;
         }
 
         .footer-bottom strong {
@@ -348,6 +382,10 @@
         </nav>
 
         <div class="nav-actions">
+            {{-- Picker tema, versi navbar. Tampil >= 640px; di bawah
+                 itu versinya ada di dalam menu mobile. --}}
+            @include('partials.theme-picker', ['variant' => 'nav'])
+
             <button type="button" class="hamburger" onclick="toggleMenu()"
                 aria-label="Buka menu navigasi" aria-controls="mobileMenu" aria-expanded="false">
                 <span aria-hidden="true">☰</span>
@@ -388,6 +426,11 @@
     </div>
 
     <div id="mobileMenu" class="mobile-menu">
+        {{-- Picker tema, versi menu mobile: tampil < 640px, di atas
+             tautan navigasi supaya panelnya membuka ke bawah tanpa
+             menabrak bawah viewport. --}}
+        @include('partials.theme-picker', ['variant' => 'menu'])
+
         <a href="{{ route('dashboard') }}">Dashboard</a>
         <a href="{{ route('laporan.create') }}">Buat Laporan</a>
         <a href="{{ route('laporan.my-report') }}">Riwayat Saya</a>
@@ -531,6 +574,6 @@
     {{-- Script khusus halaman (dialog, peta, dsb). --}}
     @stack('scripts')
 
-</body>
+    </body>
 
 </html>

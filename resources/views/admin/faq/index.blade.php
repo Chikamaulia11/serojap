@@ -36,11 +36,11 @@
         .swal2-title-custom {
             font-size: 1.4rem !important;
             font-weight: 700 !important;
-            color: #111827 !important;
+            color: var(--ink) !important;
         }
         .swal2-text-custom {
             font-size: 0.95rem !important;
-            color: #6b7280 !important;
+            color: var(--ink-soft) !important;
         }
         .swal2-confirm-custom {
             border-radius: 12px !important;
@@ -51,12 +51,12 @@
             border: none !important;
         }
         .swal2-confirm-success {
-            background-color: #2657c1 !important;
-            color: #fff !important;
+            background-color: var(--accent) !important;
+            color: var(--on-accent) !important;
         }
         .swal2-confirm-error {
-            background-color: #dc2626 !important;
-            color: #fff !important;
+            background-color: var(--danger) !important;
+            color: var(--on-danger) !important;
         }
         .swal2-backdrop-custom {
             backdrop-filter: blur(4px) !important;
@@ -359,7 +359,7 @@
                         <p class="text-[11px] text-gray-400 mt-2 italic">* Angka lebih kecil akan muncul paling atas di halaman pelapor.</p>
                     </div>
 
-                    <button type="submit" class="w-full bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]">
+                    <button type="submit" class="w-full bg-[var(--accent)] hover:bg-[var(--accent-deep)] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]">
                         Simpan Data FAQ
                     </button>
                 </form>

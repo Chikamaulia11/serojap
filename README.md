@@ -25,8 +25,9 @@ tidak pernah ditampilkan di halaman publik.
 | Statistik admin | Jumlah laporan per status dan grafik laporan per bulan |
 | Manajemen FAQ | Admin menambah/mengubah pertanyaan & jawaban yang tampil di halaman bantuan dan beranda |
 | Manajemen akun | Super admin membuat, mengubah, dan menghapus akun admin serta pelapor |
-| Profil & keamanan akun | Ubah profil, ubah kata sandi, hapus akun (beserta seluruh laporan & fotonya) |
-| Rate limit & validasi | Submit laporan dibatasi 5 permintaan/menit dan divalidasi ketat (tipe & ukuran foto, rentang koordinat, panjang keterangan) |
+| Profil & keamanan akun | Ubah profil, ubah kata sandi, lupa/reset kata sandi lewat email, hapus akun (beserta seluruh laporan & fotonya) |
+| Halaman error ramah | `403`, `404`, `419`, `429`, dan `500` punya halaman sendiri; `403` menyediakan tombol "Ganti Akun" untuk berpindah akun tanpa mengetik ulang sandi |
+| Rate limit & validasi | Submit laporan dibatasi **20 request/menit** (pagar luar, semua request) dan **5 laporan/menit** per user+IP (hanya yang benar-benar tersimpan), plus validasi ketat (tipe & ukuran foto, rentang koordinat, panjang keterangan) |
 
 ---
 
@@ -43,11 +44,20 @@ Role disimpan pada kolom `role` di tabel `users` (enum: `pelapor`, `admin`,
 
 Aturan akses:
 
-- Masing-masing role punya halaman login sendiri. Akun dengan role yang salah akan
-  otomatis logout dan ditolak dengan pesan error.
-- Area admin dilindungi middleware `admin`. Jika super admin membuka area admin,
-  ia diarahkan ke dashboard super admin.
-- Rute terbuka untuk umum: `/` (beranda), `/login*`, `/register`, dan `/up` (health check).
+- Masing-masing role punya halaman login sendiri (`/login`, `/login/admin`,
+  `/login/superadmin`). **Masuk lewat halaman yang salah akan me-logout** dan
+  menolak dengan pesan error, karena memang tidak ada halaman tujuan yang
+  cocok untuk role itu.
+- Role yang **sudah login** lalu membuka halaman role lain **tidak di-logout**.
+  Ia diarahkan ke dashboard sesuai role-nya sendiri dengan pesan penjelas.
+  Kedua kasus ini berbeda karena sebabnya berbeda — lihat
+  [catatan desain 2](#2-salah-buka-halaman-role-lain-tidak-di-logout-cuma-diarahkan).
+- Akun yang dinonaktifkan super admin (`is_active` false) akan di-logout saat
+  menyentuh area terproteksi, dengan pesan untuk menghubungi super admin.
+- Area admin dilindungi middleware `admin`. Super admin yang membuka area admin
+  diarahkan ke dashboard super admin.
+- Rute terbuka untuk umum: `/` (beranda), `/login*`, `/register`, dan `/up`
+  (health check).
 
 ---
 
@@ -164,17 +174,47 @@ php artisan test --filter=ReportSubmissionTest
 php artisan test tests/Feature/Admin/StatistikTest.php
 ```
 
+Status saat ini: **97 test, 451 assertion, semuanya hijau.**
+
 Cakupan test yang ada:
 
 | File Test | Cakupan |
 | --- | --- |
-| `tests/Feature/ReportSubmissionTest.php` | Submit laporan valid, status awal otomatis, validasi foto/koordinat/keterangan, rate limit, hak akses |
+| `tests/Feature/ReportSubmissionTest.php` | Submit laporan valid, status awal otomatis, validasi foto/koordinat/keterangan, rate limit dua lapis, hak akses |
 | `tests/Feature/Admin/LaporanManagementTest.php` | Daftar & detail laporan admin, update status + foto perbaikan, penolakan akses role lain |
 | `tests/Feature/Admin/StatistikTest.php` | Angka statistik dan grafik per bulan sesuai data yang di-seed |
 | `tests/Feature/PublicLandingPageTest.php` | Beranda terbuka untuk guest, statistik real, dan tidak bocornya data pelapor |
-| `tests/Feature/Auth/*` | Login per role, registrasi, ganti kata sandi, verifikasi email |
+| `tests/Feature/Auth/AuthenticationTest.php` | Login per role, dan penolakan login lewat halaman role yang salah |
+| `tests/Feature/Auth/RegistrationTest.php` | Registrasi, termasuk penolakan email milik akun aktif maupun akun soft-deleted |
+| `tests/Feature/Auth/EmailVerificationTest.php` | Verifikasi email |
+| `tests/Feature/Auth/PasswordResetTest.php` | Lupa & reset kata sandi, termasuk akun nonaktif dan akun soft-deleted |
+| `tests/Feature/Auth/PasswordUpdateTest.php` | Ganti kata sandi dari halaman profil |
+| `tests/Feature/Auth/PasswordConfirmationTest.php` | Konfirmasi kata sandi untuk aksi sensitif |
 | `tests/Feature/ProfileTest.php` | Ubah profil dan hapus akun beserta seluruh laporannya |
-| `tests/Feature/RuntimeSmokeTest.php` | Semua halaman publik, pelapor, admin, dan super admin benar-benar bisa dirender, termasuk verifikasi `@vite` |
+| `tests/Feature/RuntimeSmokeTest.php` | Semua halaman publik, pelapor, admin, dan super admin benar-benar bisa dirender, termasuk verifikasi `@vite`; halaman `403`/`404`; tombol "Ganti Akun"; penolakan open redirect pada `POST /logout?redirect=...` |
+
+### Pemeriksaan statis
+
+Fungsi test sudah benar, tapi test saja tidak menangkap view yang tidak pernah
+dirender, komponen Blade yang tidak ada, atau route yang menunjuk controller
+hilang. Lima skrip Python tanpa dependensi di `tools/` menutup celah itu:
+
+```bash
+python3 tools/check_php.py           # keseimbangan kurung, heredoc, impor mati
+python3 tools/check_blade_tags.py    # keseimbangan tag HTML di view Blade
+python3 tools/check_blade_compile.py # view Blade benar-benar bisa dikompilasi
+python3 tools/check_js.py            # keseimbangan kurung JS, string, console.log
+python3 tools/audit_refs.py          # rujukan lintas file: view, route, komponen, layout
+```
+
+`check_blade_compile.py` satu-satunya yang butuh PHP karena memakai Blade
+compiler milik aplikasi. Set `PHP_BIN` kalau `php`/`php.exe` tidak ada di
+`PATH`. Rincian tiap skrip ada di `tools/README.md`.
+
+Rujukan silang antar-file inilah yang dipakai untuk memastikan tidak ada
+controller, view, atau komponen yang hilang diam-diam: `audit_refs.py`
+memverifikasi bahwa setiap `view()` yang dipanggil benar-benar punya file,
+setiap `@include`/`@extends` punya target, dan setiap `<x-component>` terdaftar.
 
 ---
 
@@ -196,7 +236,6 @@ app/
 │   │   │   ├── StatistikController.php      Statistik laporan per status & per bulan
 │   │   │   ├── TabelFaqController.php       CRUD FAQ
 │   │   │   ├── AdminProfileController.php   Profil admin
-│   │   │   └── AdminAccountController.php   (belum dipakai, lihat catatan di bawah)
 │   │   ├── SuperAdmin/
 │   │   │   └── AccountController.php    Manajemen akun admin & pelapor
 │   │   └── Pelapor/
@@ -204,8 +243,7 @@ app/
 │   ├── Middleware/
 │   │   ├── PelaporMiddleware.php       Batasi area pelapor
 │   │   ├── AdminMiddleware.php         Batasi area admin
-│   │   ├── SuperAdminMiddleware.php    Batasi area super admin
-│   │   └── RolePelapor.php             (belum dipakai, lihat catatan di bawah)
+│   │   └── SuperAdminMiddleware.php    Batasi area super admin
 │   └── Requests/                       Form request (validasi terpusat)
 ├── Models/
 │   ├── User.php                        User + role (hasRole)
@@ -250,8 +288,17 @@ untuk laporan tersebut.
 ## Continuous Integration
 
 `.github/workflows/tests.yml` menjalankan `composer install` + `php artisan test`
-di atas SQLite in-memory pada setiap `push` dan `pull_request` ke branch utama.
-Workflow akan merah bila ada test yang gagal.
+di atas SQLite in-memory. Workflow terpicu pada setiap `push` ke `main` dan pada
+setiap `pull_request`, dengan matrix PHP `8.2`, `8.3`, dan `8.4` (ketiganya harus
+hijau). `fail-fast: false` dipakai supaya kegagalan di satu versi tidak menutupi
+hasil versi lain, dan `concurrency` membatalkan eksekusi lama ketika commit baru
+masuk ke branch yang sama. Workflow akan merah bila ada test yang gagal.
+
+Perlu diketahui: **CI hanya menjalankan `php artisan test`.** Lima skrip di
+`tools/` tidak ikut jalan di CI dan harus dijalankan manual sebelum push.
+Konsekuensinya, view yang tidak pernah dirender atau referensi yang putus tidak
+akan tertangkap CI — jalankan perintah yang terdaftar di `tools/README.md`
+sebelum menyatakan suatu perubahan selesai.
 
 ---
 
@@ -260,7 +307,42 @@ Workflow akan merah bila ada test yang gagal.
 Behavior di bawah ini **sengaja** begitu dan terlihat seperti bug. Jangan
 "perbaiki" tanpa membaca dulu bagian ini.
 
-### 1. Rate limit submit laporan itu dua lapis, bukan `throttle` biasa
+### 1. Riwayat status bersifat append-only, tidak pernah di-update
+
+Setiap perubahan status menambah baris baru ke `tabel_status` lewat
+`TabelStatus::create()`. Tidak ada satu pun `update()` atau `save()` terhadap
+baris status yang sudah ada. Karena itu `Report::latestStatus()` mengambil baris
+dengan `MAX(id_status)`, bukan `ORDER BY updated_at DESC` — kalau baris lama
+bisa diedit, "terakhir" tidak lagi berarti "riwayat".
+
+Konsekuensinya: `tabel_status` tumbuh terus dan tidak pernah menyusut. Itu memang
+diinginkan, karena riwayat penanganan jalan adalah jejak audit. Admin kadang
+menyesal dan ingin mengubah status yang sudah terlanjur tercatat, dan aplikasi
+tidak menyediakan jalan untuk menutupi riwayat itu. Data yang tidak perlu
+diaudit (laporan, file foto) tetap di-*hard* delete; lihat
+[poin 4](#4-user-memakai-softdeletes-bukan-hard-delete).
+
+### 2. Salah buka halaman role lain tidak di-logout, cuma diarahkan
+
+Middleware role (`AdminMiddleware`, `PelaporMiddleware`,
+`SuperAdminMiddleware`) tidak melakukan logout saat role-nya tidak cocok.
+Pengguna diarahkan ke dashboard sesuai role-nya sendiri, lengkap dengan
+pesan penjelas di `session('error')`. Alasannya, kejadian itu hampir selalu
+karena orang **salah klik** — membuka `/admin/laporan` padahal ia pelapor —
+bukan karena sesi yang diretas. Mem-logout pengguna karena salah klik akan
+membuat mereka harus login ulang dan menutupi fakta bahwa halaman itu memang
+bukan untuknya.
+
+Bedakan dengan tiga kasus yang **memang** melakukan logout:
+
+- **Belum login** → langsung diarahkan ke halaman login, tanpa pesan error role.
+- **Masuk lewat halaman role yang salah** → `AuthenticatedSessionController`
+  memanggil `logoutAndBack()`. Ini memang perilaku yang benar, karena di titik
+  itu aplikasi tidak punya halaman tujuan yang cocok untuk role tersebut.
+- **Akun dinonaktifkan** (`bisaLogin()` false) → di-logout dengan pesan untuk
+  menghubungi super admin.
+
+### 3. Rate limit submit laporan itu dua lapis, bukan `throttle` biasa
 
 `POST /report` punya dua pembatas dengan tugas berbeda:
 
@@ -280,21 +362,7 @@ Tiga test di `ReportSubmissionTest` mengunci perilaku ini — lihat
 `test_laporan_valid_ke_enam_kenai_limiter_manual_bukan_middleware`, dan
 `test_throttle_route_tetap_jalan_sebagai_pagar_luar`.
 
-### 2. Login dengan role salah diarahkan ke dashboard sendiri, bukan logout
-
-Middleware role (`AdminMiddleware`, `PelaporMiddleware`,
-`SuperAdminMiddleware`) tidak melakukan logout saat role-nya tidak cocok.
-Pengguna diarahkan ke dashboard sesuai role-nya sendiri, lengkap dengan
-pesan penjelas di `session('error')`. Alasannya, kejadian itu hampir selalu
-karena orang **salah klik** — membuka `/admin/laporan` padahal ia pelapor —
-bukan karena sesi yang diretas. Mem-logout pengguna karena salah klik akan
-membuat mereka harus login ulang dan menutupi fakta bahwa halaman itu memang
-bukan untuknya.
-
-Bedakan dengan dua kasus yang **memang** melakukan logout: belum login, dan
-akunnya dinonaktifkan (`bisaLogin()` false).
-
-### 3. `User` memakai `SoftDeletes`, bukan hard delete
+### 4. `User` memakai `SoftDeletes`, bukan hard delete
 
 Akun yang dihapus dari halaman profil hanya diberi `deleted_at`. Barisnya
 tetap ada karena `SuperAdmin\AccountController@restore()` memakainya untuk
@@ -305,7 +373,7 @@ Yang di-*hard* delete tetap data yang tidak perlu diaudit: laporan, riwayat
 status di `tabel_status`, dan file fotonya. Jadi test profil memakai
 `assertSoftDeleted`, bukan `assertNull($user->fresh())`.
 
-### 4. Submit laporan sukses diarahkan ke "Riwayat Laporan", bukan balik ke form
+### 5. Submit laporan sukses diarahkan ke "Riwayat Laporan", bukan balik ke form
 
 Setelah laporan tersimpan, pengguna diarahkan ke `laporan.my-report`, bukan
 kembali ke form kosong. Alasannya, begitu submit berhasil pengguna justru
@@ -315,6 +383,31 @@ ditampilkan di halaman riwayat, lengkap dengan status dan fotonya.
 Kembali ke form akan terasa seperti submit-nya gagal
 padahal sudah berhasil, dan memaksa pengguna membuka menu lain untuk
 mencari nomornya.
+
+### 6. Akun nonaktif tidak bisa dihidupkan lewat tautan lupa kata sandi
+
+`PasswordResetController` mengecek `$user->is_active` sebelum mengizinkan reset.
+Tanpa cek ini, siapa pun yang masih punya email akun nonaktif bisa menekan
+"Lupa kata sandi", mendapat tautan, lalu menyetel kata sandi baru — efektif
+menghidupkan kembali akun yang sengaja dimatikan super admin. Jadi guard-nya
+sengaja ada, dan test-nya menghapus guard itu untuk membuktikan test itu benar-benar
+menahan sesuatu.
+
+Akun soft-deleted punya perlindungan yang mirip tapi datang gratis dari framework:
+`SoftDeletes` membuat Eloquent tidak ikut menemukannya, sehingga
+`PasswordResetLinkController` mengembalikan `INVALID_USER`. Pesannya sengaja
+tetap generik supaya halaman ini tidak bisa dipakai menebak email mana yang
+punya akun.
+
+### 7. Registrasi menolak email milik akun aktif maupun akun soft-deleted
+
+Kolom `email` tidak punya unique global — yang ada `unique(['email', 'deleted_at'])`
+supaya email yang sudah pernah dipakai akun soft-deleted bisa dipakai lagi setelah
+akun di-restore. Konsekuensinya, `Rule::unique(User::class)` biasa akan
+**menerima** email milik akun soft-deleted, karena global scope
+`SoftDeletes` menyembunyikan baris itu. Jadi `RegisteredUserController` memeriksa
+sendiri lewat `User::withTrashed()`. Ini kelemahan `Rule::unique()` yang perlu
+disadari, bukan sekadar gaya penulisan.
 
 ---
 
@@ -332,8 +425,14 @@ Beberapa hal yang perlu diketahui saat mengembangkan project ini:
   di MySQL tanpa perlu menangani driver lain secara manual.
 - **Penghapusan akun.** `ProfileController@destroy` menghapus laporan, riwayat
   status, dan file fotonya secara permanen, lalu menandai akunnya dengan
-  `deleted_at` (lihat [poin 3](#3-user-memakai-softdeletes-bukan-hard-delete)).
+  `deleted_at` (lihat [poin 4](#4-user-memakai-softdeletes-bukan-hard-delete)).
   Saat ini tidak ada konfirmasi kata sandi pada alur ini.
+- **Gambar sudah dikompresi ke WebP.** Empat aset pelapor yang semula PNG kini
+  `.webp`: `jalan-purwakarta`, `logo-serojap`, `peta`, dan `utama` (total sekitar
+  7 MB menjadi di bawah 250 KB). Nama file yang dirujuk di view ikut berubah,
+  jadi kalau menambah gambar baru, konsisten pakai WebP dan jangan menyalin
+  referensi PNG lama. Berkas `hero-img.jpg` sudah tidak dirujuk view mana pun
+  dan tidak lagi disertakan.
 
 ---
 

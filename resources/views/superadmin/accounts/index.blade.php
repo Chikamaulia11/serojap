@@ -61,7 +61,7 @@
     .account-header {
         background:
             linear-gradient(135deg, rgba(255,255,255,.98), rgba(241,247,255,.98)),
-            radial-gradient(circle at right top, rgba(38,87,193,.13), transparent 34%);
+            radial-gradient(circle at right top, color-mix(in srgb, var(--accent) 13%, transparent), transparent 34%);
     }
 
     .stat-card,
@@ -89,12 +89,12 @@
     .swal2-title-custom {
         font-size: 1.4rem !important;
         font-weight: 700 !important;
-        color: #111827 !important;
+        color: var(--ink) !important;
     }
 
     .swal2-text-custom {
         font-size: 0.95rem !important;
-        color: #6b7280 !important;
+        color: var(--ink-soft) !important;
     }
 
     .swal2-confirm-custom {
@@ -107,13 +107,13 @@
     }
 
     .swal2-confirm-success {
-        background-color: #2657c1 !important;
-        color: #fff !important;
+        background-color: var(--accent) !important;
+        color: var(--on-accent) !important;
     }
 
     .swal2-confirm-error {
-        background-color: #dc2626 !important;
-        color: #fff !important;
+        background-color: var(--danger) !important;
+        color: var(--on-danger) !important;
     }
 
     .swal2-backdrop-custom {
@@ -134,7 +134,7 @@
 
             <div class="max-w-2xl">
 
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#2657c1] text-xs font-extrabold mb-4">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-[var(--accent)] text-xs font-extrabold mb-4">
                     <i class="mdi mdi-shield-account-outline text-base"></i>
                     Kontrol Akun Sistem
                 </div>
@@ -151,7 +151,7 @@
             </div>
 
             <a href="{{ route('superadmin.accounts.create') }}"
-               class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#2657c1] text-white text-sm font-extrabold hover:bg-[#1f4674] transition shadow-lg shadow-blue-500/20">
+               class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[var(--accent)] text-white text-sm font-extrabold hover:bg-[var(--accent-deep)] transition shadow-lg shadow-blue-500/20">
                 <i class="mdi mdi-account-plus-outline text-lg"></i>
                 Tambah Akun
             </a>
@@ -179,7 +179,7 @@
                     </p>
                 </div>
 
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-[#2657c1] flex items-center justify-center flex-shrink-0">
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-[var(--accent)] flex items-center justify-center flex-shrink-0">
                     <i class="mdi mdi-account-tie-outline text-2xl"></i>
                 </div>
             </div>
@@ -288,7 +288,7 @@
                                         @if ($filterAktif === $nilai) aria-current="page" @endif
                                         class="account-filter-btn px-4 py-2.5 rounded-2xl text-xs font-extrabold transition
                                                {{ $filterAktif === $nilai
-                                                    ? 'bg-[#2657c1] text-white'
+                                                    ? 'bg-[var(--accent)] text-white'
                                                     : 'bg-white border border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-700' }}">
                                     {{ $judul }}
                                 </button>
@@ -362,7 +362,7 @@
 
                             <div class="flex items-center gap-4 min-w-0">
 
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2657c1] to-[#226d71] text-white flex items-center justify-center font-extrabold text-sm flex-shrink-0 overflow-hidden shadow-md shadow-blue-100">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-grad-to)] text-white flex items-center justify-center font-extrabold text-sm flex-shrink-0 overflow-hidden shadow-md shadow-blue-100">
                                     @if($account->foto_profil)
                                         <img src="{{ asset('storage/' . $account->foto_profil) }}"
                                              alt="Foto Profil"
@@ -402,7 +402,7 @@
                                                 Aktif
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-rose-50 text-rose-700">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-rose-50 text-[var(--ditolak)]">
                                                 {{ $terhapus ? 'Dinonaktifkan' : 'Tidak Aktif' }}
                                             </span>
                                         @endif
@@ -563,7 +563,7 @@
                 title: 'Berhasil',
                 text: successEl.dataset.message,
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#2657c1'
+                confirmButtonColor: 'var(--accent)'
             });
         }
 
@@ -573,7 +573,7 @@
                 title: 'Gagal',
                 text: errorEl.dataset.message,
                 confirmButtonText: 'Coba Lagi',
-                confirmButtonColor: '#dc2626'
+                confirmButtonColor: 'var(--danger)'
             });
         }
 
@@ -583,7 +583,7 @@
                 title: 'Data Belum Sesuai',
                 text: 'Periksa kembali data akun yang kamu isi.',
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#2657c1'
+                confirmButtonColor: 'var(--accent)'
             });
         @endif
     });

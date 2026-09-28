@@ -8,13 +8,13 @@
 <div style="max-width: 900px; margin: 0 auto; padding: 10px 20px 40px 20px;">
 
     <div style="text-align: center; margin-bottom: 35px;">
-        <span style="display: inline-block; padding: 6px 16px; border-radius: 999px; background: #e0f2fe; color: #075985; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">
+        <span style="display: inline-block; padding: 6px 16px; border-radius: 999px; background: var(--accent-tint); color: var(--accent-deep); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">
             Prosedur
         </span>
-        <h2 style="margin: 14px 0 0 0; font-size: 28px; font-weight: 700; color: #0f172a;">
+        <h2 style="margin: 14px 0 0 0; font-size: 28px; font-weight: 700; color: var(--ink);">
             Alur Sistem Pelaporan
         </h2>
-        <p style="margin: 12px auto 0 auto; max-width: 640px; font-size: 16px; line-height: 1.7; color: #475569; text-align: left;">
+        <p style="margin: 12px auto 0 auto; max-width: 640px; font-size: 16px; line-height: 1.7; color: var(--ink-soft); text-align: left;">
             Berikut alur lengkap pelaporan kerusakan jalan di Purwakarta, mulai dari laporan dikirim
             hingga penanganan selesai. Alur ini memastikan setiap laporan dipantau dan
             ditindaklanjuti dengan cepat serta transparan.
@@ -53,11 +53,11 @@
         @endphp
 
         @foreach ($langkah as $item)
-            <div style="padding: 20px; background: #f8fafc; border-radius: 10px; border-left: 4px solid #075985;">
-                <h4 style="margin: 0 0 8px 0; font-size: 15px; font-weight: 600; color: #0f172a;">
+            <div style="padding: 20px; background: var(--bg); border-radius: 10px; border-left: 4px solid var(--accent-deep);">
+                <h4 style="margin: 0 0 8px 0; font-size: 15px; font-weight: 600; color: var(--ink);">
                     {{ $item['judul'] }}
                 </h4>
-                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-soft);">
                     {{ $item['teks'] }}
                 </p>
             </div>
@@ -68,7 +68,7 @@
     <div style="margin-top: 30px; text-align: center;">
         <a
             href="{{ route('laporan.create') }}"
-            style="display: inline-block; padding: 13px 30px; background: #075985; color: #ffffff; border-radius: 10px; font-size: 15px; font-weight: 600; text-decoration: none;"
+            style="display: inline-block; padding: 13px 30px; background: var(--accent-deep); color: var(--on-accent); border-radius: 10px; font-size: 15px; font-weight: 600; text-decoration: none;"
         >
             Buat Laporan Sekarang
         </a>
