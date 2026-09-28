@@ -35,12 +35,12 @@
     .create-shell {
         background:
             linear-gradient(135deg, rgba(255,255,255,.98), rgba(244,249,255,.98)),
-            radial-gradient(circle at right top, rgba(38,87,193,.13), transparent 34%);
+            radial-gradient(circle at right top, color-mix(in srgb, var(--accent) 13%, transparent), transparent 34%);
     }
 
     .info-card {
         background:
-            linear-gradient(135deg, #2657c1, #226d71);
+            linear-gradient(135deg, var(--band-from), var(--band-to));
     }
 
     .swal2-popup-custom {
@@ -52,12 +52,12 @@
     .swal2-title-custom {
         font-size: 1.4rem !important;
         font-weight: 700 !important;
-        color: #111827 !important;
+        color: var(--ink) !important;
     }
 
     .swal2-text-custom {
         font-size: 0.95rem !important;
-        color: #6b7280 !important;
+        color: var(--ink-soft) !important;
     }
 
     .swal2-confirm-custom {
@@ -70,13 +70,13 @@
     }
 
     .swal2-confirm-success {
-        background-color: #2657c1 !important;
-        color: #fff !important;
+        background-color: var(--accent) !important;
+        color: var(--on-accent) !important;
     }
 
     .swal2-confirm-error {
-        background-color: #dc2626 !important;
-        color: #fff !important;
+        background-color: var(--danger) !important;
+        color: var(--on-danger) !important;
     }
 
     .swal2-backdrop-custom {
@@ -89,7 +89,7 @@
 
     <div>
         <a href="{{ route('superadmin.accounts.index') }}"
-           class="inline-flex items-center gap-2 py-1 text-[#2657c1] text-sm hover:underline font-extrabold">
+           class="inline-flex items-center gap-2 py-1 text-[var(--accent)] text-sm hover:underline font-extrabold">
             <i class="mdi mdi-arrow-left"></i>
             Kembali ke Manajemen Akun
         </a>
@@ -102,7 +102,7 @@
             <div class="absolute -right-10 -top-10 w-36 h-36 rounded-full bg-blue-100/40"></div>
 
             <div class="relative z-10 max-w-2xl">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-[#2657c1] text-xs font-extrabold mb-4">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-[var(--accent)] text-xs font-extrabold mb-4">
                     <i class="mdi mdi-account-plus-outline text-base"></i>
                     Form Tambah Akun
                 </div>
@@ -289,7 +289,7 @@
 
                         <button type="button"
                                 onclick="confirmCreateAccount()"
-                                class="inline-flex justify-center items-center gap-2 px-6 py-3 rounded-2xl text-sm font-extrabold bg-[#2657c1] hover:bg-[#1f4674] text-white transition shadow-lg shadow-blue-500/20 active:scale-[0.98]">
+                                class="inline-flex justify-center items-center gap-2 px-6 py-3 rounded-2xl text-sm font-extrabold bg-[var(--accent)] hover:bg-[var(--accent-deep)] text-white transition shadow-lg shadow-blue-500/20 active:scale-[0.98]">
                             <i class="mdi mdi-content-save-outline"></i>
                             Tambah Akun
                         </button>
@@ -364,7 +364,7 @@
                 title: 'Akun Berhasil Ditambahkan',
                 text: successEl.dataset.message,
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#2657c1'
+                confirmButtonColor: 'var(--accent)'
             });
         }
 
@@ -374,7 +374,7 @@
                 title: 'Gagal Menambahkan Akun',
                 text: errorEl.dataset.message,
                 confirmButtonText: 'Coba Lagi',
-                confirmButtonColor: '#dc2626'
+                confirmButtonColor: 'var(--danger)'
             });
         }
 
@@ -384,7 +384,7 @@
                 title: 'Data Belum Sesuai',
                 text: 'Periksa kembali data akun yang kamu isi.',
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#2657c1'
+                confirmButtonColor: 'var(--accent)'
             });
         @endif
     });

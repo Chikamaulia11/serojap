@@ -21,7 +21,7 @@
 
         <a
             href="{{ route('admin.manajemen-faq.index') }}"
-            class="text-[#2657c1] text-sm hover:underline flex items-center gap-2 py-1 font-medium"
+            class="text-[var(--accent)] text-sm hover:underline flex items-center gap-2 py-1 font-medium"
         >
 
             <svg
@@ -73,12 +73,12 @@
         .swal2-title-custom {
             font-size: 1.4rem !important;
             font-weight: 700 !important;
-            color: #111827 !important;
+            color: var(--ink) !important;
         }
 
         .swal2-text-custom {
             font-size: 0.95rem !important;
-            color: #6b7280 !important;
+            color: var(--ink-soft) !important;
         }
 
         .swal2-confirm-custom {
@@ -91,13 +91,13 @@
         }
 
         .swal2-confirm-success {
-            background-color: #2657c1 !important;
-            color: #fff !important;
+            background-color: var(--accent) !important;
+            color: var(--on-accent) !important;
         }
 
         .swal2-confirm-error {
-            background-color: #dc2626 !important;
-            color: #fff !important;
+            background-color: var(--danger) !important;
+            color: var(--on-danger) !important;
         }
 
         .swal2-backdrop-custom {
@@ -293,7 +293,7 @@
 
                     <button
                         type="submit"
-                        class="flex-1 bg-[#2657c1] hover:bg-[#1f4674] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]"
+                        class="flex-1 bg-[var(--accent)] hover:bg-[var(--accent-deep)] text-white font-bold rounded-lg px-4 py-3 transition shadow-md shadow-blue-500/20 active:scale-[0.98]"
                     >
                         {{ $sedangEdit ? 'Simpan Perubahan' : 'Simpan FAQ' }}
                     </button>

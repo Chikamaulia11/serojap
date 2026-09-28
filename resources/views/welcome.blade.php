@@ -6,6 +6,8 @@
     <title>Serojap - Pelaporan Jalan Rusak Purwakarta</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description"
+
+    @include('partials.theme-bootstrap')
         content="Serojap adalah sistem pelaporan jalan rusak Kabupaten Purwakarta. Laporkan kerusakan jalan, pantau status penanganan, dan lihat statistik perbaikan secara terbuka.">
 
     <link rel="stylesheet" href="{{ asset('assets/pelapor/css/index.css') }}">
@@ -14,14 +16,14 @@
 
     <style>
         :root {
-            --teal: #226d71;
-            --teal-dark: #1a5457;
-            --teal-soft: rgba(34, 109, 113, 0.1);
+            --teal: var(--accent);
+            --teal-dark: var(--accent-deep);
+            --teal-soft: color-mix(in srgb, var(--accent) 10%, transparent);
         }
 
         body {
             overflow-x: hidden;
-            background-color: #ffffff;
+            background-color: var(--bg);
         }
 
         /* =========================
@@ -50,17 +52,17 @@
             left: -100px;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(34, 109, 113, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+            background: radial-gradient(circle, color-mix(in srgb, var(--accent) 12%, transparent) 0%, rgba(255, 255, 255, 0) 70%);
             z-index: -1;
             pointer-events: none;
         }
 
         .img-frame {
-            background-color: #ffffff;
+            background-color: var(--bg);
             padding: 15px;
             border-radius: 50px;
             box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.15);
-            border: 1px solid #f0f0f0;
+            border: 1px solid var(--line);
             display: inline-block;
             width: 100%;
         }
@@ -73,9 +75,9 @@
         }
 
         .btn-custom-action {
-            background-color: #f1f5f5 !important;
-            color: #4b5563 !important;
-            border: 1px solid #d1dbdb !important;
+            background-color: var(--accent-tint) !important;
+            color: var(--ink-soft) !important;
+            border: 1px solid var(--accent-tint) !important;
             transition: all 0.2s ease-in-out !important;
             padding: 1rem 2.5rem !important;
             font-weight: 700 !important;
@@ -93,38 +95,38 @@
         }
 
         .btn-custom-action:hover {
-            background-color: #e2eaea !important;
-            border-color: #226d71 !important;
-            color: #226d71 !important;
+            background-color: var(--accent-tint) !important;
+            border-color: var(--accent) !important;
+            color: var(--accent) !important;
         }
 
         .btn-custom-action:active {
-            background-color: #226d71 !important;
-            color: #ffffff !important;
+            background-color: var(--accent) !important;
+            color: var(--on-accent) !important;
             transform: scale(0.96);
         }
 
         .dot-green {
             width: 10px;
             height: 10px;
-            background-color: #226d71;
+            background-color: var(--accent);
             border-radius: 50%;
             display: inline-block;
             margin-right: 10px;
         }
 
         .text-teal {
-            color: #226d71 !important;
+            color: var(--accent) !important;
         }
 
         .bg-teal-light {
-            background-color: rgba(34, 109, 113, 0.1) !important;
+            background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important;
         }
 
         .btn-teal-solid {
-            background-color: #226d71 !important;
-            color: #ffffff !important;
-            border: 1px solid #226d71 !important;
+            background-color: var(--accent) !important;
+            color: var(--on-accent) !important;
+            border: 1px solid var(--accent) !important;
             transition: all 0.2s ease-in-out !important;
             padding: 1rem 2.5rem !important;
             font-weight: 700 !important;
@@ -141,9 +143,9 @@
         }
 
         .btn-teal-outline {
-            background-color: #ffffff !important;
-            color: #226d71 !important;
-            border: 1px solid #226d71 !important;
+            background-color: var(--surface) !important;
+            color: var(--accent) !important;
+            border: 1px solid var(--accent) !important;
             transition: all 0.2s ease-in-out !important;
             padding: 1rem 2.5rem !important;
             font-weight: 700 !important;
@@ -154,8 +156,8 @@
         }
 
         .btn-teal-outline:hover {
-            background-color: #226d71 !important;
-            color: #ffffff !important;
+            background-color: var(--accent) !important;
+            color: var(--on-accent) !important;
         }
 
         /* =========================
@@ -186,7 +188,7 @@
 
         .section-title {
             font-weight: 800;
-            color: #111827;
+            color: var(--ink);
             line-height: 1.25;
         }
 
@@ -194,8 +196,8 @@
            STAT BAR
         ========================= */
         .stat-card {
-            background: #ffffff;
-            border: 1px solid #f0f0f0;
+            background: var(--surface);
+            border: 1px solid var(--line);
             border-radius: 24px;
             padding: 1.75rem 1.5rem;
             height: 100%;
@@ -203,8 +205,8 @@
         }
 
         .stat-card:hover {
-            border-color: #cfe0e0;
-            box-shadow: 0 18px 40px -24px rgba(34, 109, 113, 0.45);
+            border-color: var(--accent-tint);
+            box-shadow: 0 18px 40px -24px color-mix(in srgb, var(--accent) 45%, transparent);
             transform: translateY(-3px);
         }
 
@@ -213,29 +215,29 @@
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: #6b7280;
+            color: var(--ink-soft);
             margin-bottom: 0.4rem;
         }
 
         .stat-value {
             font-size: 2.1rem;
             font-weight: 800;
-            color: #111827;
+            color: var(--ink);
             line-height: 1.1;
         }
 
         .stat-suffix {
             font-size: 0.9rem;
             font-weight: 600;
-            color: #6b7280;
+            color: var(--ink-soft);
         }
 
         /* =========================
            CARA KERJA
         ========================= */
         .langkah-card {
-            background: #ffffff;
-            border: 1px solid #f0f0f0;
+            background: var(--surface);
+            border: 1px solid var(--line);
             border-radius: 24px;
             padding: 2rem 1.5rem;
             height: 100%;
@@ -246,8 +248,8 @@
             width: 48px;
             height: 48px;
             border-radius: 50px;
-            background-color: var(--teal);
-            color: #ffffff;
+            background-color: var(--accent);
+            color: var(--on-accent);
             font-weight: 800;
             display: flex;
             align-items: center;
@@ -259,8 +261,8 @@
            LAPORAN PUBLIK
         ========================= */
         .laporan-card {
-            background: #ffffff;
-            border: 1px solid #f0f0f0;
+            background: var(--surface);
+            border: 1px solid var(--line);
             border-radius: 24px;
             padding: 1.5rem;
             height: 100%;
@@ -284,8 +286,8 @@
            FAQ
         ========================= */
         .faq-item {
-            background: #ffffff;
-            border: 1px solid #f0f0f0;
+            background: var(--surface);
+            border: 1px solid var(--line);
             border-radius: 20px;
             padding: 0 1.5rem;
         }
@@ -294,7 +296,7 @@
             cursor: pointer;
             list-style: none;
             font-weight: 700;
-            color: #111827;
+            color: var(--ink);
             padding: 1.15rem 0;
             display: flex;
             align-items: center;
@@ -320,11 +322,11 @@
         }
 
         .faq-item[open] {
-            border-color: #cfe0e0;
+            border-color: var(--accent-tint);
         }
 
         .faq-jawaban {
-            color: #4b5563;
+            color: var(--ink-soft);
             padding-bottom: 1.25rem;
             margin-bottom: 0;
         }
@@ -333,14 +335,14 @@
            CTA PENUTUP
         ========================= */
         .cta-banner {
-            background: linear-gradient(135deg, #226d71 0%, #1a5457 100%);
+            background: linear-gradient(135deg, var(--band-from) 0%, var(--band-to) 100%);
             border-radius: 40px;
             padding: 3.5rem 2rem;
-            color: #ffffff;
+            color: var(--on-band);
         }
 
         .cta-banner .section-title {
-            color: #ffffff;
+            color: var(--on-band);
         }
     </style>
 </head>
@@ -379,6 +381,12 @@
                         <a href="{{ route('login') }}" class="btn btn-custom-action">
                             Log In
                         </a>
+
+                        {{-- Picker tema di area tombol. Halaman ini tidak
+                             punya navbar, dan tidak punya menu mobile
+                             juga, jadi satu penempatan ini dipakai di
+                             semua lebar. --}}
+                        @include('partials.theme-picker', ['variant' => 'hero'])
                     </div>
 
                     <p class="text-muted mt-4 mb-0" style="font-size: 0.9rem;">
@@ -621,7 +629,7 @@
                 </p>
                 <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
                     <a href="{{ route('register') }}" class="btn btn-lg fw-bold rounded-pill px-4"
-                        style="background-color:#ffffff; color:#226d71; border:1px solid #ffffff;">
+                        style="background-color:var(--surface); color:var(--accent); border:1px solid var(--line);">
                         Daftar &amp; Lapor
                     </a>
                     <a href="{{ route('login') }}"
@@ -651,7 +659,7 @@
                     title: 'Akun Tidak Ditemukan',
                     text: "{{ session('account_deleted') }}",
                     confirmButtonText: 'Kembali ke Beranda',
-                    confirmButtonColor: '#226d71',
+                    confirmButtonColor: 'var(--accent)',
                     allowOutsideClick: false,
                     allowEscapeKey: false
                 });
@@ -660,6 +668,7 @@
     @endif
 
     <script src="{{ asset('assets/pelapor/js/index.js') }}" defer></script>
-</body>
+
+    </body>
 
 </html>

@@ -1,0 +1,98 @@
+/* =========================================================
+   REMAP UTILITAS NETRAL TAILWIND KE TOKEN TEMA
+   =========================================================
+
+   DIJASILKAN OTOMATIS oleh tools/gen_neutral_remap.py.
+   Jangan disunting tangan -- jalankan ulang scriptnya kalau
+   daftar kelas di Blade berubah.
+
+   Area admin/superadmin dibangun dengan kelas netral Tailwind
+   (slate/gray/white), bukan dengan hex, jadi kelas itu tidak
+   ikut berubah saat aksen atau mode diganti. File ini memetakan
+   utility yang benar-benar terpakai ke token tema.
+
+   Ketiadaan `!important` di sini bukan kelalaian: remap ini sengaja
+   tidak memakainya supaya `style="..."` inline di view tetap bisa
+   mengalahkan remap, dan `!bg-white` versi Tailwind tetap bisa menimpa
+   remap bila memang dibutuhkan.
+
+   Yang membuat remap menang adalah SPESIFISITAS: tiap selector remap
+   diawali `html[data-accent]`, sehingga spesifisitasnya melampaui
+   utility Tailwind yang setara. Build ini tidak menghasilkan
+   `@layer utilities`, jadi cascade layer tidak bisa diandalkan.
+
+   Modifier opasitas dipertahankan lewat `color-mix()` ke
+   `transparent`.
+   ========================================================= */
+
+/* Utility yang SENGAJA dibiarkan apa adanya:
+
+     bg-slate-900               chrome gelap (tombol/pill/tirai), harus tetap gelap
+     bg-slate-900/40            chrome gelap (tombol/pill/tirai), harus tetap gelap
+     bg-white/10                veil dekoratif di atas gradien, harus tetap putih
+     bg-white/15                veil dekoratif di atas gradien, harus tetap putih
+     bg-white/60                veil dekoratif di atas gradien, harus tetap putih
+     bg-white/70                veil dekoratif di atas gradien, harus tetap putih
+     bg-white/80                veil dekoratif di atas gradien, harus tetap putih
+     hover:bg-slate-700         chrome gelap (tombol/pill/tirai), harus tetap gelap
+     hover:text-white           di atas badge/aksen/avatar, konteks beragam
+     text-white                 di atas badge/aksen/avatar, konteks beragam
+     text-white/85              di atas badge/aksen/avatar, konteks beragam
+
+   `text-white` tidak dipetakan: dipakai di atas badge abu-abu,
+   tombol aksen, avatar, dan gradien. Dipetakan otomatis justru
+   merusak kontras pada mode dark. Yang di atas aksen diubah
+   eksplisit di Blade menjadi `text-[var(--on-accent)]`.
+   ========================================================= */
+
+/* --- Latar --- */
+html[data-accent] .bg-gray-100 { background-color: var(--surface-2); }
+html[data-accent] .bg-gray-200 { background-color: var(--line); }
+html[data-accent] .bg-gray-50 { background-color: var(--bg); }
+html[data-accent] .bg-gray-50\/50 { background-color: color-mix(in srgb, var(--bg) 50%, transparent); }
+html[data-accent] .bg-slate-100 { background-color: var(--surface-2); }
+html[data-accent] .bg-slate-200 { background-color: var(--line); }
+html[data-accent] .bg-slate-300 { background-color: var(--line); }
+html[data-accent] .bg-slate-400 { background-color: var(--ink-mute); }
+html[data-accent] .bg-slate-50 { background-color: var(--bg); }
+html[data-accent] .bg-slate-50\/70 { background-color: color-mix(in srgb, var(--bg) 70%, transparent); }
+html[data-accent] .bg-white { background-color: var(--surface); }
+html[data-accent] .hover\:bg-gray-100 { background-color: var(--surface-2); }
+html[data-accent] .hover\:bg-gray-200 { background-color: var(--line); }
+html[data-accent] .hover\:bg-gray-50 { background-color: var(--bg); }
+html[data-accent] .hover\:bg-slate-100 { background-color: var(--surface-2); }
+html[data-accent] .hover\:bg-slate-200 { background-color: var(--line); }
+html[data-accent] .hover\:bg-slate-50 { background-color: var(--bg); }
+
+/* --- Teks --- */
+html[data-accent] .hover\:text-gray-700 { color: var(--ink-soft); }
+html[data-accent] .hover\:text-gray-900 { color: var(--ink); }
+html[data-accent] .placeholder\:text-slate-400 { color: var(--ink-mute); }
+html[data-accent] .text-gray-400 { color: var(--ink-mute); }
+html[data-accent] .text-gray-500 { color: var(--ink-soft); }
+html[data-accent] .text-gray-600 { color: var(--ink-soft); }
+html[data-accent] .text-gray-700 { color: var(--ink-soft); }
+html[data-accent] .text-gray-800 { color: var(--ink); }
+html[data-accent] .text-gray-900 { color: var(--ink); }
+html[data-accent] .text-slate-200 { color: var(--ink-mute); }
+html[data-accent] .text-slate-400 { color: var(--ink-mute); }
+html[data-accent] .text-slate-500 { color: var(--ink-soft); }
+html[data-accent] .text-slate-600 { color: var(--ink-soft); }
+html[data-accent] .text-slate-700 { color: var(--ink-soft); }
+html[data-accent] .text-slate-800 { color: var(--ink); }
+html[data-accent] .text-slate-900 { color: var(--ink); }
+
+/* --- Border --- */
+html[data-accent] .border-gray-100 { border-color: var(--surface-2); }
+html[data-accent] .border-gray-200 { border-color: var(--line); }
+html[data-accent] .border-gray-300 { border-color: var(--line); }
+html[data-accent] .border-slate-100 { border-color: var(--surface-2); }
+html[data-accent] .border-slate-200 { border-color: var(--line); }
+html[data-accent] .border-slate-200\/70 { border-color: color-mix(in srgb, var(--line) 70%, transparent); }
+html[data-accent] .border-slate-300 { border-color: var(--line); }
+
+/* --- Pembatas --- */
+html[data-accent] .divide-gray-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--surface-2); }
+
+/* --- Focus ring --- */
+html[data-accent] .focus-visible\:ring-slate-400 { --tw-ring-color: var(--ink-mute); }

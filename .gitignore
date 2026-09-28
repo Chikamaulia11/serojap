@@ -24,3 +24,11 @@ Homestead.yaml
 Thumbs.db
 __pycache__/
 *.pyc
+
+# Hasil audit tema (dibuat tests/Feature/ThemeAuditDumpTest.php)
+/public/theme-audit
+
+# Hasil audit tema (tools/audit_theme.py dan tools/shot_theme.py)
+/public/theme-audit-run
+/storage/app/theme-audit.json
+/storage/app/theme-shots

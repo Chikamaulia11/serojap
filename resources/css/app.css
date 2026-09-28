@@ -1,3 +1,28 @@
+/*
+ * Sistem tema (6 aksen x light/dark) dimuat paling atas, sebelum
+ * @tailwind base.
+ *
+ * Alasannya dua: `@import` diwajibkan spesifikasi CSS mendahului semua
+ * aturan lain, dan selector `html[data-accent][data-mode-resolved]`
+ * punya spesifisitas lebih tinggi daripada `:root` yang ditulis
+ * `@tailwind base`, sehingga variabel tema tetap menang atas base.
+ *
+ * Vite me-resolve `@import` secara native, jadi berkas ini ikut masuk ke
+ * bundle tanpa perlu `postcss-import` di postcss.config.js.
+ *
+ * SEMUA `@import` harus tetap di baris paling atas. Percobaan
+ * meletakkan `neutral-remap.css` setelah `@tailwind utilities` supaya
+ * utility Tailwind ditulis lebih dulu, dan hasilnya justru merusak:
+ * Vite membuang `@import` yang muncul setelah aturan lain, sehingga
+ * seluruh remap hilang dari bundle tanpa ada error. Urutan sumber bukan
+ * jalan keluar di sini.
+ */
+
+@import "./theme.css";
+@import "./neutral-remap.css";
+@import "./theme-picker.css";
+@import "./status.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,8 +39,13 @@
     animation: shine 2s infinite;
 }
 
+/*
+ * Namanya masih "teal" karena dipakai di view yang sudah ada, tapi
+ * cahaya sekarang mengikuti aksen aktif supaya tidak terlihat asing
+ * setelah pengguna memilih warna lain.
+ */
 .neon-glow-teal {
-    box-shadow: 0 10px 50px rgba(20, 184, 166, 0.4);
+    box-shadow: 0 10px 50px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 /* =========================================================
@@ -27,8 +57,9 @@
    dan dashboard pelapor kehilangan warna sama sekali, dan setiap
    halaman harus menebak class mana yang sedang aktif.
 
-   Sekarang didefinisikan sekali di sini. Nilai warna diambil dari
-   palet yang sudah lolos kontras WCAG AA di atas latar putih.
+   Sekarang didefinisikan sekali di sini. Warnanya bukan hex lagi tapi
+   variable dari `theme.css`, supaya tombol dan input ini ikut berubah
+   saat pengguna mengganti tema.
 ========================================================= */
 
 @layer components {
@@ -39,7 +70,8 @@
     }
 
     .btn:focus-visible {
-        @apply outline outline-2 outline-offset-2 outline-slate-900;
+        @apply outline outline-2 outline-offset-2;
+        outline-color: var(--accent);
     }
 
     .btn:disabled {
@@ -47,33 +79,45 @@
     }
 
     .btn-primary {
-        @apply bg-[#1d5a5d] text-white;
+        @apply bg-[var(--accent)] text-[var(--on-accent)];
     }
 
     .btn-primary:hover:not(:disabled) {
-        @apply bg-[#183e3f];
+        background: var(--accent-deep);
     }
 
     .btn-secondary {
-        @apply bg-teal-50 text-[#1a4a4c] border border-[#abe5e4];
+        @apply text-[var(--accent-deep)];
+        background: var(--accent-tint);
+        border: 1px solid var(--line);
     }
 
     .btn-secondary:hover:not(:disabled) {
-        @apply bg-teal-100;
+        background: color-mix(in srgb, var(--accent) 22%, var(--surface));
     }
 
     .field-input {
         @apply block w-full min-h-[44px] px-[14px] py-[11px] rounded-xl
-               border border-slate-300 bg-white font-sans text-[15px] leading-normal
-               text-slate-900 transition;
+               border bg-[var(--surface)] font-sans text-[15px] leading-normal
+               text-[var(--ink)] transition;
+        border-color: var(--line);
     }
 
     .field-input::placeholder {
-        @apply text-slate-500;
+        color: var(--ink-soft);
     }
 
+    /*
+     * Focus ring memakai `color-mix()` dan bukan `ring-[#hex]/20`.
+     * Modifier opacity Tailwind hanya bisa diterapkan ke warna yang
+     * Tailwind kenal sebagai channel RGB; `--accent` yang isinya hex
+     * utuh tidak bisa di-/20-kan, dan `ring-[var(--accent)]/20` akan
+     * menghasilkan CSS yang salah diam-diam.
+     */
     .field-input:focus {
-        @apply outline-none border-[#226d71] ring-[3px] ring-[#226d71]/20;
+        @apply outline-none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
     }
 
     .field-input[aria-invalid='true'] {

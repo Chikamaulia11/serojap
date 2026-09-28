@@ -1,6 +1,6 @@
 <x-error-layout>
     <div class="w-full max-w-lg text-center">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-100 text-rose-600 mb-6">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-100 text-[var(--danger)] mb-6">
             <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
             </svg>

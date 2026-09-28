@@ -30,11 +30,15 @@
 .hero-overlay{
     position:absolute;
     inset:0;
+    /* Kedua ujung memakai warna gelap yang gelap di light DAN dark
+       (`--accent-deep`), dengan opasitas tinggi. Versi sebelumnya
+       memakai `--accent` 72%, yang di mode light terang kalau fotonya
+       sendiri terang -- teks putih di atasnya lalu hilang. */
     background:
     linear-gradient(
         135deg,
-        rgba(14,44,68,0.88),
-        rgba(34,109,113,0.72)
+        color-mix(in srgb, #0e2c44 90%, transparent),
+        color-mix(in srgb, var(--accent-deep) 88%, transparent)
     );
 }
 
@@ -91,8 +95,11 @@
 /* ================= BUTTON ================= */
 
 .btn-primary{
-    background:white;
-    color:#226d71;
+    /* Background putih + teks aksen gagal di mode dark, karena
+       `--accent` justru terang di sana. Pakai aksen sebagai latar dan
+       `--on-accent` sebagai teks: kontrasnya dijamin di kedua mode. */
+    background:var(--accent);
+    color:var(--on-accent);
     padding:14px 24px;
     border-radius:16px;
     text-decoration:none;
@@ -226,7 +233,7 @@
 }
 
 .menu-card{
-    background:white;
+    background:var(--surface);
     border-radius:28px;
     padding:35px;
     transition:0.4s;
@@ -264,7 +271,7 @@
 }
 
 .section-title span{
-    color:#226d71;
+    color:var(--accent);
     font-weight:600;
 }
 
@@ -288,14 +295,17 @@
 }
 
 .glass{
-    background:rgba(255,255,255,0.7);
+    /* Kalau tetap putih, di mode dark hasilnya jadi kabut terang dan
+       teks terang di atasnya tidak terbaca. Menurunkan dari
+       `--surface` membuat kaca ikut terang/gelap bersama tema. */
+    background:color-mix(in srgb, var(--surface) 70%, transparent);
     backdrop-filter:blur(16px);
 }
 
 .laporan-badge{
     display:inline-block;
-    background:#dffaf6;
-    color:#226d71;
+    background:var(--accent-tint);
+    color:var(--accent);
     padding:10px 16px;
     border-radius:999px;
     margin-bottom:25px;
@@ -329,8 +339,8 @@
 .feature span{
     width:28px;
     height:28px;
-    background:#226d71;
-    color:white;
+    background:var(--accent);
+    color:var(--on-accent);
     border-radius:50%;
     display:flex;
     align-items:center;
@@ -423,8 +433,11 @@
     top:50%;
     left:20px;
     transform:translateY(-50%);
+    /* Kaca putih + teks yang ikut tema berarti teks terang di atas
+       putih pada mode dark. Kacanya diturunkan dari `--surface`
+       supaya gelap dan menyatu dengan tema. */
     background:
-    rgba(255,255,255,0.92);
+    color-mix(in srgb, var(--surface) 92%, transparent);
     backdrop-filter:blur(16px);
     padding:28px;
     border-radius:28px;
@@ -456,16 +469,16 @@
     gap:10px;
     font-size:14px;
     font-weight:600;
-    color:#226d71;
+    color:var(--accent);
 }
 
 .dot{
     width:10px;
     height:10px;
     border-radius:50%;
-    background:#2ecc71;
+    background:var(--selesai);
     box-shadow:
-    0 0 12px #2ecc71;
+    0 0 12px var(--selesai);
     animation:blinkDot 1.5s infinite;
 }
 
@@ -494,7 +507,7 @@
 }
 
 .info-card{
-    background:white;
+    background:var(--surface);
     padding:40px;
     border-radius:30px;
     box-shadow:0 20px 45px rgba(0,0,0,0.05);
@@ -516,7 +529,7 @@
 
 .progress-bar{
     height:12px;
-    background:#edf2f7;
+    background:var(--line);
     border-radius:999px;
     overflow:hidden;
 }
@@ -528,22 +541,22 @@
 
 .blue{
     width:100%;
-    background:#3498db;
+    background:var(--diterima);
 }
 
 .orange{
     width:75%;
-    background:#f39c12;
+    background:var(--diproses);
 }
 
 .green{
     width:55%;
-    background:#2ecc71;
+    background:var(--selesai);
 }
 
 .red{
     width:55%;
-    background:#ef4444;
+    background:var(--ditolak);
 }
 
 .riwayat-preview{
@@ -553,7 +566,7 @@
 }
 
 .riwayat-item{
-    background:white;
+    background:var(--surface);
     padding:24px;
     border-radius:24px;
     box-shadow:0 15px 35px rgba(0,0,0,0.04);
@@ -578,23 +591,23 @@
 }
 
 .status.diterima{
-    background:#dff2ff;
-    color:#3498db;
+    background:var(--diterima-tint);
+    color:var(--diterima-ink);
 }
 
 .status.diproses{
-    background:#fff1d9;
-    color:#f39c12;
+    background:var(--diproses-tint);
+    color:var(--diproses-ink);
 }
 
 .status.selesai{
-    background:#dcfff0;
-    color:#2ecc71;
+    background:var(--selesai-tint);
+    color:var(--selesai-ink);
 }
 
 .status.ditolak{
-    background:#fee2e2;
-    color:#ef4444;
+    background:var(--ditolak-tint);
+    color:var(--ditolak-ink);
 }
 
 /* ================= FAQ ================= */
@@ -612,8 +625,8 @@
     width:100%;
     max-width:620px;
     min-height:54px;
-    background:#ffffff;
-    border:1px solid #e2e8f0;
+    background:var(--surface);
+    border:1px solid var(--line);
     border-radius:999px;
     padding:0 22px;
     box-shadow:0 8px 24px rgba(15,23,42,0.05);
@@ -622,8 +635,8 @@
 
 .google-search-box:hover,
 .google-search-box:focus-within {
-    border-color:#226d71;
-    box-shadow:0 12px 28px rgba(34,109,113,0.12);
+    border-color:var(--accent);
+    box-shadow:0 12px 28px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .google-search-box input {
@@ -634,11 +647,11 @@
     box-shadow:none !important;
     padding:10px 0;
     font-size:16px;
-    color:#202124;
+    color: var(--ink);
 }
 
 .google-search-box input::placeholder {
-    color:#94a3b8;
+    color:var(--ink-soft);
 }
 
 .search-icon-left {
@@ -661,8 +674,8 @@
 
 .faq-bubble-card {
     position:relative;
-    background:#ffffff;
-    border:1px solid #e5e7eb;
+    background:var(--surface);
+    border:1px solid var(--line);
     border-radius:24px;
     padding:22px 22px 20px;
     cursor:pointer;
@@ -679,9 +692,9 @@
     bottom:-9px;
     width:22px;
     height:22px;
-    background:#ffffff;
-    border-left:1px solid #e5e7eb;
-    border-bottom:1px solid #e5e7eb;
+    background:var(--surface);
+    border-left:1px solid var(--line);
+    border-bottom:1px solid var(--line);
     transform:rotate(-35deg);
     border-bottom-left-radius:6px;
     transition:0.28s ease;
@@ -689,12 +702,12 @@
 
 .faq-bubble-card:hover {
     transform:translateY(-4px);
-    border-color:#226d71;
-    box-shadow:0 18px 36px rgba(34,109,113,0.12);
+    border-color:var(--accent);
+    box-shadow:0 18px 36px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .faq-bubble-card:hover::before {
-    border-color:#226d71;
+    border-color:var(--accent);
 }
 
 .faq-bubble-top {
@@ -707,22 +720,25 @@
     width:36px;
     height:36px;
     border-radius:14px;
-    background:linear-gradient(135deg, #226d71, #2657c1);
-    color:#ffffff;
+    /* Ujung `--accent-deep` gelap di mode dark, sedangkan
+       `--on-accent` juga gelap di sana. Ujung kedua dicampur
+       naik supaya seluruh gradien/netral teks tetap kontras. */
+    background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, var(--accent-deep)));
+    color:var(--on-accent);
     display:flex;
     align-items:center;
     justify-content:center;
     font-size:17px;
     font-weight:700;
     flex-shrink:0;
-    box-shadow:0 8px 18px rgba(34,109,113,0.18);
+    box-shadow:0 8px 18px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 .faq-question {
     flex:1;
     font-size:15px;
     font-weight:700;
-    color:#0f172a;
+    color:var(--ink);
     line-height:1.5;
     margin:0;
     padding-top:2px;
@@ -732,8 +748,8 @@
     width:28px;
     height:28px;
     border-radius:999px;
-    background:#f1f5f9;
-    color:#226d71;
+    background:var(--bg);
+    color:var(--accent);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -756,21 +772,21 @@
 .faq-answer {
     margin-top:18px;
     padding-top:16px;
-    border-top:1px solid #f1f5f9;
+    border-top:1px solid var(--bg);
     font-size:14px;
-    color:#475569;
+    color:var(--ink-soft);
     line-height:1.8;
 }
 
 .faq-bubble-card.open {
-    border-color:#226d71;
-    background:linear-gradient(180deg, #ffffff 0%, #f8fffe 100%);
-    box-shadow:0 18px 38px rgba(34,109,113,0.14);
+    border-color:var(--accent);
+    background:linear-gradient(180deg, var(--surface) 0%, var(--accent-tint) 100%);
+    box-shadow:0 18px 38px color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
 .faq-bubble-card.open::before {
-    background:#f8fffe;
-    border-color:#226d71;
+    background:var(--accent-tint);
+    border-color:var(--accent);
 }
 
 .faq-bubble-card.open .faq-answer-wrap {
@@ -780,20 +796,20 @@
 }
 
 .faq-bubble-card.open .faq-arrow {
-    background:#226d71;
-    color:#ffffff;
+    background:var(--accent);
+    color:var(--on-accent);
     transform:rotate(180deg);
 }
 
 .faq-empty {
     grid-column:1 / -1;
-    background:#ffffff;
+    background:var(--surface);
     border-radius:22px;
     padding:38px 20px;
     text-align:center;
-    color:#94a3b8;
+    color:var(--ink-soft);
     font-style:italic;
-    border:1px solid #e5e7eb;
+    border:1px solid var(--line);
     box-shadow:0 10px 26px rgba(15,23,42,0.04);
 }
 
@@ -803,9 +819,9 @@
 }
 
 .faq-more-btn {
-    border:1px solid #dbe4e8;
-    background:#ffffff;
-    color:#226d71;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--accent);
     padding:13px 34px;
     border-radius:14px;
     font-size:14px;
@@ -816,15 +832,15 @@
 }
 
 .faq-more-btn:hover {
-    background:#226d71;
-    color:#ffffff;
+    background:var(--accent);
+    color:var(--on-accent);
     transform:translateY(-2px);
 }
 
 /* ================= PLACEHOLDER ================= */
 
 .placeholder-box{
-    background:white;
+    background:var(--surface);
     border-radius:30px;
     padding:80px;
     text-align:center;

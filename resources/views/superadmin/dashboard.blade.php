@@ -25,11 +25,12 @@
         position: relative;
         overflow: hidden;
         border-radius: 28px;
-        background:
-            linear-gradient(135deg, rgba(38,87,193,0.96), rgba(34,109,113,0.95));
-        color: white;
+          /* Awalnya gradasi 96% -> 95% biru admin; selisihnya tak
+             terlihat, jadi diratakan jadi satu warna aksen pekat. */
+          background: color-mix(in srgb, var(--accent) 96%, transparent);
+          color: var(--on-accent);
         padding: 30px;
-        box-shadow: 0 20px 40px rgba(38, 87, 193, 0.14);
+        box-shadow: 0 20px 40px color-mix(in srgb, var(--accent) 14%, transparent);
     }
 
     .dashboard-hero::before {
@@ -140,7 +141,7 @@
         position: relative;
         overflow: hidden;
         background: white;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--line);
         border-radius: 24px;
         padding: 22px;
         box-shadow: 0 10px 24px rgba(15,23,42,0.04);
@@ -167,20 +168,20 @@
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.16em;
-        color: #94a3b8;
+        color: var(--ink-mute);
     }
 
     .summary-title {
         font-size: 22px;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--ink);
         margin-top: 8px;
     }
 
     .summary-desc {
         font-size: 14px;
         line-height: 1.65;
-        color: #64748b;
+        color: var(--ink-soft);
         margin-top: 8px;
     }
 
@@ -193,15 +194,15 @@
 
     .action-card {
         background: white;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--line);
         border-radius: 24px;
         padding: 24px;
         box-shadow: 0 10px 24px rgba(15,23,42,0.04);
     }
 
     .dark-card {
-        background: #0f172a;
-        color: white;
+        background: var(--ink);
+        color: var(--on-ink);
         border-radius: 24px;
         padding: 24px;
         position: relative;
@@ -226,17 +227,17 @@
         gap: 8px;
         padding: 12px 18px;
         border-radius: 16px;
-        background: #2657c1;
-        color: white;
+          background: var(--accent);
+          color: var(--on-accent);
         font-size: 14px;
         font-weight: 800;
         text-decoration: none;
-        box-shadow: 0 12px 24px rgba(38,87,193,0.18);
+        box-shadow: 0 12px 24px color-mix(in srgb, var(--accent) 18%, transparent);
         transition: 0.25s ease;
     }
 
     .btn-primary-super:hover {
-        background: #1f4674;
+        background: var(--accent-deep);
         transform: translateY(-2px);
     }
 
@@ -247,8 +248,8 @@
         padding: 12px 18px;
         border-radius: 16px;
         background: white;
-        border: 1px solid #e2e8f0;
-        color: #334155;
+        border: 1px solid var(--line);
+        color: var(--ink);
         font-size: 14px;
         font-weight: 800;
         text-decoration: none;
@@ -256,7 +257,7 @@
     }
 
     .btn-secondary-super:hover {
-        background: #f8fafc;
+        background: var(--bg);
         transform: translateY(-2px);
     }
 
@@ -328,7 +329,7 @@
     <div class="summary-grid">
 
         <div class="summary-card">
-            <div class="summary-icon" style="background:#eff6ff; color:#2657c1;">
+            <div class="summary-icon" style="background:var(--accent-tint); color:var(--accent);">
                 <i class="mdi mdi-account-tie-outline text-2xl"></i>
             </div>
 
@@ -341,7 +342,7 @@
         </div>
 
         <div class="summary-card">
-            <div class="summary-icon" style="background:#ecfdf5; color:#059669;">
+            <div class="summary-icon" style="background:var(--selesai-tint); color:var(--accent);">
                 <i class="mdi mdi-account-group-outline text-2xl"></i>
             </div>
 
@@ -359,7 +360,7 @@
 
         <div class="action-card">
 
-            <div style="width:56px; height:56px; border-radius:22px; background:linear-gradient(135deg,#eff6ff,#ecfeff); color:#2657c1; display:flex; align-items:center; justify-content:center; margin-bottom:18px;">
+              <div style="width:56px; height:56px; border-radius:22px; background:var(--accent-tint); color:var(--accent); display:flex; align-items:center; justify-content:center; margin-bottom:18px;">
                 <i class="mdi mdi-account-cog-outline text-3xl"></i>
             </div>
 
@@ -367,7 +368,7 @@
                 Manajemen Akun Terpusat
             </p>
 
-            <h2 style="font-size:24px; font-weight:800; color:#0f172a; margin-top:10px;">
+            <h2 style="font-size:24px; font-weight:800; color:var(--ink); margin-top:10px;">
                 Kelola admin dan pelapor dari satu panel.
             </h2>
 
@@ -392,7 +393,7 @@
                     <i class="mdi mdi-information-outline text-3xl"></i>
                 </div>
 
-                <p style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:#bfdbfe;">
+                <p style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:var(--accent-tint);">
                     Catatan Akses
                 </p>
 
@@ -400,9 +401,9 @@
                     Registrasi admin tidak dibuka publik.
                 </h2>
 
-                <div style="height:3px; width:100%; border-radius:999px; background:linear-gradient(90deg,#2657c1,#226d71,transparent); margin:18px 0;"></div>
+                <div style="height:3px; width:100%; border-radius:999px; background:linear-gradient(90deg,var(--band-from),var(--band-to),transparent); margin:18px 0;"></div>
 
-                <p style="font-size:14px; color:#cbd5e1; line-height:1.7;">
+                <p style="font-size:14px; color:var(--line); line-height:1.7;">
                     Admin dan super admin tidak dapat registrasi sendiri.
                     Pelapor tetap dapat mendaftar mandiri melalui halaman register publik.
                 </p>
@@ -462,19 +463,19 @@
             <p class="summary-label">Laporan Terbaru</p>
 
             @forelse ($laporanTerbaru as $laporan)
-                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid #f1f5f9;">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--bg);">
                     <div style="min-width:0;">
-                        <p style="margin:0; font-size:14px; font-weight:600; color:#0f172a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        <p style="margin:0; font-size:14px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                             {{ $laporan->alamat }}
                         </p>
-                        <p style="margin:2px 0 0; font-size:12px; color:#64748b;">
+                        <p style="margin:2px 0 0; font-size:12px; color:var(--ink-soft);">
                             {{ $laporan->created_at?->format('d M Y, H:i') }}
                         </p>
                     </div>
                     <x-status-badge :status="$laporan->latestStatus?->status" />
                 </div>
             @empty
-                <p style="font-size:14px; color:#64748b; margin-top:8px;">Belum ada laporan masuk.</p>
+                <p style="font-size:14px; color:var(--ink-soft); margin-top:8px;">Belum ada laporan masuk.</p>
             @endforelse
         </div>
 
@@ -482,17 +483,17 @@
             <p class="summary-label">FAQ Terbaru</p>
 
             @forelse ($faqTerbaru as $faq)
-                <div style="padding:12px 0; border-bottom:1px solid #f1f5f9;">
-                    <p style="margin:0; font-size:14px; font-weight:600; color:#0f172a;">
+                <div style="padding:12px 0; border-bottom:1px solid var(--bg);">
+                    <p style="margin:0; font-size:14px; font-weight:600; color:var(--ink);">
                         {{ $faq->pertanyaan }}
                     </p>
-                    <p style="margin:2px 0 0; font-size:12px; color:#64748b;">
+                    <p style="margin:2px 0 0; font-size:12px; color:var(--ink-soft);">
                         {{ $faq->admin?->name ?? 'Admin tidak tersedia' }}
                         &middot; urutan {{ $faq->urutan }}
                     </p>
                 </div>
             @empty
-                <p style="font-size:14px; color:#64748b; margin-top:8px;">Belum ada FAQ.</p>
+                <p style="font-size:14px; color:var(--ink-soft); margin-top:8px;">Belum ada FAQ.</p>
             @endforelse
         </div>
 
@@ -502,13 +503,13 @@
     @if ($petugasAktif === 0)
         <div class="dark-card" style="margin-top:24px;">
             <div style="position:relative; z-index:2;">
-                <p style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:#bfdbfe;">
+                <p style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:var(--accent-tint);">
                     Perhatian
                 </p>
                 <h2 style="font-size:20px; font-weight:800; margin-top:8px;">
                     Tidak ada admin yang aktif menangani laporan.
                 </h2>
-                <p style="font-size:14px; color:#cbd5e1; line-height:1.7; margin-top:10px;">
+                <p style="font-size:14px; color:var(--line); line-height:1.7; margin-top:10px;">
                     Tidak ada satu pun akun admin aktif yang mengubah status
                     laporan dalam 30 hari terakhir. Periksa daftar akun --
                     mungkin akunnya sudah dinonaktifkan tanpa disengaja.

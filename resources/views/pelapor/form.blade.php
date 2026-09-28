@@ -138,7 +138,7 @@
                             aria-expanded="false"
                             aria-controls="mapContainer"
                         >
-                            <span aria-hidden="true">&#128205;</span> Tandai di Peta
+                            <span aria-hidden="true">&var(--selesai);</span> Tandai di Peta
                         </button>
 
                         <button
@@ -146,7 +146,7 @@
                             class="btn btn-secondary"
                             id="tombol-gps"
                         >
-                            <span aria-hidden="true">&#128241;</span> Pakai Lokasi Saya
+                            <span aria-hidden="true">&var(--selesai);</span> Pakai Lokasi Saya
                         </button>
                     </div>
 

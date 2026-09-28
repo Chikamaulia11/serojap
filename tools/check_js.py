@@ -36,6 +36,63 @@ def line_of(text: str, index: int) -> int:
     return text.count("\n", 0, index) + 1
 
 
+# Token yang membuat `/` setelahnya berarti regex, bukan pembagi.
+# Semua `close` mengakhiri ekspresi, jadi `(` atau `,` setelahnya juga
+# boleh diikuti regex.
+_REGEX_PRECEDERS = {
+    "(", ",", "=", ":", "[", "!", "&", "|", "?", "{", "}", ";",
+    "=>", "==", "!=", "===", "!==", "<", ">", "<=", ">=",
+    "+", "-", "*", "%", "~", "^",
+}
+_REGEX_KEYWORDS = {
+    "return", "typeof", "instanceof", "in", "of", "new", "delete",
+    "void", "throw", "case", "do", "else", "yield", "await",
+}
+
+
+def regex_can_start(text: str, index: int) -> bool:
+    """Apakah `/` di `index` memulai regex literal?"""
+    j = index - 1
+    while j >= 0 and text[j] in " \t\r\n":
+        j -= 1
+    if j < 0:
+        return True
+    if text[j] in _REGEX_PRECEDERS:
+        return True
+    if text[j].isalnum() or text[j] in "_$":
+        end = j + 1
+        while j >= 0 and (text[j].isalnum() or text[j] in "_$"):
+            j -= 1
+        return text[j + 1:end] in _REGEX_KEYWORDS
+    return False
+
+
+def skip_regex(text: str, index: int) -> tuple[int, bool]:
+    """Lewati satu regex literal; kembalikan (index akhir, tertutup)."""
+    n = len(text)
+    i = index + 1
+    in_class = False
+    while i < n:
+        c = text[i]
+        if c == "\\":
+            i += 2
+            continue
+        if c == "\n":
+            return i, False
+        if c == "[":
+            in_class = True
+        elif c == "]":
+            in_class = False
+        elif c == "/" and not in_class:
+            i += 1
+            # Flag setelah penutup: /x/g, /a/i
+            while i < n and text[i].isalpha():
+                i += 1
+            return i, True
+        i += 1
+    return i, False
+
+
 def scan(text: str, path: Path) -> list[str]:
     problems: list[str] = []
     stack: list[tuple[str, int]] = []
@@ -114,6 +171,29 @@ def scan(text: str, path: Path) -> list[str]:
             i = j + 1
             continue
 
+        # --- regex literal ---
+        #
+        # Tanpa ini, kurung di dalam regex dibaca sebagai kurung kode.
+        # `/rgba?\(([^)]+)\)/` punya tiga pasang kurung di dalamnya dan
+        # semuanya(false positive) melaporkan file ini rusak padahal
+        # `node --check` bilang baik-baik saja -- persis kelas kegagalan
+        # yang membuat orang mematikan pemeriksa.
+        #
+        # `/` hanya membuka regex di posisi yang secara sintaks memang
+        # bisa jadi awal regex; di posisi lain dia pembagi. Daftar ini
+        # sengaja tidak lengkap gegen standard, tapi cukup untuk
+        # pemakaian di repo ini, dan kalau tidak yakin dia memperlakukan
+        # `/` sebagai pembagi -- pilihan yang lebih sering benar daripada
+        # kebalikannya.
+        if ch == "/" and regex_can_start(text, i):
+            j, ok = skip_regex(text, i)
+            if ok:
+                line += text.count("\n", i, j)
+                i = j
+                continue
+            # Regex tidak tertutup: biarkan brace scanner yang melapor,
+            # supaya pesan errornya menyebut posisi yang sama.
+
         # --- kurung ---
         if ch in OPENERS:
             stack.append((ch, line))
@@ -155,7 +235,13 @@ def main() -> int:
     else:
         targets = sorted(
             p for p in (ROOT / "public" / "js").rglob("*.js")
-        ) + sorted((ROOT / "resources" / "js").rglob("*.js"))
+        ) + sorted((ROOT / "resources" / "js").rglob("*.js")) + sorted(
+            # Alat-alat di `tools/` juga JavaScript yang dijalankan
+            # sungguhan (`cdp.js`). Kalau tidak ikut dipindai, satu
+            # kurung yang tidak tertutup di sana baru ketahuan setelah
+            # audit gagal dengan pesan yang membingungkan.
+            p for p in (ROOT / "tools").glob("*.js")
+        )
 
     failed = 0
     for path in targets:

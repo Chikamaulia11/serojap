@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    @include('partials.theme-bootstrap')
     <title>@yield('title', 'Serojap Admin')</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -38,7 +40,7 @@
     <div class="md:hidden sticky top-0 z-40 flex items-center gap-3 h-14 px-4 bg-white border-b border-slate-200">
         <button
             type="button"
-            class="inline-flex items-center justify-center w-10 h-10 -ml-1 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2657c1]"
+            class="inline-flex items-center justify-center w-10 h-10 -ml-1 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             x-on:click="sidebarTerbuka = ! sidebarTerbuka"
             x-bind:aria-expanded="sidebarTerbuka ? 'true' : 'false'"
             aria-controls="adminSidebar"
@@ -49,7 +51,7 @@
             </svg>
         </button>
 
-        <span class="font-bold text-[#2657c1] tracking-wide">SEROJAP</span>
+        <span class="font-bold text-[var(--accent)] tracking-wide">SEROJAP</span>
     </div>
 
     <!-- Lapisan gelap di belakang drawer -->
@@ -76,14 +78,14 @@
     --}}
     <aside
         id="adminSidebar"
-        class="fixed top-0 left-0 z-50 w-60 h-screen bg-white border-r border-slate-200 flex flex-col overflow-y-auto transition-transform duration-200 -translate-x-full md:translate-x-0"
+        class="fixed top-0 left-0 z-50 w-60 h-screen bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 -translate-x-full md:translate-x-0"
         x-bind:style="sidebarTerbuka ? 'transform: translateX(0)' : ''"
     >
 
         <!-- Brand -->
         <div class="flex items-center gap-2.5 px-5 py-5 border-b border-slate-100">
             <img src="{{ asset('assets/pelapor/images/logo-serojap.webp') }}" alt="Serojap" class="w-10 h-10 rounded-lg object-cover shadow-md">
-            <span class="text-lg font-bold text-[#2657c1] tracking-wide">SEROJAP</span>
+            <span class="text-lg font-bold text-[var(--accent)] tracking-wide">SEROJAP</span>
         </div>
 
         <!-- Menu Utama -->
@@ -91,12 +93,12 @@
             <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">Menu Utama</p>
         </div>
 
-        <nav class="flex-1 px-2 space-y-0.5">
+        <nav class="flex-1 min-h-0 overflow-y-auto px-2 space-y-0.5">
 
             {{-- Dashboard --}}
             <a href="{{ route('admin.dashboard') }}"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                    {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
+                    {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
                 <i class="mdi mdi-view-dashboard-outline text-lg w-5 text-center"></i>
                 Dashboard
             </a>
@@ -105,7 +107,7 @@
             <div x-data="{ open: {{ request()->routeIs('admin.laporan.*') ? 'true' : 'false' }} }" class="relative">
                 <button @click="open = !open"
                     class="w-full flex items-center justify-between gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                        {{ request()->routeIs('admin.laporan.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
+                        {{ request()->routeIs('admin.laporan.*') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
                     <span class="flex items-center gap-2.5">
                         <i class="mdi mdi-clipboard-text-outline text-lg w-5 text-center"></i>
                         Manajemen Laporan
@@ -118,7 +120,7 @@
                     {{-- Semua Laporan --}}
                     <a href="{{ route('admin.laporan.index') }}"
                         class="flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition
-                            {{ request()->routeIs('admin.laporan.index') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
+                            {{ request()->routeIs('admin.laporan.index') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
                         <i class="mdi mdi-file-document-outline text-lg w-5 text-center"></i>
                         Daftar Laporan
                     </a>
@@ -126,7 +128,7 @@
                     {{-- Update Status --}}
                     <a href="{{ route('admin.laporan.update-status') }}"
                         class="flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition
-                            {{ request()->routeIs('admin.laporan.update-status') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
+                            {{ request()->routeIs('admin.laporan.update-status') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
                         <i class="mdi mdi-clipboard-check-outline text-lg w-5 text-center"></i>
                         Update Status
                     </a>
@@ -137,7 +139,7 @@
             {{-- Manajemen FAQ --}}
             <a href="{{ route('admin.manajemen-faq.index') }}"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                    {{ request()->routeIs('admin.manajemen-faq.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
+                    {{ request()->routeIs('admin.manajemen-faq.*') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
                 <i class="mdi mdi-frequently-asked-questions text-lg w-5 text-center"></i>
                 Manajemen FAQ
             </a>
@@ -145,7 +147,7 @@
             {{-- Grafik Statistik --}}
             <a href="{{ route('admin.statistik.index') }}"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                    {{ request()->routeIs('admin.statistik.*') ? 'bg-blue-50 text-[#2657c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-[#2657c1]' }}">
+                    {{ request()->routeIs('admin.statistik.*') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
                 <i class="mdi mdi-chart-bar text-lg w-5 text-center"></i>
                 Grafik Statistik
             </a>
@@ -177,10 +179,15 @@
         <!-- Footer / User Info -->
         <div class="mt-auto px-4 py-4 border-t border-slate-100">
 
+            {{-- Picker tema, dekat profil dan Keluar. Di layar kecil
+                 sidebar ini yang jadi menu (drawer), jadi satu
+                 penempatan ini melayani desktop dan mobile sekaligus. --}}
+            @include('partials.theme-picker', ['variant' => 'sidebar'])
+
             <a href="{{ route('admin.profile.index') }}"
                 class="flex items-center gap-2.5 rounded-lg p-2 hover:bg-slate-50 transition">
 
-                <div class="w-9 h-9 bg-gradient-to-br from-[#2657c1] to-[#226d71] rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                <div class="w-9 h-9 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
                     @if(auth()->user()->foto_profil)
                         <img src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
                              alt="Profil"
@@ -238,8 +245,8 @@
                         showCancelButton: true,
                         confirmButtonText: 'Ya, Logout',
                         cancelButtonText: 'Batal',
-                        confirmButtonColor: '#d63031',
-                        cancelButtonColor: '#64748b',
+                        confirmButtonColor: 'var(--danger)',
+                        cancelButtonColor: 'var(--ink-soft)',
                         reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -252,5 +259,6 @@
     </script>
 
     @stack('scripts')
+
 </body>
 </html>

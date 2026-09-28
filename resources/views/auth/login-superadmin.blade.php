@@ -18,7 +18,7 @@
 
             <x-text-input
                 id="email"
-                class="block mt-1 w-full border-gray-300 focus:border-[#2657c1] focus:ring-[#2657c1]"
+                class="block mt-1 w-full border-gray-300 focus:border-[var(--accent)] focus:ring-[var(--accent)]"
                 type="email"
                 name="email"
                 :value="old('email')"
@@ -34,7 +34,7 @@
 
             <x-text-input
                 id="password"
-                class="block mt-1 w-full border-gray-300 focus:border-[#2657c1] focus:ring-[#2657c1]"
+                class="block mt-1 w-full border-gray-300 focus:border-[var(--accent)] focus:ring-[var(--accent)]"
                 type="password"
                 name="password"
                 required
@@ -49,7 +49,7 @@
                 <input
                     id="remember_me"
                     type="checkbox"
-                    class="rounded border-gray-300 text-[#2657c1] shadow-sm focus:ring-[#2657c1]"
+                    class="rounded border-gray-300 text-[var(--accent)] shadow-sm focus:ring-[var(--accent)]"
                     name="remember"
                 >
 
@@ -60,7 +60,7 @@
         </div>
 
         <div class="flex items-center justify-end mt-6">
-            <x-primary-button class="w-full justify-center bg-[#2657c1] hover:bg-[#1f4674] py-3">
+            <x-primary-button class="w-full justify-center bg-[var(--accent)] hover:bg-[var(--accent-deep)] py-3">
                 LOGIN SUPER ADMIN
             </x-primary-button>
         </div>

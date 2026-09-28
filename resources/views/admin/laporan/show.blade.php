@@ -31,11 +31,11 @@
         .swal2-title-custom {
             font-size: 1.4rem !important;
             font-weight: 700 !important;
-            color: #111827 !important;
+            color: var(--ink) !important;
         }
         .swal2-text-custom {
             font-size: 0.95rem !important;
-            color: #6b7280 !important;
+            color: var(--ink-soft) !important;
         }
         .swal2-confirm-custom {
             border-radius: 12px !important;
@@ -46,12 +46,12 @@
             border: none !important;
         }
         .swal2-confirm-success {
-            background-color: #4f46e5 !important;
-            color: #fff !important;
+            background-color: var(--accent) !important;
+            color: var(--on-accent) !important;
         }
         .swal2-confirm-error {
-            background-color: #dc2626 !important;
-            color: #fff !important;
+            background-color: var(--danger) !important;
+            color: var(--on-danger) !important;
         }
         .swal2-backdrop-custom {
             backdrop-filter: blur(4px) !important;
@@ -661,7 +661,7 @@
                 title: 'Status belum dipilih',
                 text: 'Silakan pilih status laporan terlebih dahulu.',
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#4f46e5',
+                confirmButtonColor: 'var(--accent)',
                 customClass: {
                     popup:         'swal2-popup-custom',
                     title:         'swal2-title-custom',
@@ -680,7 +680,7 @@
                 title: 'Keterangan wajib diisi',
                 text: 'Mohon isi keterangan sebelum menyimpan perubahan status.',
                 confirmButtonText: 'Oke, isi dulu',
-                confirmButtonColor: '#4f46e5',
+                confirmButtonColor: 'var(--accent)',
                 customClass: {
                     popup:         'swal2-popup-custom',
                     title:         'swal2-title-custom',
@@ -699,7 +699,7 @@
                 title: 'Keterangan terlalu pendek',
                 text: 'Keterangan minimal 5 karakter.',
                 confirmButtonText: 'Oke, lengkapi dulu',
-                confirmButtonColor: '#4f46e5',
+                confirmButtonColor: 'var(--accent)',
                 customClass: {
                     popup:         'swal2-popup-custom',
                     title:         'swal2-title-custom',

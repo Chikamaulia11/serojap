@@ -22,15 +22,15 @@
     background:
     linear-gradient(
         135deg,
-        #1f4674,
-        #226d71
+        var(--accent-deep),
+        var(--accent)
     );
 
     border-radius:35px;
 
     padding:50px;
 
-    color:white;
+    color: var(--on-accent);
 
     display:flex;
     justify-content:space-between;
@@ -95,7 +95,7 @@
 
 .dashboard-btn{
     background:rgba(255,255,255,0.14);
-    color:white;
+    color: var(--on-accent);
 
     padding:14px 24px;
 
@@ -116,7 +116,7 @@
 
 .logout-btn{
     background:white;
-    color:#d63031;
+    color:var(--danger);
 
     padding:14px 24px;
 
@@ -168,7 +168,7 @@
 }
 
 .card-title p{
-    color:#666;
+    color:var(--ink-soft);
     line-height:1.7;
 }
 
@@ -183,7 +183,7 @@
     margin-bottom:10px;
 
     font-weight:600;
-    color:#222;
+    color:var(--ink);
 }
 
 .form-input{
@@ -193,7 +193,7 @@
 
     border-radius:16px;
 
-    border:1px solid #dfe6e9;
+    border:1px solid var(--accent-tint);
 
     outline:none;
 
@@ -203,15 +203,15 @@
 }
 
 .form-input:focus{
-    border-color:#226d71;
+    border-color:var(--accent);
 
     box-shadow:
-    0 0 0 4px rgba(34,109,113,0.12);
+    0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .form-error{
     margin-top:8px;
-    color:#d63031;
+    color:var(--danger);
     font-size:13px;
     line-height:1.5;
 }
@@ -219,8 +219,8 @@
 /* BUTTON */
 
 .save-btn{
-    background:#226d71;
-    color:white;
+    background:var(--accent);
+    color: var(--on-accent);
 
     border:none;
 
@@ -248,7 +248,7 @@
     border-radius:50%;
     object-fit:cover;
 
-    border:4px solid #eef2f7;
+    border:4px solid var(--accent-tint);
 
     margin-bottom:18px;
 }
@@ -259,7 +259,7 @@
     background:
     linear-gradient(
         135deg,
-        rgba(34,109,113,0.08),
+        color-mix(in srgb, var(--accent) 8%, transparent),
         rgba(31,70,116,0.06)
     );
 
@@ -270,12 +270,12 @@
 
 .password-box p{
     line-height:1.8;
-    color:#444;
+    color:var(--ink);
 }
 
 .password-note{
     font-size:13px;
-    color:#666;
+    color:var(--ink-soft);
     line-height:1.7;
     margin-bottom:20px;
 }
@@ -291,7 +291,7 @@
 }
 
 .delete-box p{
-    color:#444;
+    color:var(--ink);
     line-height:1.7;
 }
 
@@ -305,7 +305,7 @@
 
     border-radius:16px;
 
-    color:#9f1d1d;
+    color:var(--danger);
     font-size:14px;
     line-height:1.7;
 }
@@ -313,8 +313,8 @@
 .delete-btn{
     margin-top:20px;
 
-    background:#d63031;
-    color:white;
+    background:var(--danger);
+    color: var(--on-danger);
 
     border:none;
 
@@ -583,7 +583,7 @@
                 title: 'Profil Berhasil Diperbarui',
                 text: 'Informasi profil kamu sudah berhasil disimpan.',
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#226d71'
+                confirmButtonColor: 'var(--accent)'
             });
         @endif
 
@@ -593,7 +593,7 @@
                 title: 'Password Berhasil Diperbarui',
                 text: 'Password akun kamu sudah berhasil diganti.',
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#226d71'
+                confirmButtonColor: 'var(--accent)'
             });
         @endif
 
@@ -603,7 +603,7 @@
                 title: 'Data Belum Sesuai',
                 text: 'Periksa kembali data yang kamu isi.',
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#226d71'
+                confirmButtonColor: 'var(--accent)'
             });
         @endif
 
@@ -622,8 +622,8 @@
                     showCancelButton: true,
                     confirmButtonText: 'Ya, Hapus Akun',
                     cancelButtonText: 'Batal',
-                    confirmButtonColor: '#d63031',
-                    cancelButtonColor: '#64748b',
+                    confirmButtonColor: 'var(--danger)',
+                    cancelButtonColor: 'var(--ink-soft)',
                     reverseButtons: true,
                     allowOutsideClick: false,
                     allowEscapeKey: true

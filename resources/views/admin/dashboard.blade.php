@@ -207,7 +207,7 @@
                 <dl class="mt-3 space-y-2 text-sm">
                     <div class="flex justify-between">
                         <dt class="text-gray-600">Ditolak</dt>
-                        <dd class="font-semibold text-rose-700">{{ $stats['ditolak'] }}</dd>
+                        <dd class="font-semibold text-[var(--danger)]">{{ $stats['ditolak'] }}</dd>
                     </div>
                     <div class="flex justify-between">
                         <dt class="text-gray-600">Belum ada status</dt>

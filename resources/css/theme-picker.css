@@ -1,0 +1,237 @@
+/* =========================================================
+   KOMPONEN PICKER TEMA
+   =========================================================
+
+   Berawal dari draft referensi (Bagian 2), lalu dipindahkan dari
+   pojok kanan bawah ke dalam navbar / menu mobile / sidebar.
+
+   Tiga hal yang berubah dari draf:
+
+   1. Akarnya tidak lagi `fixed bottom-5 right-5`. Ia dikembalikan
+      ke `position: relative` supaya panel -- yang tetap `absolute`
+      dengan `top: calc(100% + 8px)` dan `right: 0` -- mengikuti
+      tempat pemicunya di navbar, dan tidak ikut terpotong oleh
+      `overflow` milik induknya.
+
+   2. Lebar panel dibatasi viewport: `min(230px, calc(100vw - 24px))`.
+      Di sidebar admin/superadmin ruangnya hanya 208px, jadi angka
+      230px yang dulu aman akan keluar 6px dari tepi kiri layar.
+
+   3. `theme.js` yang menjaga agar panel utuh: `data-drop="up"`
+      membaliknya ke atas kalau tidak ada ruang di bawah (kasus
+      sidebar yang menempel di dasar layar), dan `--dd-shift`
+      menggesernya kalau tepinya menyentuh tepi layar.
+
+   Warna tombol mode aktif memakai `var(--on-accent)`, bukan
+   `#fff`: di mode dark aksen justru terang, jadi teks putih di
+   atasnya tidak terbaca.
+   ========================================================= */
+
+.swatches { display: flex; gap: 8px; }
+
+.swatch {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+}
+
+.swatch[data-active="true"] { border-color: var(--ink); }
+
+/* Warna swatch sengaja TIDAK memakai var(--accent): masing-masing harus
+   tetap menampilkan warna aksen itu sendiri, bukan warna yang sedang
+   aktif. Kalau ikut var(--accent), keenam swatch akan berwarna sama
+   begitu tema berganti. */
+.sw-teal { background: #226d71; }
+.sw-blue { background: #2454b8; }
+.sw-green { background: #1f7a45; }
+.sw-purple { background: #6b3fc2; }
+.sw-amber { background: #b06a12; }
+.sw-rose { background: #b0245e; }
+
+.mode-seg {
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+}
+
+.mode-seg button {
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: .78rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: inherit;
+    flex: 1;
+}
+
+.mode-seg button[data-active="true"] {
+    background: var(--accent);
+    color: var(--on-accent);
+}
+
+.theme-dd { position: relative; }
+
+.theme-dd-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 14px 7px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.theme-dd-btn .dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+}
+
+.theme-dd-btn .chevron {
+    font-size: .65rem;
+    color: var(--ink-soft);
+    transition: transform .15s ease;
+}
+
+.theme-dd-btn[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
+.theme-dd-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    /* Draf memakai lebar tetap 230px. Di sidebar admin/superadmin
+       ruang dalam sidebar hanya 208px, jadi panel_fixed itu keluar
+       dari layar. Batas viewport yang sécuriser letaknya. */
+    width: min(230px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
+    box-sizing: border-box;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .16);
+    display: none;
+    /* Di atas navbar (z-index 100) dan di atas skip-link (200),
+       karena panel bisa terbuka di dalam navbar itu sendiri. */
+    z-index: 210;
+    /* Geser horizontal dari `theme.js` kalau panel menyentuh tepi
+       layar. Nilai default 0 supaya tidak perlu direset. */
+    --dd-shift: 0px;
+    transform: translateX(var(--dd-shift));
+}
+
+/* Dibuka ke atas, bukan ke bawah: dipicu `theme.js` kalau
+   `top: calc(100% + 8px)` membuat panel keluar dari bawah
+   viewport -- kasusnya picker di sidebar yang meluncur ke
+   viewport tengah. */
+.theme-dd-panel[data-drop="up"] {
+    top: auto;
+    bottom: calc(100% + 8px);
+}
+
+.theme-dd-panel[data-open="true"] { display: block; }
+
+.theme-dd-label {
+    font-size: .72rem;
+    font-weight: 800;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin-bottom: 10px;
+}
+
+.theme-dd-panel .swatches { margin-bottom: 16px; }
+
+/* =========================================================
+   PENEMPATAN PER VARIANT
+   =========================================================
+
+   Halaman pelapor punya dua tempat: navbar (desktop) dan menu
+   mobile. Keduanya me-render partial yang sama dengan `$variant`
+   berbeda, lalu CSS yang memilih mana yang tampil. Yang disembunyikan
+   `display: none`, jadi tidak masuk ke accessibility tree dan tidak
+   bisa di-tab ke, meskipun masih ada di DOM. */
+
+.theme-dd--nav {
+    display: none;
+    /* Jangan sampai terpengut saat navbar mulai sempit di 640-1024px,
+       di situ hamburger + picker + profil + Keluar berbagi ruang. */
+    flex-shrink: 0;
+}
+
+.theme-dd--menu { display: block; }
+
+@media (min-width: 640px) {
+    .theme-dd--nav {
+        display: block;
+    }
+
+    .theme-dd--menu {
+        display: none;
+    }
+}
+
+/* Di dalam menu mobile barisnya harus serata dengan tautan lain,
+   tapi tidak boleh ikut aturan hover merah (warna "Keluar") dan
+   tidak boleh ikut `text-align: left` untuk tombol panel. */
+.mobile-menu .theme-dd {
+    padding: 4px;
+}
+
+.mobile-menu .theme-dd-btn {
+    width: 100%;
+    justify-content: flex-start;
+    background: transparent;
+    border-color: transparent;
+}
+
+.mobile-menu .theme-dd-btn:hover {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
+}
+
+.mobile-menu .theme-dd-btn .chevron {
+    margin-left: auto;
+}
+
+/* Di sidebar admin/superadmin lebarnya sempit, jadi pemicunya
+   dibuat selebar baris. Panel tetap rata kanan seperti di navbar. */
+.theme-dd--sidebar {
+    margin-bottom: 10px;
+}
+
+.theme-dd--sidebar .theme-dd-btn {
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.theme-dd--sidebar .theme-dd-btn .chevron {
+    margin-left: auto;
+}
+
+/* Di landing page pickernya satu baris dengan tombol Register dan
+   Log In, jadi harus ikut aturan flex yang sama: melebar penuh saat
+   tombolnya menumpuk (kolom) dan ikut tinggi saat berjajar (baris). */
+.theme-dd--hero {
+    display: flex;
+}
+
+.theme-dd--hero .theme-dd-btn {
+    flex: 1;
+}

@@ -1,0 +1,54 @@
+/* =========================================================
+   STATUS LAPORAN
+   =========================================================
+
+   Warna status adalah warna FUNGSIONAL, bukan merek: pengguna harus
+   bisa membedakan "diterima" dari "ditolak" tanpa perlu tahu aksen
+   apa yang dipilih. Karena itu kelas di sini sengaja memakai
+   `--diterima` / `--diproses` / `--selesai` / `--ditolak` dari
+   `theme.css`, bukan `var(--accent)`. Ganti tema tidak boleh
+   menggeser makna warna status.
+
+   PRA-SEBELUMNYA kelas ini ditulis sebagai utilitas Tailwind
+   (`bg-blue-100 text-blue-800 ring-blue-600/20`). Masalahnya dua:
+   palet Tailwind tidak sama dengan palet status yang disepakati, dan
+   yang lebih penting -- `bg-blue-100` adalah terang, jadi di mode dark
+   teks `text-blue-800` di atasnya tidak terbaca dan badge ikut
+  Terlihat seperti noda putih.
+
+   `resources/views/...` dan `app/Support/StatusPeta.php` sekarang
+   memakai kelas di file ini.
+   ========================================================= */
+
+/* Per-status: hanya menunjuk dua token, tidak mengatur warna langsung.
+   `--tint` untuk latar, `--fg` untuk teks/border/dot.
+
+   `--fg` memakai varian `-ink`, bukan warna status mentah: warna
+   status sengaja satu nilai untuk semua mode, sedangkan `--tint`
+   mengikuti `--surface`, jadi di mode dark pasangannya tidak
+   konstan. `-ink` sudah mengimbangi itu. */
+.st-diterima { --tint: var(--diterima-tint); --fg: var(--diterima-ink); }
+.st-diproses { --tint: var(--diproses-tint); --fg: var(--diproses-ink); }
+.st-selesai { --tint: var(--selesai-tint); --fg: var(--selesai-ink); }
+.st-ditolak { --tint: var(--ditolak-tint); --fg: var(--ditolak-ink); }
+
+/* "Menunggu" bukan status resmi, jadi netral -- bukan kelabu gelap
+   yang ikut berubah saat mode dibalik. */
+.st-default { --tint: var(--surface-2); --fg: var(--ink-soft); }
+
+.status-badge {
+    background-color: var(--tint);
+    color: var(--fg);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 25%, transparent);
+}
+
+.status-text { color: var(--fg); }
+
+.status-dot { background-color: var(--fg); }
+
+.status-bg { background-color: var(--tint); }
+
+/* Cincin fokus dan sorotan tipis dengan warna status. */
+.status-ring {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--fg) 30%, transparent);
+}

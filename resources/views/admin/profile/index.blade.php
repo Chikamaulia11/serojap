@@ -19,7 +19,7 @@
 
         <div class="p-6 border-b border-slate-100 flex items-center gap-4">
 
-            <div class="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-[#2657c1] to-[#226d71] flex items-center justify-center text-white text-2xl font-bold">
+            <div class="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-[var(--accent)] to-[var(--accent-deep)] flex items-center justify-center text-white text-2xl font-bold">
 
                 @if($admin->foto_profil)
                     <img src="{{ asset('storage/' . $admin->foto_profil) }}"
@@ -163,7 +163,7 @@
                 <x-submit-button
                     type="submit"
                     loading-text="Menyimpan..."
-                    class="px-5 py-2.5 rounded-xl text-sm font-medium bg-[#2657c1] text-white hover:bg-blue-700 transition shadow-sm"
+                    class="px-5 py-2.5 rounded-xl text-sm font-medium bg-[var(--accent)] text-white hover:bg-blue-700 transition shadow-sm"
                 >
                     Simpan Perubahan
                 </x-submit-button>
@@ -184,7 +184,7 @@
                 title: 'Berhasil',
                 text: '{{ session('success') }}',
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#2657c1'
+                confirmButtonColor: 'var(--accent)'
             });
         @endif
 
@@ -194,7 +194,7 @@
                 title: 'Gagal Menyimpan',
                 text: 'Periksa kembali data profil admin yang kamu isi.',
                 confirmButtonText: 'Oke',
-                confirmButtonColor: '#2657c1'
+                confirmButtonColor: 'var(--accent)'
             });
         @endif
 
