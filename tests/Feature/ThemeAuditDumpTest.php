@@ -110,7 +110,110 @@ class ThemeAuditDumpTest extends TestCase
             .'Pastikan public/build/manifest.json ada (jalankan: npm run build).'
         );
 
+        // Guard: markup yang rusak diam-diam lolos semua pemeriksaan
+        // lain, karena audit men-set atribut tema sendiri sebelum
+        // mengukur. `@include` yang jatuh di tengah tag yang belum
+        // tertutup -- pernah terjadi di `welcome.blade.php`, antara
+        // `name="description"` dan `content="...">` -- membuat script
+        // anti-FOUC berubah jadi teks yang ter-render di `<body>`:
+        // 1039 karakter `(function () { var ACCENTS = ...` setinggi
+        // 138px di paling atas halaman, dan `data-accent` tidak pernah
+        // terpasang. Pemeriksaan kontras tetap hijau karena yang
+        // diukur atributnya, bukan DOM-nya.
+        $this->assertNoTagInsideTag($html, $name);
+
         file_put_contents(base_path(self::OUT.'/'.$name.'.html'), $html);
+    }
+
+    /**
+     * Pastikan tidak ada tag baru yang dibuka sebelum tag sebelumnya
+     * ditutup.
+     *
+     * Kalau terjadi, tag yang belum tertutup itu menelan seluruh
+     * isi di depannya -- di `<meta name="description"` yang begitu,
+     * browser memindahkan isi `<script>` ke `<body>` dan merendernya
+     * sebagai teks yang terlihat.
+     *
+     * Yang diperiksa adalah HTML HASIL render, bukan sumbernya, jadi
+     * kelas kesalahan yang sama di view mana pun ikut tertangkap.
+     *
+     * `DOMDocument` sengaja tidak dipakai: parser libxml tidak
+     * mereproduksi quirks HTML5 yang sama, sehingga di situ skripnya
+     * tetap terlihat "di dalam" tag `<meta>` dan bug-nya jadi tak
+     * terdeteksi.
+     *
+     * Dua hal yang harus dilewati, karena `<` di sana cuma teks biasa:
+     * isi `<style>`/`<script>`, dan `<` yang tidak diikuti huruf --
+     * `Sistem Pelaporan <br>` di landing page, misalnya. Kombinasi
+     * keduanya pernah bikin versi pertama guard ini melaporkan
+     * false positive pada dua tempat.
+     */
+    private function assertNoTagInsideTag(string $html, string $name): void
+    {
+        $len = strlen($html);
+        $i = 0;
+        $blocks = 0;
+
+        // Posisi `<` pembuka tag yang belum ditutup, atau null kalau
+        // kita sedang di luar tag mana pun.
+        $openAt = null;
+
+        while ($i < $len) {
+            $c = $html[$i];
+
+            if ($c === '>') {
+                $openAt = null;
+                $i++;
+                continue;
+            }
+
+            if ($c !== '<') {
+                $i++;
+                continue;
+            }
+
+            $startsTag = $i + 1 < $len && ctype_alpha($html[$i + 1]);
+
+            if ($openAt !== null) {
+                if ($startsTag) {
+                    $ctx = rtrim(substr($html, 0, $openAt));
+
+                    $this->fail(
+                        'Halaman '.$name.': tag baru dibuka di posisi '.$i.' sementara tag '
+                        .'yang dimulai di posisi '.$openAt.' belum ditutup -- konteks '
+                        .'"'.substr($ctx, -60).'". Browser akan merender isi berikutnya '
+                        .'sebagai teks. Periksa tag yang terpotong sebelum @include/@stack.'
+                    );
+                }
+                $i++;
+                continue;
+            }
+
+            if ($startsTag && preg_match('/^<(script|style)\b/i', substr($html, $i, 12), $m)) {
+                $tag = strtolower($m[1]);
+                $blocks++;
+                $close = stripos($html, '</'.$tag, $i);
+                $end = $close === false ? false : strpos($html, '>', $close);
+                $i = ($end === false) ? $len : $end + 1;
+                continue;
+            }
+
+            if ($startsTag) {
+                $openAt = $i;
+            }
+            $i++;
+        }
+
+        // Supaya guard ini kelihatan benar-benar jalan. Kalau hanya
+        // `fail()` tanpa penghitung, versi yang tidak memindai
+        // apa pun ikut dilaporkan hijau, persis seperti guard yang
+        // terlalu longgar -- dua-duanya sama-sama tidak berguna.
+        $this->assertGreaterThan(
+            0,
+            $blocks,
+            'Halaman '.$name.': tidak ada blok <script>/<style> yang dipindai, '
+            .'jadi guard tag-nested yang longgar ikut dilaporkan hijau.'
+        );
     }
 
     protected function setUp(): void

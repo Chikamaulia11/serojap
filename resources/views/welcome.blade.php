@@ -6,9 +6,26 @@
     <title>Serojap - Pelaporan Jalan Rusak Purwakarta</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description"
-
-    @include('partials.theme-bootstrap')
         content="Serojap adalah sistem pelaporan jalan rusak Kabupaten Purwakarta. Laporkan kerusakan jalan, pantau status penanganan, dan lihat statistik perbaikan secara terbuka.">
+
+    {{-- Script anti-FOUC harus SESUDAH tag <meta> lengkap, bukan di
+         tengah-tengahnya.
+
+         Dulu `@include` ini duduk di antara `name="description"` dan
+         `content="...">`, jadi tag `<meta>`-nya tidak pernah tertutup
+         waktu include itu dievaluasi. Akibatnya di DOM benar-benar:
+
+           1. Isi script jadi TEKS VISIBEL di dalam `<body>` --
+              1039 karakter, mulai `(function () { var ACCENTS = ...`,
+              tinggi 138px di paling atas halaman. Itulah yang
+              terbaca sebagai "teks function aneh".
+           2. `<html>` TIDAK pernah dapat `data-accent`/`data-mode`,
+              jadi anti-FOUC tidak berjalan sama sekali di halaman ini.
+
+         Audit tidak pernah menangkapnya karena `theme-audit-inject.js`
+         men-set sendiri atribut tema sebelum mengukur, jadi DOM rusak
+         tadi tidak terlihat dari sisi audit -- hanya dari browser. --}}
+    @include('partials.theme-bootstrap')
 
     <link rel="stylesheet" href="{{ asset('assets/pelapor/css/index.css') }}">
 
