@@ -63,20 +63,30 @@ PROBE_JS = r"""
 
     function clipper(node, panel) {
         var out = null;
+        var pl = panel.getBoundingClientRect();
         for (var p = panel.parentElement; p; p = p.parentElement) {
             var cs = getComputedStyle(p);
-            if (cs.overflow !== 'visible' || cs.overflowX !== 'visible' ||
-                cs.overflowY !== 'visible') {
-                var pr = p.getBoundingClientRect();
-                var pl = panel.getBoundingClientRect();
-                if (pl.left < pr.left - 0.5 || pl.right > pr.right + 0.5 ||
-                    pl.top < pr.top - 0.5 || pl.bottom > pr.bottom + 0.5) {
-                    out = p.tagName.toLowerCase() +
-                        (p.id ? '#' + p.id : '') +
-                        (p.className && typeof p.className === 'string'
-                            ? '.' + p.className.trim().split(/\s+/).join('.') : '');
-                    break;
-                }
+            var clipX = cs.overflowX !== 'visible';
+            var clipY = cs.overflowY !== 'visible';
+            if (!clipX && !clipY) continue;
+            var pr = p.getBoundingClientRect();
+            /* Sisi horizontal hanya bisa terpotong oleh `overflow-x`, sisi
+             * vertikal hanya oleh `overflow-y`.
+             *
+             * `.hero-section` memakai `overflow-x: clip` + `overflow-y:
+             * visible` supaya dekorasi `.gradient-bg` yang melebar ke kiri
+             * tertahan tanpa membuat hero jadi wadah scroll. Versi lama
+             * menguji keempat sisi begitu saja, jadi sumbu `clip` yang
+             * cuma horizontal ikut menuduh panel vertikal sebagai
+             * terpotong. */
+            var keluarX = clipX && (pl.left < pr.left - 0.5 || pl.right > pr.right + 0.5);
+            var keluarY = clipY && (pl.top < pr.top - 0.5 || pl.bottom > pr.bottom + 0.5);
+            if (keluarX || keluarY) {
+                out = p.tagName.toLowerCase() +
+                    (p.id ? '#' + p.id : '') +
+                    (p.className && typeof p.className === 'string'
+                        ? '.' + p.className.trim().split(/\s+/).join('.') : '');
+                break;
             }
         }
         return out;

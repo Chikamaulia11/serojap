@@ -121,6 +121,11 @@ html[data-accent="amber"][data-mode-resolved="light"] {
        implementasi ini, dan tugas sistem tema memang mensyaratkan
        kontras teks tetap terbaca. */
     --on-accent: #0a0a0a;
+
+    /* Aksen sebagai teks di atas permukaan terang (tombol "Daftar &
+       Lapor" yang berlatar `--surface`): #b06a12 di atas putih 4.27,
+       jadi amber light pakai `--accent-deep`-nya. */
+    --accent-ink: var(--accent-deep);
 }
 
 html[data-accent="amber"][data-mode-resolved="dark"] {
@@ -217,15 +222,48 @@ html[data-mode-resolved="dark"] {
    ========================================================= */
 
 html[data-mode-resolved="light"] {
-    --band-from: var(--accent);
-    --band-to: var(--accent-deep);
+    /* Gradien pita di mode light DIBUAT GELAP, bukan terang.
+     *
+     * Sebelumnya `--band-from` = `--accent` apa adanya, jadi pita CTA
+     * dan gradien footer menyalin warna aksen terang dengan teks putih
+     * di atasnya. Untuk amber light putih di atas #b06a12 hanya 4.27.
+     * Memakai tinta gelap sebagai gantinya tidak menyelesaikan apa pun:
+     * gradiennya bertransisi dari #b06a12 ke #6b3e08, jadi ujungnya
+     * gelap dan tinta gelap hilang di sana (2.19). Tidak ada satu pun
+     * warna teks yang bisa menutup kedua ujung gradien terang-gelap.
+     *
+     * Aksen yang dispesialkan adalah `--accent-deep`, yang di keenam
+     * mode light sudah gelap: putih di atasnya 9.06 (amber) sampai
+     * 12.44 (purple). Ujung kedua digelapkan lagi, jadi teks putih
+     * aman di sepanjang gradien.
+     *
+     * Warna palet tidak disentuh; hanya dua token turunan yang
+     * diturunkan ulang. */
+    --band-from: var(--accent-deep);
+    --band-to: color-mix(in srgb, var(--accent-deep) 70%, #05090a);
     --on-band: #ffffff;
+
+    /* Aksen yang diperuntukkan sebagai TEKS di atas `--surface`.
+     *
+     * Aksen di mode light sengaja gelap supaya teks putih di atasnya
+     * terbaca -- artinya aksen itu diperuntukkan sebagai latar tombol,
+     * bukan sebagai tinta. Dipakai terbalik (aksen sebagai teks di
+     * atas permukaan terang) hampir selalu lolos, kecuali amber:
+     * #b06a12 di atas putih hanya 4.27. `--accent-ink` adalah selector
+     * untuk "aksen sebagai teks", dan satu-satunya yang perlu
+     * digeser adalah amber light.
+     */
+    --accent-ink: var(--accent);
 }
 
 html[data-mode-resolved="dark"] {
     --band-from: color-mix(in srgb, var(--accent) 30%, var(--accent-deep));
     --band-to: var(--accent-deep);
     --on-band: #ffffff;
+
+    /* Aksen mode dark terang, jadi sebagai teks di atas `--surface`
+       gelap sudah keterbaca tanpa perubahan. */
+    --accent-ink: var(--accent);
 }
 
 /* =========================================================

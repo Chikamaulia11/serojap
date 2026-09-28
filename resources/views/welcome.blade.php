@@ -34,16 +34,42 @@
             padding-bottom: 2rem !important;
             position: relative;
             z-index: 1;
-            min-height: 85vh;
+            /* `min-height: 85vh` DIHAPUS.
+             *
+             * Hero dipaksa setinggi 85% tinggi jendela, padahal isinya
+             * cuma 538px: gambar 480px + bingkai, dan kolom teksnya
+             * lebih pendek. Dengan `align-items: center` sisanya dibagi
+             * rata ke atas dan bawah, jadi di 1280x900 ada 227px
+             * kosong di dalam hero dan 99px lagi sebelum kartu
+             * statistik -- 326px tanpa isi, dan itu yang terbaca sebagai
+             * "area kosong tinggi" di screenshot penuh.
+             *
+             * Di 375px tinggi sebenarnya 1165px (dua kolom jadi beruntai),
+             * jadi `min-height` tidak pernah mengikat di mobile --
+             * masalahnya hanya di lebar desktop/tablet.
+             *
+             * Gambarnya sendiri tidak bermasalah: `naturalWidth` 896 dan
+             * `complete` true, jadi ini bukan aset gagal dimuat yang
+             * menyisakan tempat kosong. */
             display: flex;
             align-items: center;
             /* WAJIB: `.gradient-bg` adalah dekorasi 600x600px yang digeser
                ke `left: -100px`, jadi ujungnya berada di 500px. Tanpa
-               `overflow: hidden` di sini, elemen itu ikut lebarkan
+               pemotongan di sini, elemen itu ikut lebarkan
                `scrollWidth` dokumen: di layar 375px (iPhone SE) halaman
                jadi bisa di-scroll ke samping dan seluruh konten geser
-               keluar layar. */
-            overflow: hidden;
+               keluar layar.
+
+               Dipakai `clip`, bukan `hidden`. `hidden` di satu sumbu
+               memaksa sumbu lain jadi `auto`, jadi hero jadi wadah
+               scroll dan panel tema yang terbuka ke bawah ikut terpotong
+               di batasnya -- di 1280px panel di navbar landing page
+               tidak terlihat sama sekali. `overflow-x: clip` +
+               `overflow-y: visible` dip honored, jadi dekorasi
+               tetap terpotong horizontal sementara panel bebas
+               keluar vertikal. */
+            overflow-x: clip;
+            overflow-y: visible;
         }
 
         .gradient-bg {
@@ -179,7 +205,14 @@
             font-weight: 700;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--teal);
+            /* Tint aksen tetap di latar, tapi TEKSnya bukan warna aksen.
+             *
+             * Aksen sebagai teks di atas tint-nya sendiri selalu di
+             * bawah ambang: rose dark 3.99, amber light 3.78. Warna
+             * aksen memang tidak dimaksudkan sebagai tinta; teks 11px di atas
+             * pil 10% bukan tempat memakainya. `--ink` lolos >10:1 di kedua mode
+             * dan identitas aksen tetap terbawa oleh tint-nya. */
+            color: var(--ink);
             background-color: var(--teal-soft);
             border-radius: 50px;
             padding: 0.4rem 1rem;
@@ -357,9 +390,9 @@
 
                 <div class="col-lg-6">
                     <div
-                        class="d-inline-flex align-items-center bg-teal-light text-teal px-4 py-2 border border-teal-light border-opacity-25 rounded-pill mb-4">
+                        class="d-inline-flex align-items-center bg-teal-light px-4 py-2 border border-teal-light border-opacity-25 rounded-pill mb-4">
                         <span class="dot-green"></span>
-                        <small class="fw-bold text-uppercase tracking-wider" style="font-size: 10px;">Sistem Pelaporan
+                        <small class="fw-bold text-uppercase tracking-wider" style="font-size: 10px; color: var(--ink);">Sistem Pelaporan
                             Purwakarta</small>
                     </div>
 
@@ -629,12 +662,12 @@
                 </p>
                 <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
                     <a href="{{ route('register') }}" class="btn btn-lg fw-bold rounded-pill px-4"
-                        style="background-color:var(--surface); color:var(--accent); border:1px solid var(--line);">
+                        style="background-color:var(--surface); color:var(--accent-ink); border:1px solid var(--line);">
                         Daftar &amp; Lapor
                     </a>
                     <a href="{{ route('login') }}"
                         class="btn btn-lg fw-bold rounded-pill px-4"
-                        style="background-color:transparent; color:#ffffff; border:1px solid rgba(255,255,255,0.7);">
+                        style="background-color:transparent; color:var(--on-band); border:1px solid color-mix(in srgb, var(--on-band) 70%, transparent);">
                         Masuk
                     </a>
                 </div>

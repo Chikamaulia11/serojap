@@ -25,27 +25,86 @@ function __audit() {
       // masih melaporkan warna LAMA yang sedang dianimasikan, sehingga
       // mode light ikut terukur memakai tinta mode dark (dan sebaliknya).
       // Yang diukur adalah warna akhir, bukan tengah animasi.
+      //
+      // Sifat khususnya penting: `*, *::before` (0,0,0) TIDAK cukup.
+      // `welcome.blade.php` menulis
+      // `.btn-custom-action { transition: all .2s ease-in-out !important }`
+      // dan `!important` di spesifisitas (0,1,0) mengalahkan `*` yang
+      // juga `!important`. Akibatnya tombol diukur sewaktu animasi --
+      // teks dark mode sudah bergerak ke warna light, tapi `getPropertyValue`
+      // custom property sudah berubah, jadi laporan menampilkan dua
+      // nilai yang saling bertentangan untuk elemen yang sama.
+      //
+      // `html[data-accent] [class]` bernilai (0,2,1) dan menang. Atribut
+      // `data-accent` selalu dipasang audit ini sebelum mengukur, jadi
+      // selektor ini tidak pernah gagal match.
       var stopMotion = document.createElement('style');
-      stopMotion.textContent = '*,*::before,*::after{transition:none !important;'
-          + 'animation:none !important;scroll-behavior:auto !important}';
+      stopMotion.textContent = 'html[data-accent] [class],'
+          + 'html[data-accent] [class]::before,'
+          + 'html[data-accent] [class]::after{'
+          + 'transition:none !important;'
+          + 'animation:none !important;'
+          + 'scroll-behavior:auto !important}';
       document.head.appendChild(stopMotion);
 
 
-    function srgb(c) {
-        // Array 0-1 (hasil komposit) langsung dipakai apa adanya.
+    /* Parser warna yang mengembalikan [r, g, b, a] dengan r/g/b 0-1.
+     *
+     * Semua bentuk warna yang memang bisa dikembalikan browser harus
+     * ditangani:
+     * `rgb(1, 2, 3)`, `rgba(1, 2, 3, .5)`, `rgb(1 2 3 / 50%)`,
+     * `color(srgb 0.1 0.2 0.3 / 0.4)`, dan `transparent`.
+     *
+     * Yang paling penting adalah `/ alpha` pada notasi `color()`:
+     * `color-mix(in srgb, var(--teal) 10%, transparent)` dikomputasi
+     * browser menjadi `color(srgb 0.13 0.42 0.44 / 0.1)`. Versi lama
+     * membaca `color(` sebagai "opak" dan mengabaikan alpha-nya, jadi
+     * badge 10% itu dihitung seolah warnanya penuh -- teks accent di
+     * atasnya jadi kontras 1:1, padahal di layar yang tampil jauh lebih
+     * terang. Audit melaporkan kontras salah, bukan temuannya salah.
+     */
+    function parseColor(c) {
         if (Object.prototype.toString.call(c) === '[object Array]') return c;
-        // Normalisasi apa pun yang dikembalikan browser (rgb(), rgba(),
-        // color(srgb ...), oklch) menjadi angka 0-1 per kanal.
-        var m = String(c).match(/[-\d.]+/g);
-        if (!m) return null;
-        if (/^color\(/.test(String(c).trim())) {
-            return [parseFloat(m[0]), parseFloat(m[1]), parseFloat(m[2])];
+        var s = String(c).trim();
+        if (!s || s === 'none') return null;
+        if (s === 'transparent') return [0, 0, 0, 0];
+
+        var nums = (s.match(/[-\d.]+%?/g) || []).map(function (t) {
+            return t.charAt(t.length - 1) === '%' ? parseFloat(t) / 100 : parseFloat(t);
+        });
+        if (nums.length < 3) return null;
+
+        var a = 1;
+        var isColorFn = /^color\(/i.test(s);
+        var rgb;
+
+        if (isColorFn) {
+            // `color(srgb r g b / a)` -- kanal sudah 0-1.
+            rgb = [nums[0], nums[1], nums[2]];
+        } else {
+            // `rgb()`/rgba() kanal 0-255; `oklab`/`oklch()` juga 0-1
+            // tapi tidak pernah muncul sebagai background-color komputasi
+            // di browser, jadi tidak ditangani terpisah.
+            rgb = [nums[0] / 255, nums[1] / 255, nums[2] / 255];
         }
-        return [
-            parseFloat(m[0]) / 255,
-            parseFloat(m[1]) / 255,
-            parseFloat(m[2]) / 255
-        ];
+
+        // Alpha: baik `%` legacy `rgba(r,g,b,0.35)` maupun `/ a` modern.
+        var slash = s.indexOf('/');
+        if (slash !== -1) {
+            var rest = (s.slice(slash + 1).match(/[-\d.]+%?/) || [])[0];
+            if (rest !== undefined) {
+                a = rest.charAt(rest.length - 1) === '%' ? parseFloat(rest) / 100 : parseFloat(rest);
+            }
+        } else if (nums.length >= 4) {
+            a = nums[3];
+        }
+
+        return [rgb[0], rgb[1], rgb[2], isNaN(a) ? 1 : a];
+    }
+
+    function srgb(c) {
+        var v = parseColor(c);
+        return v ? [v[0], v[1], v[2]] : null;
     }
 
     function lum(c) {
@@ -58,15 +117,9 @@ function __audit() {
     }
 
     function alpha(c) {
-        if (!c) return 1;
-        if (c === 'transparent') return 0;
-        var m = String(c).match(/rgba?\(([^)]+)\)/);
-        if (m) {
-            var parts = m[1].split(',');
-            if (parts.length >= 4) return parseFloat(parts[3]);
-        }
-        if (/^color\(/.test(String(c).trim())) return 1;
-        return 1;
+        if (Object.prototype.toString.call(c) === '[object Array]') return c[3];
+        var v = parseColor(c);
+        return v ? v[3] : 1;
     }
 
     function over(fg, bg) {
@@ -285,6 +338,13 @@ function isDisabled(el) {
                 fails.push({
                     text: el.textContent.trim().slice(0, 60),
                     fg: worst.fg, bg: worst.bg,
+                    // Warna mentah apa adanya dari `getComputedStyle`.
+                    // `fg`/`bg` di atas sudah berupa hasil komposit, jadi
+                    // tanpa ini laporan sering tidak cocok dengan yang
+                    // ditunjukkan DevTools dan debugging berhenti di
+                    // pertanyaan "kenapa audit bilang begini".
+                    rawFg: fg,
+                    rawClass: typeof el.className === 'string' ? el.className.trim() : '',
                     ratio: Math.round(worst.ratio * 100) / 100,
                     need: min, large: large, disabled: isDisabled(el),
                     onGradient: !!bgInfo.onGradient,
