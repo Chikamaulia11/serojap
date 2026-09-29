@@ -215,14 +215,115 @@ class Cdp {
         return false;
     }
 
-    async screenshot(out, fullPage = true) {
+    async screenshot(out, fullPage = true, clip) {
         const params = { format: 'png' };
-        if (fullPage) {
+        if (clip) {
+            /*
+             * Crop per elemen. `Page.captureScreenshot` menerima
+             * koordinat CSS, jadi rect harus diukur dari DOM-nya --
+             * bukan diteruskan dari luar, karena pemanggil tidak
+             * bisa tahu posisi elemen tanpa menjalankan JS juga.
+             *
+             * `scale: 1` sengaja: untuk memeriksa apakah teks benar
+             *ibolata atau tidak, rasio 1:1 dengan pixel device
+             * diperlukan. Kalau diskalakan, teks kecil jadi lebih
+             * mudah terbaca daripada kenyataannya.
+             */
+            params.clip = {
+                x: Math.max(0, clip.x),
+                y: Math.max(0, clip.y),
+                width: Math.max(1, clip.width),
+                height: Math.max(1, clip.height),
+                scale: 1,
+            };
+            params.captureBeyondViewport = true;
+        } else if (fullPage) {
             params.captureBeyondViewport = true;
         }
         const data = await this.send('Page.captureScreenshot', params, this.session);
         mkdirSync(dirname(out), { recursive: true });
         writeFileSync(out, Buffer.from(data.data, 'base64'));
+    }
+
+    /**
+     * Ukur rect elemen yang pertama cocok dengan `selector`, dalam
+     * koordinat viewport CSS. Dipakai bareng `screenshot()` untuk
+     * memotong gambar tepat pada elemennya.
+     */
+    async elementRect(selector) {
+        const expr = `(() => {
+            const el = document.querySelector(${JSON.stringify(selector)});
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return { x: r.x + scrollX, y: r.y + scrollY, width: r.width, height: r.height };
+        })()`;
+        return this.evaluate(expr);
+    }
+
+    /**
+     * Sama seperti `elementRect()`, tapi untuk "path" gaya
+     * `pathOf()` dari `theme-audit-inject.js`:
+     *
+     *     body.bg-white.font-sans > aside#adminSidebar > a.flex.items-center
+     *
+     * Itu BUKAN selector. Class Tailwind yang memuat titik dua
+     * -- `div.md:ml-60.flex` -- bakalan ditolak `querySelector` sebagai
+     * pseudo-class, dan path yang memuat `:` atau `>` di dalam nama
+     * class akan gagal. Segmen terakhir dipakai sebagai selector,
+     * lalu kandidat dicocokkan satu per satu dengan membandingkan
+     * rantainya sendiri dan memilih yang prefiks terpanjang cocok.
+     */
+    async elementRectForPath(desc) {
+        const expr = `(() => {
+            const want = ${JSON.stringify(desc)};
+            const own = (el) => {
+                const out = [];
+                let n = el;
+                while (n && n.nodeType === 1 && n.tagName !== 'HTML') {
+                    let t = n.tagName.toLowerCase();
+                    if (n.id) t += '#' + n.id;
+                    else if (typeof n.className === 'string' && n.className.trim()) {
+                        t += '.' + n.className.trim().split(/\\s+/).slice(0, 2).join('.');
+                    }
+                    out.unshift(t);
+                    n = n.parentElement;
+                }
+                return out.slice(-6).join(' > ');
+            };
+
+            // Class Tailwind arbitrary-value -- 'text-[11px]', 'w-[calc(100%-2rem)]' --
+            // dan class responsif dengan titik dua -- 'md:ml-60' -- BUKAN
+            // selector CSS: yang pertama ditolak sebagai attribut, yang
+            // kedua sebagai pseudo-class. Jadi segmen terakhir dicoba
+            // apa adanya dulu, lalu class bermasalah itu dibuang.
+            const segs = [want.split(' > ').pop()];
+            const cleaned = segs[0]
+                .split('.')
+                .filter((c) => c && !c.includes('[') && !c.includes(':'))
+                .join('.');
+            if (cleaned && cleaned !== segs[0]) segs.push(cleaned);
+
+            const b = want.split(' > ');
+            let cands = [];
+            for (const seg of segs) {
+                try { cands = [...document.querySelectorAll(seg)]; } catch (e) { cands = []; }
+                if (cands.length) break;
+            }
+            if (!cands.length) return null;
+
+            let best = -1, el = null;
+            for (const c of cands) {
+                const a = own(c).split(' > ');
+                let sc = 0;
+                while (sc < Math.min(a.length, b.length) && a[a.length - 1 - sc] === b[b.length - 1 - sc]) sc++;
+                if (sc > best) { best = sc; el = c; }
+            }
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return { x: r.x + scrollX, y: r.y + scrollY, width: r.width, height: r.height,
+                     kandidat: cands.length };
+        })()`;
+        return this.evaluate(expr);
     }
 }
 
@@ -287,8 +388,42 @@ async function main() {
                     }
                 }
 
-                if (job.screenshot) {
-                    await cdp.screenshot(job.screenshot, job.fullPage !== false);
+                if (job.screenshot || job.screenshotSelector || job.screenshotPath) {
+                    let out = job.screenshot;
+                    let clip = null;
+                    if (job.screenshotPath) {
+                        // `path` dari audit, bukan selector -- lihat
+                        // `elementRectForPath()`.
+                        clip = await cdp.elementRectForPath(job.screenshotPath);
+                        if (!clip) {
+                            throw new Error('path tidak bisa diresolve: ' + job.screenshotPath);
+                        }
+                    } else if (job.screenshotSelector) {
+                        clip = await cdp.elementRect(job.screenshotSelector);
+                        if (!clip) {
+                            throw new Error('selector tidak cocok: ' + job.screenshotSelector);
+                        }
+                    }
+                    if (clip) {
+                        // Sisakan konteks visual: crop yang persis
+                        // sebesar elemen sering cuma menghasilkan
+                        // potongan teks tanpa tepi, sehingga yang
+                        // diuji kontrasnya tidak terlihat.
+                        const pad = job.screenshotPad ?? 12;
+                        clip = {
+                            x: clip.x - pad,
+                            y: clip.y - pad,
+                            width: clip.width + pad * 2,
+                            height: clip.height + pad * 2,
+                        };
+                        if (!out) {
+                            out = job.screenshotDir
+                                ? job.screenshotDir + '/' + (job.name || 'elemen') + '.png'
+                                : (job.screenshotPath || job.screenshotSelector)
+                                    .replace(/[^a-z0-9]+/gi, '_') + '.png';
+                        }
+                    }
+                    await cdp.screenshot(out, job.fullPage !== false, clip);
                 }
 
                 const value = job.eval ? await cdp.evaluate(job.eval) : null;
