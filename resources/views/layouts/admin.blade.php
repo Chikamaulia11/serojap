@@ -84,7 +84,7 @@
 
         <!-- Brand -->
         <div class="flex items-center gap-2.5 px-5 py-5 border-b border-slate-100">
-            <img src="{{ asset('assets/pelapor/images/logo-serojap.webp') }}" alt="Serojap" class="w-10 h-10 rounded-lg object-cover shadow-md">
+            <x-application-logo class="w-10 h-10 rounded-lg object-cover shadow-md" />
             <span class="text-lg font-bold text-[var(--accent)] tracking-wide">SEROJAP</span>
         </div>
 

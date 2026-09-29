@@ -252,9 +252,7 @@
         <div class="px-5 py-5 border-b border-slate-200">
             <div class="flex items-center gap-3">
                 <div class="w-11 h-11 rounded-2xl bg-white shadow-md shadow-blue-100 border border-slate-100 flex items-center justify-center overflow-hidden">
-                    <img src="{{ asset('assets/pelapor/images/logo-serojap.webp') }}"
-                         alt="Serojap"
-                         class="w-8 h-8 object-contain">
+                    <x-application-logo class="w-8 h-8 object-contain" />
                 </div>
 
                 <div>

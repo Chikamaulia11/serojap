@@ -469,7 +469,7 @@
                     <div class="footer-brand-head">
 
                         <div class="footer-logo-box">
-                            <img src="{{ asset('assets/pelapor/images/logo-serojap.webp') }}" alt="Logo SEROJAP">
+                            <x-application-logo />
                         </div>
 
                         <div>
