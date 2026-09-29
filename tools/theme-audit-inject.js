@@ -320,7 +320,23 @@ function gradientCandidates(image, base, comp, el, imageNode) {
                 }
                 if (!painted) throw new Error('canvas tidak menerima lapis gradien');
 
-                var under = comp(base);
+                // Urutan composite: gradien dulu di atas `base`, baru
+                // `stack` di atas gradien.
+                //
+                // `stack` diisi dari `elementsFromPoint` (atas ke bawah)
+                // dan loop-nya berhenti saat ketemu `background-image`.
+                // Jadi seluruh isi `stack` berada DI ATAS gradien, bukan
+                // di bawahnya. `comp()` sudah benar dengan menumpukkan
+                // `stack` di atas apa pun yang diberi sebagai argumen,
+                // tapi argumennya harus SUDAH memuat gradien.
+                //
+                // Dulu gradien di-composite di atas `comp(base)`, yaitu
+                // gradien dianggap layer paling atas. Kartu
+                // `.footer-system-card` (putih 92% di atas gradien
+                // `.footer-section`) jadi terbalik: teks --ink light
+                // dilaporkan di atas `rgb(11,20,22)` -- warna awal
+                // gradien footer -- dengan rasio 1.2:1, padahal teksnya
+                // berdiri di atas panel putih.
                 var inset = Math.max(1, Math.round(Math.min(w, h) * 0.02));
                 var probes = [
                     [w >> 1, h >> 1],
@@ -335,8 +351,10 @@ function gradientCandidates(image, base, comp, el, imageNode) {
                     var y = Math.min(h - 1, Math.max(0, probes[p][1]));
                     var d = cx.getImageData(x, y, 1, 1).data;
                     if (d[3] === 0) continue;
-                    var c = over('rgba(' + d[0] + ',' + d[1] + ',' + d[2] + ',' +
-                                 (Math.round(d[3] / 255 * 1000) / 1000) + ')', under) || under;
+                    var grad = 'rgba(' + d[0] + ',' + d[1] + ',' + d[2] + ',' +
+                               (Math.round(d[3] / 255 * 1000) / 1000) + ')';
+                    var under = comp(over(grad, base) || base) || base;
+                    var c = under;
                     var L = lum(c);
                     if (L === null) continue;
                     if (loL === null || L < loL) { loL = L; lo = c; }
@@ -422,7 +440,21 @@ function parseGradientFallback(image, base, comp, el, node) {
     // di atas warna body -- padahal di layar yang mengaturnya ada
     // lapisan putih 0.98 di atasnya. Itu melaporkan 3.51:1 untuk
     // label yang areanya terang.
-    var acc = base;
+    //
+    // Titik mula HARUS `comp(base)`, bukan `base` polos. `stack`
+    // berisi lapisan `background-color` yang menutupi gradien, dan
+    // audit tetap menumpuknya di jalur canvas -- hanya fallback ini
+    // yang melewatkannya. Kartu `.footer-system-card` di
+    // `layouts/app.blade.php` persis kasusnya:
+    //
+    //   background: color-mix(in srgb, var(--surface) 92%, transparent)
+    //   di atas `.footer-section` yang gradiennya #0b1416 ke --band-*
+    //
+    // `stack`-nya `white/0.92`, dan karena diabaikan, teks
+    // `rgb(28,38,36)` (--ink light) dilaporkan di atas
+    // `rgb(11,20,22)` -- gradien gelap footer. Rasio 1.2:1 untuk
+    // teks yang sebenarnya berdiri di atas panel putih 92%.
+    var acc = comp(base);
     var results = [];
     for (var i = layers.length - 1; i >= 0; i--) {
         var sampled = null;
@@ -439,9 +471,14 @@ function parseGradientFallback(image, base, comp, el, node) {
         // itu yang terburuk, dan kalau terang justru titik paling
         // terang. Karena rasio monotonik terhadap luminansi, menguji
         // kedua ujung di setiap lapis menutup semua kasus.
+        // `comp()` menumpuk `stack` (lapisan solid yang berada DI ATAS
+        // gradien) di atas hasil gradien -- urutan yang benar, sama
+        // seperti di jalur canvas. Tanpa itu, kartu putih 92% di atas
+        // gradien footer diabaikan dan teks gelapnya dilaporkan di atas
+        // gradien gelap.
         var composited = [];
         for (var j = 0; j < sampled.length; j++) {
-            composited.push(over(sampled[j], acc) || acc);
+            composited.push(comp(over(sampled[j], acc) || acc));
         }
         for (var q = 0; q < composited.length; q++) results.push(composited[q]);
 
