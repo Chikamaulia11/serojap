@@ -19,7 +19,7 @@
 
         <div class="p-6 border-b border-slate-100 flex items-center gap-4">
 
-            <div class="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-[var(--accent)] to-[var(--accent-grad-to)] flex items-center justify-center text-white text-2xl font-bold">
+            <div class="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-[var(--accent)] to-[var(--accent-grad-to)] flex items-center justify-center text-[var(--on-accent-grad)] text-2xl font-bold">
 
                 @if($admin->foto_profil)
                     <img src="{{ asset('storage/' . $admin->foto_profil) }}"

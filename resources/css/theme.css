@@ -160,28 +160,27 @@ html[data-mode-resolved="light"] {
     /* Aksen mode light gelap, jadi teks di atasnya putih. */
     --on-accent: #ffffff;
 
-    /* Gradien avatar inisial: `from --accent` ke turunan aksen.
+    /* Gradien avatar inisial: `from --accent` ke `--accent-grad-to`.
      *
-     * Di mode light kedua stop gelap (aksen #226d71 ke deep #153e41),
-     * jadi teks putih aman: 6.01:1 dan 11.68:1.
-     *
-     * Di mode dark arahnya dibalik total: `--accent` terang
-     * (#4ba3a8) sementara `--accent-deep` nyaris hitam (#0e2b2d).
-     * Gradien seperti itu tidak punya SATU warna teks yang cocok di
-     * kedua ujungnya -- putih 2.96:1 di stop terang, teks gelap
-     * 1.24:1 di stop gelap. Inisial jadi tak terbaca di 6 mode dark.
-     *
-     * Stop kedua digeser ke `color-mix()` aksen dengan putih supaya
-     * keduanya tetap terang, lalu teksnya `--on-accent` yang gelap.
-     * Di titik 22% putih teks gelap di atasnya 6.9:1 (amber 8.9:1),
-     * jauh di atas ambang.
-     *
-     * Mode light TIDAK bisa pakai campuran yang sama: teksnya putih,
-     * jadi kedua stop harus gelap. Yang dipakai `--accent-deep` --
-     * semua aksen punya putih di atasnya 9.06:1 (amber) sampai
-     * 12.44:1 (purple). Pengecualian amber handled oleh `--on-accent`
-     * yang di blok amber sudah #0a0a0a. */
+     * Mode light: `--accent-grad-to` = `--accent-deep`, jadi kedua
+     * stop gelap dan teks putih aman (6.01:1 s.d. 11.68:1). */
     --accent-grad-to: var(--accent-deep);
+
+    /* Warna teks di atas gradien avatar.
+     *
+     * Token ini dipisah dari `--on-accent` karena kebutuhannya
+     * berbeda. `--on-accent` di mode light sudah putih untuk semua
+     * aksen kecuali amber (#0a0a0a), dan aturan itu benar untuk
+     * tombol berlatar aksen solid. Tapi gradien di mode light punya
+     * ujung `--accent-deep` yang gelap, jadi teks gelap di sana
+     * hanya 2.19:1 -- lebih buruk dari putih yang 9.06:1.
+     *
+     * Di mode dark arahnya berbalik sepenuhnya: kedua stop terang,
+     * dan putih di atasnya hanya 1.18:1 s.d. 2.96:1, sedangkan
+     * `--on-accent` yang gelap dapat 6.3:1 s.d. 15.8:1.
+     *
+     * Diperksa di keenam aksen, keduanya mode. */
+    --on-accent-grad: #ffffff;
 
     /* Tooltip dan kotak gelap lain yang warnanya diambil dari
        `--ink`. Di mode dark `--ink` justru TERANG, jadi teks di
@@ -205,9 +204,12 @@ html[data-mode-resolved="dark"] {
     /* Lihat catatan `--accent-grad-to` di blok light. Di mode dark
      * arahnya dibalik: `--accent` sudah terang, jadi stop kedua
      * dicampur ke PUTIH supaya gradien tidak pernah menyeberangi
-     * dari terang ke gelap. Tanpa ini inisial avatar punya 2.96:1 di
-     * satu ujung dan 1.24:1 di ujung lain. */
+     * dari terang ke gelap. */
     --accent-grad-to: color-mix(in srgb, var(--accent) 22%, #ffffff);
+
+    /* Kedua stop sudah terang, jadi teksnya gelap. Lihat catatan
+     * `--on-accent-grad` di blok light untuk angkanya. */
+    --on-accent-grad: #0d1415;
 }
 
 /* Turunan netral untuk layer remap utilitas Tailwind.
