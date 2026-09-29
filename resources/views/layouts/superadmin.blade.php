@@ -43,17 +43,43 @@
                 var(--accent-tint);
         }
 
+        /* Panel sidebar superadmin SELALU putih di kedua mode.
+         *
+         * `rgba(255,255,255,.94)` adalah kaca buram di atas foto/gradien
+         * terang. Kalau dipetakan ke `var(--surface)`, mode dark
+         * menjadikannya gelap dan panel hilang terhadap foto di
+         * belakangnya. Jadi latar dikunci apa adanya.
+         *
+         * Konsekuensinya: token tinta di dalam sidebar juga harus dikunci
+         * ke nilai LIGHT. Kalau dibiarkan mengikuti mode, di mode dark
+         * `--ink-soft` jadi #a7b6b3 (terang) di atas panel putih -- 1.88:1,
+         * dan teks menu praktis tak terbaca. Aksen pun sama: `--accent`
+         * mode dark_only1.98:1 s.d. 2.76:1 di keenam aksen.
+         *
+         * Override-nya lokal ke sidebar, jadi konten area utama tetap
+         * mengikuti mode seperti seharusnya.
+         *
+         * Rasio di panel #f1f2f2 (putis .94 di atas gradien terang):
+         *   --ink        #1c2624  13.85:1
+         *   --ink-soft   #5b6a68   5.05:1
+         *   --ink-mute   #586765   5.28:1
+         *   --accent-ink  8.08:1 (amber, terendah) s.d. 11.09:1
+         */
         .superadmin-sidebar {
             width: 260px;
-            /* `rgba(255,255,255,.94)` di sini adalah panel putih tembus
-               pandang di atas foto/gradien terang, jadi HARUS tetap putih
-               di kedua mode. Kalau dipetakan ke `var(--surface)`, mode
-               dark menjadikannya gelap dan kontrasnya hilang terhadap foto
-               di belakangnya. Sengaja dibiarkan. */
             background: rgba(255,255,255,0.94);
             backdrop-filter: blur(18px);
             border-right: 1px solid var(--line);
             box-shadow: 8px 0 24px rgba(15, 23, 42, 0.04);
+
+            /* Kunci token ke nilai light -- lihat catatan di atas. */
+            --ink: #1c2624;
+            --ink-soft: #5b6a68;
+            --ink-mute: #586765;
+            --surface: #ffffff;
+            --surface-2: #f7f9f9;
+            --bg: #f1f5f5;
+            --line: #e2e8e8;
         }
 
         .superadmin-main {
@@ -86,7 +112,7 @@
 
         .sidebar-link.active {
             background: var(--accent-tint);
-            color: var(--accent);
+            color: var(--accent-ink);
             box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 8%, transparent);
         }
 
@@ -96,7 +122,7 @@
 
         .sidebar-link:not(.active):hover {
             background: var(--bg);
-            color: var(--accent);
+            color: var(--accent-ink);
         }
 
         .sidebar-icon {
@@ -113,7 +139,7 @@
 
         .sidebar-link.active .sidebar-icon {
             background: var(--surface);
-            color: var(--accent);
+            color: var(--accent-ink);
         }
 
         .logout-link {
@@ -256,7 +282,7 @@
                 </div>
 
                 <div>
-                    <div class="text-xl font-extrabold text-[var(--accent)] leading-tight">
+                    <div class="text-xl font-extrabold text-[var(--accent-ink)] leading-tight">
                         SEROJAP
                     </div>
 

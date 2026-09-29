@@ -27,7 +27,7 @@
     margin-bottom: 12px;
     padding: 0 4px;
     text-decoration: none;
-    color: var(--accent-deep);
+    color: var(--accent-ink);
     font-size: 14px;
     font-weight: 600;
     transition: transform 0.2s ease;
@@ -120,7 +120,7 @@
 }
 
 .field-help a {
-    color: var(--accent-deep);
+    color: var(--accent-ink);
     font-weight: 600;
 }
 
@@ -215,7 +215,7 @@
 .autocomplete-item:hover,
 .autocomplete-item.aktif {
     background: var(--accent-tint);
-    color: var(--accent-deep);
+    color: var(--accent-ink);
 }
 
 /* ================= PETA ================= */
