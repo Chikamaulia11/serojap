@@ -77,7 +77,14 @@
     }
 
     .account-search {
-        background: rgba(255,255,255,.88);
+        /* Semula `rgba(255,255,255,.88)` -- putih hardcoded, jadi di
+         * mode dark kotak pencarian tetap terang sementara teksnya
+         * `text-slate-700` sudah ikut jadi terang. Hasilnya box putih
+         * dengan teks abu muda: rasio yang diukur ~1.6:1.
+         * `color-mix` ke `transparent` mempertahankan efek kaca
+         * buram yang jelas sengaja dipakai di sini, tapi warna
+         * dasarnya sekarang ikut mode. */
+        background: color-mix(in srgb, var(--surface) 88%, transparent);
     }
 
     .swal2-popup-custom {
@@ -362,7 +369,7 @@
 
                             <div class="flex items-center gap-4 min-w-0">
 
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-grad-to)] text-white flex items-center justify-center font-extrabold text-sm flex-shrink-0 overflow-hidden shadow-md shadow-blue-100">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-grad-to)] text-[var(--on-accent-grad)] flex items-center justify-center font-extrabold text-sm flex-shrink-0 overflow-hidden shadow-md shadow-blue-100">
                                     @if($account->foto_profil)
                                         <img src="{{ asset('storage/' . $account->foto_profil) }}"
                                              alt="Foto Profil"
