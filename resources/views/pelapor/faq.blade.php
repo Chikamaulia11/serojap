@@ -8,7 +8,7 @@
 <div style="max-width: 900px; margin: 0 auto; padding: 10px 20px 40px 20px;">
 
     <div style="text-align: center; margin-bottom: 35px;">
-        <span style="display: inline-block; padding: 6px 16px; border-radius: 999px; background: var(--accent-tint); color: var(--accent-deep); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">
+        <span style="display: inline-block; padding: 6px 16px; border-radius: 999px; background: var(--accent-tint); color: var(--accent-ink); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">
             Pusat Bantuan
         </span>
         <h2 style="margin: 14px 0 0 0; font-size: 28px; font-weight: 700; color: var(--ink);">
@@ -72,7 +72,7 @@
             Tidak ada pertanyaan yang cocok
         </span>
         <span style="font-size: 14px; color: var(--ink-soft);">
-            Coba kata kunci lain, atau <a href="{{ route('pelapor.faq') }}" style="color: var(--accent-deep); font-weight: 600;">hapus pencarian</a>.
+            Coba kata kunci lain, atau <a href="{{ route('pelapor.faq') }}" style="color: var(--accent-ink); font-weight: 600;">hapus pencarian</a>.
         </span>
     </p>
 
