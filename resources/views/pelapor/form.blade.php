@@ -138,7 +138,11 @@
                             aria-expanded="false"
                             aria-controls="mapContainer"
                         >
-                            <span aria-hidden="true">&var(--selesai);</span> Tandai di Peta
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                                <circle cx="12" cy="10" r="3" />
+                            </svg> Tandai di Peta
                         </button>
 
                         <button
@@ -146,7 +150,12 @@
                             class="btn btn-secondary"
                             id="tombol-gps"
                         >
-                            <span aria-hidden="true">&var(--selesai);</span> Pakai Lokasi Saya
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10" />
+                                <circle cx="12" cy="12" r="4" />
+                                <path d="M12 2v4m0 12v4M2 12h4m12 0h4" />
+                            </svg> Pakai Lokasi Saya
                         </button>
                     </div>
 
