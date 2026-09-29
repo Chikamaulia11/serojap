@@ -102,7 +102,7 @@
             <div class="absolute -right-10 -top-10 w-36 h-36 rounded-full bg-blue-100/40"></div>
 
             <div class="relative z-10 max-w-2xl">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-[var(--accent)] text-xs font-extrabold mb-4">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--accent-tint)] text-[var(--accent-ink)] text-xs font-extrabold mb-4">
                     <i class="mdi mdi-account-plus-outline text-base"></i>
                     Form Tambah Akun
                 </div>

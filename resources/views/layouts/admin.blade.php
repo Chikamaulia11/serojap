@@ -98,7 +98,7 @@
             {{-- Dashboard --}}
             <a href="{{ route('admin.dashboard') }}"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                    {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
+                    {{ request()->routeIs('admin.dashboard') ? 'bg-[var(--accent-tint)] text-[var(--accent-ink)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent-ink)]' }}">
                 <i class="mdi mdi-view-dashboard-outline text-lg w-5 text-center"></i>
                 Dashboard
             </a>
@@ -107,7 +107,7 @@
             <div x-data="{ open: {{ request()->routeIs('admin.laporan.*') ? 'true' : 'false' }} }" class="relative">
                 <button @click="open = !open"
                     class="w-full flex items-center justify-between gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                        {{ request()->routeIs('admin.laporan.*') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
+                        {{ request()->routeIs('admin.laporan.*') ? 'bg-[var(--accent-tint)] text-[var(--accent-ink)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent-ink)]' }}">
                     <span class="flex items-center gap-2.5">
                         <i class="mdi mdi-clipboard-text-outline text-lg w-5 text-center"></i>
                         Manajemen Laporan
@@ -120,7 +120,7 @@
                     {{-- Semua Laporan --}}
                     <a href="{{ route('admin.laporan.index') }}"
                         class="flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition
-                            {{ request()->routeIs('admin.laporan.index') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
+                            {{ request()->routeIs('admin.laporan.index') ? 'bg-[var(--accent-tint)] text-[var(--accent-ink)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent-ink)]' }}">
                         <i class="mdi mdi-file-document-outline text-lg w-5 text-center"></i>
                         Daftar Laporan
                     </a>
@@ -128,7 +128,7 @@
                     {{-- Update Status --}}
                     <a href="{{ route('admin.laporan.update-status') }}"
                         class="flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition
-                            {{ request()->routeIs('admin.laporan.update-status') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
+                            {{ request()->routeIs('admin.laporan.update-status') ? 'bg-[var(--accent-tint)] text-[var(--accent-ink)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent-ink)]' }}">
                         <i class="mdi mdi-clipboard-check-outline text-lg w-5 text-center"></i>
                         Update Status
                     </a>
@@ -139,7 +139,7 @@
             {{-- Manajemen FAQ --}}
             <a href="{{ route('admin.manajemen-faq.index') }}"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                    {{ request()->routeIs('admin.manajemen-faq.*') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
+                    {{ request()->routeIs('admin.manajemen-faq.*') ? 'bg-[var(--accent-tint)] text-[var(--accent-ink)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent-ink)]' }}">
                 <i class="mdi mdi-frequently-asked-questions text-lg w-5 text-center"></i>
                 Manajemen FAQ
             </a>
@@ -147,7 +147,7 @@
             {{-- Grafik Statistik --}}
             <a href="{{ route('admin.statistik.index') }}"
                 class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-medium transition
-                    {{ request()->routeIs('admin.statistik.*') ? 'bg-blue-50 text-[var(--accent)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent)]' }}">
+                    {{ request()->routeIs('admin.statistik.*') ? 'bg-[var(--accent-tint)] text-[var(--accent-ink)]' : 'text-slate-500 hover:bg-slate-50 hover:text-[var(--accent-ink)]' }}">
                 <i class="mdi mdi-chart-bar text-lg w-5 text-center"></i>
                 Grafik Statistik
             </a>

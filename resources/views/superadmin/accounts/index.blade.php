@@ -141,7 +141,7 @@
 
             <div class="max-w-2xl">
 
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 text-[var(--accent)] text-xs font-extrabold mb-4">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--accent-tint)] text-[var(--accent-ink)] text-xs font-extrabold mb-4">
                     <i class="mdi mdi-shield-account-outline text-base"></i>
                     Kontrol Akun Sistem
                 </div>
@@ -186,7 +186,7 @@
                     </p>
                 </div>
 
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-[var(--accent)] flex items-center justify-center flex-shrink-0">
+                <div class="w-12 h-12 rounded-2xl bg-[var(--accent-tint)] text-[var(--accent-ink)] flex items-center justify-center flex-shrink-0">
                     <i class="mdi mdi-account-tie-outline text-2xl"></i>
                 </div>
             </div>
@@ -296,7 +296,7 @@
                                         class="account-filter-btn px-4 py-2.5 rounded-2xl text-xs font-extrabold transition
                                                {{ $filterAktif === $nilai
                                                     ? 'bg-[var(--accent)] text-white'
-                                                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-700' }}">
+                                                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-[var(--accent-tint)] hover:text-blue-700' }}">
                                     {{ $judul }}
                                 </button>
                             @endforeach
@@ -387,7 +387,7 @@
                                         </h3>
 
                                         @if($account->role === 'admin')
-                                            <span class="inline-flex px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-blue-50 text-blue-700">
+                                            <span class="inline-flex px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[var(--accent-tint)] text-blue-700">
                                                 Admin
                                             </span>
                                         @else
@@ -447,7 +447,7 @@
                                     </form>
                                 @else
                                     <a href="{{ route('superadmin.accounts.edit', $account->id) }}"
-                                       class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-extrabold rounded-2xl border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 transition">
+                                       class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-extrabold rounded-2xl border border-blue-200 text-blue-700 bg-[var(--accent-tint)] hover:bg-blue-100 transition">
                                         <i class="mdi mdi-pencil-outline" aria-hidden="true"></i>
                                         Edit
                                     </a>
