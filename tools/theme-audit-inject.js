@@ -756,6 +756,48 @@ function isDisabled(el) {
      */
     var actualWidth = window.innerWidth;
 
+    /*
+     * Matikan semua transisi SEBELUM mengukur.
+     *
+     * Loop di bawah menukar `data-mode-resolved` lalu langsung
+     * membaca `getComputedStyle` di task yang sama. Custom property
+     * tidak bisa dianimasikan, jadi nilainya melompat seketika ke
+     * mode baru -- tapi `background-color` dan `color` yang ber-
+     * `transition` masih menunjukkan nilai mode LAMA.
+     *
+     * Diuji di `pelapor-buat-laporan` pada `.field-input`, yang punya
+     * `transition`:
+     *
+     *   bacaan sinkron  -> rgb(26, 35, 35)   (mode dark lama)
+     *   +50ms           -> rgb(131, 136, 136) ( tengah transisi)
+     *   +450ms          -> rgb(255, 255, 255)  (mode light, benar)
+     *
+     * `--surface` sudah `rgb(255,255,255)` sejak bacaan pertama,
+     * karena custom property tidak ikut bertransisi.
+     *
+     * Efeknya ke laporan: setiap elemen ber-transisi diukur dengan
+     * warna kombinasi sebelumnya, sehingga rasio kontras yang
+     * tercatat bisa milik mode yang salah. Sebagian besar lonjakan
+     * jumlah kegagalan di commit 3 kemungkinan berasal dari ini,
+     * bukan dari penemuan masalah yang baru.
+     *
+     * `!important` dipakai karena aturan transisi di `app.css`
+     * dan `navbar.css` specificity-nya lebih tinggi daripada
+     * selector universal di sini.
+     */
+    var kill = document.createElement('style');
+    kill.id = 'theme-audit-freeze';
+    kill.textContent =
+        '*,*::before,*::after{' +
+        'transition:none !important;' +
+        'animation:none !important;' +
+        'animation-duration:0s !important;' +
+        'transition-duration:0s !important;' +
+        'caret-color:transparent !important;' +
+        'scroll-behavior:auto !important' +
+        '}';
+    document.head.appendChild(kill);
+
     for (var a = 0; a < ACCENTS.length; a++) {
         for (var m = 0; m < MODES.length; m++) {
             root.setAttribute('data-accent', ACCENTS[a]);
