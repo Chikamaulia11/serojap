@@ -77,6 +77,16 @@
         gap: 8px;
         padding: 8px 14px;
         border-radius: 999px;
+        /* Veil kaca sengaja TIDAK ditokenkan.
+         *
+         * Hero memakai `color-mix(... 96%, transparent)` di atas
+         * `--accent`, jadi latarnya berbalik: gelap di mode light,
+         * TERANG di mode dark (aksen dark memang terang). Album
+         * "kaca" selalu menambah terang, jadi putih bekerja di
+         * kedua mode: di light lebih terang di atas hero gelap,
+         * di dark lebih terang di atas hero terang. Yang tidak bisa
+         * di-hardcode adalah WARNANYA (lihat `.hero-stat span`),
+         * karena teks hero ikut mode. */
         background: rgba(255,255,255,0.16);
         border: 1px solid rgba(255,255,255,0.22);
         font-size: 12px;
@@ -93,7 +103,9 @@
 
     .hero-desc {
         margin-top: 12px;
-        color: rgba(255,255,255,0.88);
+        /* 0.88 -> 0.92, sama alasan dan sama nilainya dengan
+         * `.hero-stat span` supaya hierarki teks hero konsisten. */
+        color: color-mix(in srgb, var(--on-accent) 92%, transparent);
         line-height: 1.7;
         font-size: 15px;
     }
@@ -127,7 +139,26 @@
         margin-top: 7px;
         font-size: 12px;
         font-weight: 700;
-        color: rgba(255,255,255,0.9);
+        /* `rgba(255,255,255,0.9)` di sini adalah satu-satunya teks di
+         * dalam hero yang tidak mewarisi `color: var(--on-accent)`.
+         * Di mode dark hero-nya terang, jadi putih 90% di atasnya
+         * cuma ~2.4 : 1 -- label "Admin"/"Pelapor"/"Akun" nyaris
+         * tak terbaca sementara angka `<strong>` di atasnya normal,
+         * karena itu yang memang mewarisi.
+         *
+         *enting: rasionya ditentukan chip `.hero-stat` (kaca putih
+         * 13%), bukan hero. Chip itu selalu lebih terang dari hero,
+         * jadi teks tinta 92% di atasnya naik ke 5.27 - 7.10 : 1
+         * di mode dark -- lolos di 6 aksen, `tools/audit_theme.py`
+         * 0 kegagalan hero untuk dark.
+         *
+         * TIDAK ikut diperbaiki: mode light masih 3.55 - 4.44 : 1
+         * (teal 3.88, green 3.55, purple 4.28, rose 4.34, badge
+         * green 3.70 / teal 3.99). Structurally sama seperti kartu
+         * gelap: chip putih 13% di atas hero gelap justru
+         * MENDEKATI teks putih, jadi alpha tidak akan menolong --
+         * butuh veil gelap di light dan terang di dark. Separate. */
+        color: color-mix(in srgb, var(--on-accent) 92%, transparent);
     }
 
     .summary-grid {
@@ -213,8 +244,22 @@
     }
 
     .dark-card {
-        background: var(--ink);
-        color: var(--on-ink);
+        /* `background: var(--ink)` diganti token pita.
+         *
+         * `--ink` justru yang berbalik saat mode berubah: gelap di
+         * light, `#eef3f2` di dark. Di mode dark kartu notice ini
+         * jadi satu panel putih terang di tengah dashboard gelap,
+         * 13 : 1 dari canvas -- persis elemen yang terlihat lupa
+         * di-remap.
+         *
+         * Pita (`--band-to` + `--on-band`) adalah satu-satunya grub
+         * di sistem tema yang dijamin gelap di kedua mode, jadi
+         * {latar gelap, teks putih} benar tanpa blok tambahan per
+         * mode. Lihat catatan "KARTU GELAP" di `theme.css`.
+         *
+         * Dipakai untuk "Catatan Akses" DAN "Perhatian" di bawah. */
+        background: var(--band-to);
+        color: var(--on-band);
         border-radius: 24px;
         padding: 24px;
         position: relative;
@@ -347,7 +392,10 @@
     <div class="summary-grid">
 
         <div class="summary-card">
-            <div class="summary-icon" style="background:var(--accent-tint); color:var(--accent);">
+            {{-- `--accent-tint`/`--accent` diganti pasangan chip di
+                 `theme.css`: di mode dark tint-nya cuma 1.00 - 1.10 : 1
+                 dari kartu, jadi bentuk lingkarannya hilang. --}}
+            <div class="summary-icon" style="background:var(--icon-chip); color:var(--on-icon-chip);">
                 <i class="mdi mdi-account-tie-outline text-2xl"></i>
             </div>
 
@@ -360,7 +408,7 @@
         </div>
 
         <div class="summary-card">
-            <div class="summary-icon" style="background:var(--selesai-tint); color:var(--accent);">
+            <div class="summary-icon" style="background:var(--icon-chip-selesai); color:var(--on-icon-chip-selesai);">
                 <i class="mdi mdi-account-group-outline text-2xl"></i>
             </div>
 
@@ -378,7 +426,7 @@
 
         <div class="action-card">
 
-              <div style="width:56px; height:56px; border-radius:22px; background:var(--accent-tint); color:var(--accent); display:flex; align-items:center; justify-content:center; margin-bottom:18px;">
+              <div style="width:56px; height:56px; border-radius:22px; background:var(--icon-chip); color:var(--on-icon-chip); display:flex; align-items:center; justify-content:center; margin-bottom:18px;">
                 <i class="mdi mdi-account-cog-outline text-3xl"></i>
             </div>
 
@@ -411,7 +459,7 @@
                     <i class="mdi mdi-information-outline text-3xl"></i>
                 </div>
 
-                <p style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:var(--accent-tint);">
+                <p style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:var(--on-band);">
                     Catatan Akses
                 </p>
 
@@ -421,7 +469,12 @@
 
                 <div style="height:3px; width:100%; border-radius:999px; background:linear-gradient(90deg,var(--band-from),var(--band-to),transparent); margin:18px 0;"></div>
 
-                <p style="font-size:14px; color:var(--line); line-height:1.7;">
+                {{-- `--line` dan `--accent-tint` DILARANG di dalam kartu gelap:
+                     keduanya token mode, jadi di mode dark justru gelap dan
+                     rasionya di atas pita gelap jatuh ke ~1.04 : 1. Di light
+                     keduanya praktis putih seperti `--on-band`, jadi tidak ada
+                     yang berubah di sana. --}}
+                <p style="font-size:14px; color:var(--on-band); line-height:1.7;">
                     Admin dan super admin tidak dapat registrasi sendiri.
                     Pelapor tetap dapat mendaftar mandiri melalui halaman register publik.
                 </p>
@@ -521,13 +574,13 @@
     @if ($petugasAktif === 0)
         <div class="dark-card" style="margin-top:24px;">
             <div style="position:relative; z-index:2;">
-                <p style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:var(--accent-tint);">
+                <p style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:var(--on-band);">
                     Perhatian
                 </p>
                 <h2 style="font-size:20px; font-weight:800; margin-top:8px;">
                     Tidak ada admin yang aktif menangani laporan.
                 </h2>
-                <p style="font-size:14px; color:var(--line); line-height:1.7; margin-top:10px;">
+                <p style="font-size:14px; color:var(--on-band); line-height:1.7; margin-top:10px;">
                     Tidak ada satu pun akun admin aktif yang mengubah status
                     laporan dalam 30 hari terakhir. Periksa daftar akun --
                     mungkin akunnya sudah dinonaktifkan tanpa disengaja.

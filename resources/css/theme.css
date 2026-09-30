@@ -402,6 +402,110 @@ html[data-mode-resolved="dark"] {
 }
 
 /* =========================================================
+   CHIP IKON
+
+   Kotak bundar yang membingkai satu glif di dalam kartu: lingkaran
+   48px di dashboard superadmin, kotak 56px di "Manajemen Akun
+   Terpusat". Dua token, bukan hex per pemakaian, karena latar dan
+   warnanya wajib berbalik bersamaan.
+
+   Kenapa `--accent-tint` tidak bisa dipakai apa adanya di mode dark.
+   Diukur di 1280px pada kartu `.summary-card` lewat
+   `getComputedStyle`, keenam aksen:
+
+       --accent-tint  vs  --surface   1.00 - 1.10 : 1
+       --selesai-tint vs  --surface   1.16 : 1
+
+   Tint gelap di atas permukaan gelap: bentuk chip hilang, tersisa
+   cuma area yang berubah warna sangat tipis. Glif di dalamnya sendiri
+   masih terbaca (4.45 - 6.82 : 1), jadi yang rusak adalah bentuknya,
+   bukan isinya.
+
+   Menambah `border: 1px solid var(--line)` saja tidak menyelesaikan:
+   `--line` mode dark hanya 1.30 : 1 dari `--surface`, jadi yang
+   bertambah 0.18 : 1 -- tetap di bawah ambang 3 : 1.
+
+   Yang benar adalah membalik arahnya: chip SOLID di mode dark dengan
+   glif gelap di atasnya. Persis pola tombol aksen, dan satu-satunya
+   yang memenuhi kedua sisi sekaligus. Terukur di mode dark:
+
+       aksen   chip vs --surface   glif vs chip
+       teal         5.43 : 1           6.30 : 1
+       blue         5.52 : 1           6.40 : 1
+       green        7.07 : 1           8.20 : 1
+       purple       5.41 : 1           6.27 : 1
+       amber        7.22 : 1           8.37 : 1
+       rose         5.18 : 1           6.01 : 1
+
+   Di mode light tidak ada yang berubah: `--accent-tint` persis seperti
+   sebelumnya, dan warnanya tetap `--accent-ink` (yang sudah digeser ke
+   `--accent-deep` untuk amber light, lihat blok amber di atas).
+
+   Badge status TIDAK memakai pasangan ini; badge punya aturannya
+   sendiri lewat `--*-tint` + `--*-ink` di atas.
+   ========================================================= */
+
+html[data-mode-resolved="light"] {
+    --icon-chip: var(--accent-tint);
+    --on-icon-chip: var(--accent-ink);
+
+    --icon-chip-selesai: var(--selesai-tint);
+    --on-icon-chip-selesai: var(--selesai-ink);
+}
+
+html[data-mode-resolved="dark"] {
+    --icon-chip: var(--accent);
+    --on-icon-chip: var(--on-accent);
+
+    --icon-chip-selesai: var(--selesai);
+    /* Tinta gelap yang sama persis dengan `--on-accent` mode dark:
+       satu-satunya syaratnya warna solid terang di atas `--surface`
+       yang gelap. */
+    --on-icon-chip-selesai: var(--on-accent);
+}
+
+/* =========================================================
+   KARTU GELAP
+
+   Kartu "notice" yang sengaja dibedakan dari kartu biasa -- "Catatan
+   Akses" dan "Perhatian" di dashboard superadmin. Semula latarnya
+   `var(--ink)`, dan `var(--ink)` justru yang BERBALIK saat mode
+   berubah: gelap di light, `#eef3f2` di dark. Akibatnya di mode dark
+   kartu ini jadi satu panel putih terang di tengah dashboard yang
+   gelap -- persis elemen yang terlihat lupa di-remap.
+
+   Dipakai token pita (`--band-from`/`--band-to`/`--on-band`) dan
+   bukan netral, karena pita adalah satu-satunya grub di sistem tema
+   yang dijamin gelap di KEDUA mode (lihat catatan blok pita di atas).
+   Pasangan {latar gelap, teks putih} jadi benar tanpa blok tambahan
+   per mode, dan isi kartunya ikut benar: `--on-band` putih, veil
+   `rgba(255,255,255,.08-.16)` dekoratif, dan gradien dari
+   `--band-from` ke `--band-to`.
+
+   Yang TIDAK boleh dipakai di dalam kartu gelap: `--accent-tint` dan
+   `--line`. Keduanya gelap di mode dark, jadi di atas pita gelap
+   rasionya jatuh ke ~1.04 : 1. Bug yang sama seperti di atas, hanya
+   sekarang muncul di dalam kartu gelap.
+
+   Konsekuensi yang diterima di mode dark: karena canvas halaman
+   superadmin juga gelap, kartu gelap ini diukur 1.01 - 1.04 : 1
+   dari `--accent-tint` canvas (mode light 10.52 - 12.42 : 1). Jadi
+   di mode dark kartu tidak lagi "menonjol" seperti semula, tapi
+   tepinya juga tidak ada -- ia dibaca lewat isinya (14.5 - 16.2 : 1
+   untuk judul, label, dan paragraf). Kalau nanti tepinya ingin
+   kelihatan, kandidatnya bukan `--line` (1.30 : 1) tapi border
+   `--on-band` transparan; angka 3 : 1 tidak tercapai tanpa membuat
+   kartu lebih terang.
+
+   Catatan: hero dashboard TIDAK ikut aturan ini. Veil kacanya tetap
+   `rgba(255,255,255,...)` apa adanya dan itu benar di dua mode --
+   alias "kaca" selalu menambah terang, jadi putih bekerja baik di
+   atas hero gelap (light) maupun hero terang (dark). Yang tidak
+   boleh di-hardcode di hero hanya WARNA TEKS-nya; lihat
+   `.hero-stat span` di `superadmin/dashboard.blade.php`.
+   ========================================================= */
+
+/* =========================================================
    ALASAN SISTEM
    =========================================================
 

@@ -76,12 +76,51 @@
              * jadi kelas yang dirangkai dari variabel tidak pernah
              * muncul di hasil build dan angka di kartunya jadi tak
              * berwarna. Karena itu warna ditulis utuh di sini.
+             *
+             * Warnanya `--*-ink`, bukan `--accent-deep` dan bukan
+             * warna status mentah dari palet Tailwind. Alasannya
+             * semuanya satu: `--accent-deep` mode dark adalah hex
+             * GELAP (mis. teal `#0e2b2d`), sedangkan kartunya berlatar
+             * `--surface` mode dark `#1a2323`. Terukur:
+             *
+             *     --accent-deep vs --surface (dark)   1.00 - 1.11 : 1
+             *     emerald-700    vs --surface (dark)   2.93 : 1
+             *     amber-700      vs --surface (dark)   3.20 : 1
+             *
+             * Ketiganya gagal di mode dark, padahal warna yang sama
+             * lolos di mode light. Penyebabnya `--accent-deep` dan
+             * utilitas `emerald-700`/`amber-700` tidak punya pasangan
+             * per mode sama sekali.
+             *
+             * `--accent-ink` dan `--*-ink` status memang punya:
+             * keduanya sudah diukur ulang per mode. Setelah dipakai,
+             * di mode dark (teks 30px bold, ambang 3.0):
+             *
+             *     --accent-ink    5.18 - 7.22 : 1   (Total, Diterima)
+             *     --diproses-ink  9.06 : 1
+             *     --selesai-ink   8.44 : 1
+             *
+             * `--diproses-ink` dan `--selesai-ink` nilainya sama di
+             * keenam aksen karena warnanya berasal dari palet status,
+             * bukan dari aksen.
+             *
+             * Di mode light hasilnya nyaris sama dengan sebelumnya:
+             * aksen hanya bergeser sedikit (5.35 - 9.06 : 1), dan
+             * rona oranye / hijau status tetap terjaga karena
+             * diturunkan dari warna status aslinya.
+             *
+             * "Total Laporan" memakai aksen (bukan warna status)
+             * karena itu memang bukan status -- hanya total semua
+             * laporan. "Diterima" juga memakai aksen, mengikuti desain
+             * yang sudah ada di halaman ini; kalau mau warnanya ikut
+             * warna badge status, ganti satu baris dengan
+             * `text-[var(--diterima-ink)]`.
              */
             $kartu = [
-                ['Total Laporan', $stats['total'], 'admin.laporan.index', [], 'text-accent-700'],
-                ['Diterima', $stats['diterima'], 'admin.laporan.index', ['status' => 'diterima'], 'text-primary-700'],
-                ['Diproses', $stats['diproses'], 'admin.laporan.index', ['status' => 'diproses'], 'text-amber-700'],
-                ['Selesai', $stats['selesai'], 'admin.laporan.index', ['status' => 'selesai'], 'text-emerald-700'],
+                ['Total Laporan', $stats['total'], 'admin.laporan.index', [], 'text-[var(--accent-ink)]'],
+                ['Diterima', $stats['diterima'], 'admin.laporan.index', ['status' => 'diterima'], 'text-[var(--accent-ink)]'],
+                ['Diproses', $stats['diproses'], 'admin.laporan.index', ['status' => 'diproses'], 'text-[var(--diproses-ink)]'],
+                ['Selesai', $stats['selesai'], 'admin.laporan.index', ['status' => 'selesai'], 'text-[var(--selesai-ink)]'],
             ];
         @endphp
 
@@ -111,7 +150,10 @@
 
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 p-5">
                     <h2 class="text-lg font-bold text-gray-900">Laporan Terbaru</h2>
-                    <a href="{{ route('admin.laporan.index') }}" class="inline-block py-1 text-sm font-semibold text-accent-700 hover:underline">
+                    {{-- `--accent-ink`, bukan `text-accent-700` (= `--accent-deep`).
+                         Di mode dark link ini cuma 1.00 - 1.11 : 1 dari kartu, jadi
+                         praktis hilang. `--accent-ink` 5.18 - 7.22 : 1. --}}
+                    <a href="{{ route('admin.laporan.index') }}" class="inline-block py-1 text-sm font-semibold text-[var(--accent-ink)] hover:underline">
                         Lihat semua
                     </a>
                 </div>
@@ -215,7 +257,9 @@
                     </div>
                     <div class="flex justify-between">
                         <dt class="text-gray-600">Rasio selesai</dt>
-                        <dd class="font-semibold text-emerald-700">{{ $stats['rasioSelesai'] }}%</dd>
+                        {{-- Sama seperti kartu "Selesai" di atas: `text-emerald-700`
+                             cuma 2.93 : 1 di mode dark. --}}
+                        <dd class="font-semibold text-[var(--selesai-ink)]">{{ $stats['rasioSelesai'] }}%</dd>
                     </div>
                 </dl>
             </div>
