@@ -25,6 +25,8 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-mode-locked="light">
     <head>
         <meta charset="utf-8">
+
+        @include('partials.favicon')
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -53,7 +55,7 @@
                      masih bisa diganti di sini. --}}
             <div class="w-full sm:max-w-md px-6 flex items-center justify-between">
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    <x-logo :size="80" />
                 </a>
 
                 @include('partials.theme-picker', ['variant' => 'guest', 'modeLocked' => true])

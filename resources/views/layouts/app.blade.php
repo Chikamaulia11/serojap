@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="utf-8">
+
+    @include('partials.favicon')
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -106,24 +108,20 @@
             margin-bottom: 18px;
         }
 
-        .footer-logo-box {
-            width: 54px;
-            height: 54px;
-            border-radius: 18px;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-            flex-shrink: 0;
-        }
+        /* CATATAN: `.footer-logo-box` dan `.footer-logo-box img`
+           dihapus. Kotak translucent itu sebelumnya membungkus logo
+           yang bentuknya salah; sekarang komponen logo sudah membawa
+           platnya sendiri, jadi lapisan kedua hanya menumpuk
+           background tanpa gunanya.
 
-        .footer-logo-box img {
-            width: 38px;
-            height: 38px;
-            object-fit: contain;
-        }
+           PENTING: jangan tulis nama tag komponen Blade di dalam
+           komentar CSS seperti ini -- termasuk kalau ditulis sebagai
+           "x-logo" tanpa tanda kurung sudut. Blade memindai tag
+           komponen sebelum tahu itu isi CSS, sehingga tag di dalam
+           `/* ... *` dikompilasi jadi komponen sungguhan dan layout
+           jadi Parse error "unexpected end of file, expecting
+           endif". `{{-- --}}` aman karena Blade membuangnya lebih
+           dulu; `/* */` tidak. */
 
         .footer-brand h3 {
             margin: 0;
@@ -365,7 +363,7 @@
     <div class="navbar">
 
         <a href="{{ route('dashboard') }}" class="nav-left">
-            <img src="{{ asset('logo.png') }}" alt="Logo SEROJAP">
+            <x-logo :size="36" />
             <span>SEROJAP</span>
         </a>
 
@@ -468,9 +466,7 @@
 
                     <div class="footer-brand-head">
 
-                        <div class="footer-logo-box">
-                            <x-application-logo />
-                        </div>
+                        <x-logo :size="54" />
 
                         <div>
                             <h3>SEROJAP</h3>

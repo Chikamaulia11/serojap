@@ -557,6 +557,56 @@ body {
     color: var(--ink);
 }
 
+/* =========================================================
+   PLAT LOGO
+   =========================================================
+
+   Warna logo resmi gelap: petal luar navy, petal dalam teal. Di atas
+   `--surface` mode dark petal itu praktis hilang, jadi logo selalu
+   diletakkan di plat terang.
+
+   `--logo-plate` sengaja SAMA di kedua mode, sama seperti warna
+   putih yang dulu ikut tertanam di `logo.png` -- jadi pergantian ke
+   komponen `<x-logo>` tidak mengubah tampilan navbar. Plat terang di
+   mode dark bukan hal baru: sidebar superadmin sudah memakainya.
+
+   Angka kontras yang diukur terhadap plat #f9f9f7:
+
+       petal navy  #183868   11.04:1
+       petal teal  #107070    5.57:1
+       plat  vs  --surface dark  #1a2323   15.22:1
+       plat  vs  --surface light #ffffff    1.05:1
+
+   Baris terakhir itu sebabnya `--logo-plate-line` ada: di mode
+   light batas plat nyaris tak terlihat, jadi tepinya butuh garis
+   agar kotak logo tidak "tenggelam" ke kartu putih. Garis ini
+   dekoratif, bukan pembawa informasi, jadi tidak ikut menuntut 3:1.
+   ========================================================= */
+
+:root {
+    --logo-plate: #f9f9f7;
+    --logo-plate-line: #e4e4de;
+}
+
+.serojap-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--logo-size, 40px);
+    height: var(--logo-size, 40px);
+    border-radius: 30%;
+    background-color: var(--logo-plate);
+    box-shadow: inset 0 0 0 1px var(--logo-plate-line);
+    overflow: hidden;
+}
+
+.serojap-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
 /* CATATAN: tidak ada aturan global untuk `h1`..`h6` di sini.
 
    Judul otomatis mewarisi `color` dari `body` di atas, jadi sebenarnya

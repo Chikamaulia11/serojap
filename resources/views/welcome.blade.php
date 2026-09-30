@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8" />
+
+    @include('partials.favicon')
     <title>Serojap - Pelaporan Jalan Rusak Purwakarta</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description"

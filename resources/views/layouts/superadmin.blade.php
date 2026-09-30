@@ -2,6 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+
+    @include('partials.favicon')
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -277,9 +279,7 @@
         <!-- Brand -->
         <div class="px-5 py-5 border-b border-slate-200">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-2xl bg-white shadow-md shadow-blue-100 border border-slate-100 flex items-center justify-center overflow-hidden">
-                    <x-application-logo class="w-8 h-8 object-contain" />
-                </div>
+                <x-logo :size="44" />
 
                 <div>
                     <div class="text-xl font-extrabold text-[var(--accent-ink)] leading-tight">

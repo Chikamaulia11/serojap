@@ -19,7 +19,7 @@
     <div class="card">
 
         <div class="header">
-            <img src="{{ asset('logo.png') }}" alt="Logo SEROJAP">
+            <x-logo :size="44" />
             <div>
                 <h2>Laporan Kerusakan Jalan</h2>
                 <p class="header-sub">Isi bagian yang kamu bisa. Petugas akan menindaklanjuti.</p>

@@ -31,11 +31,16 @@
     text-decoration: none;
 }
 
-.nav-left img {
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
-}
+/* CATATAN: dulu ada `.nav-left img { width: 36px; height: 36px;
+   object-fit: contain }` di sini. Aturan itu dihapus karena logo
+   sekarang berasal dari komponen `<x-logo>`, dan ukurannya diurus
+   di sana lewat `--logo-size`.
+
+   Tidak boleh dikembalikan: `.nav-left img` dan `.serojap-logo img`
+   sama-sama specificity (0,2,0), jadi yang menang hanya bergantung
+   pada urutan stylesheet. navbar.css dimuat lewat <link> sementara
+   komponennya datang dari bundel Vite -- urutan itu mudah berubah,
+   dan gejalanya logo di navbar tiba-tiba 36x36 penuh tanpa plat. */
 
 .nav-left span {
     font-weight: 600;
