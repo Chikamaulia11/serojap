@@ -778,6 +778,23 @@ function isDisabled(el) {
     var results = [];
 
     /*
+     * Mode terkunci per halaman.
+     *
+     * `layouts/guest.blade.php` menaruh `data-mode-locked="light"` di
+     * tag `<html>`, jadi seluruh halaman auth selalu light apa pun isi
+     * `localStorage`. Loop di bawah menukar `data-mode-resolved`
+     * secara langsung -- kalau dibiarkan, audit akan mengukur halaman
+     * auth seolah-olah gelap dan melaporkan kegagalan yang tidak pernah
+     * muncul di browser sungguhan. Jadi kuncinya ikut dihormati:
+     * `data-accent` dan `data-mode` tetap diputar seperti biasa,
+     * hanya `data-mode-resolved` yang dipaksa ke mode terkunci.
+     */
+    var locked = root.getAttribute('data-mode-locked');
+    if (locked !== 'light' && locked !== 'dark') {
+        locked = null;
+    }
+
+    /*
      * Lebar TIDAK lagi diputar di dalam skrip ini.
      *
      * Dulu ada loop `for (w of WIDTHS)` yang tidak pernah mengubah
@@ -839,7 +856,7 @@ function isDisabled(el) {
         for (var m = 0; m < MODES.length; m++) {
             root.setAttribute('data-accent', ACCENTS[a]);
             root.setAttribute('data-mode', MODES[m]);
-            root.setAttribute('data-mode-resolved', MODES[m]);
+            root.setAttribute('data-mode-resolved', locked || MODES[m]);
             var c = scanContrast();
             var o = scanOverflow();
             results.push({

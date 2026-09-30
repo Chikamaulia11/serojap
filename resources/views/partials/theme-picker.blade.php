@@ -21,9 +21,19 @@
     ia mengikuti tempat pemicunya dan tidak pernah terpotong oleh
     `overflow` di luarnya. `theme.js` masih mengoreksi posisi kalau
     tidak ada ruang di bawah atau di samping.
+
+    `$modeLocked` (opsional, default false) disembunyikan bersama
+    blok "Mode". Dipakai halaman auth: `layouts/guest.blade.php`
+    mengunci `data-mode-locked="light"`, jadi tombol Dark/Sistem di
+    sana tidak akan mengubah apa pun -- menampilkannya hanya
+    menawarkan pilihan yang bohong. Swatch aksen tetap dirender,
+    karena mengganti warna aksen tetap berlaku dan tidak menyentuh
+    mode yang tersimpan. Tombol pemicunya ikut berubah dari "Tema"
+    jadi "Warna" supaya tidak menjanjikan mode yang tidak bisa diubah.
 --}}
 @php
     $variant = $variant ?? 'default';
+    $modeLocked = $modeLocked ?? false;
     $uid = 'theme-dd-' . $variant;
 @endphp
 
@@ -31,7 +41,7 @@
     <button type="button" class="theme-dd-btn" id="{{ $uid }}-btn" aria-haspopup="true" aria-expanded="false"
         aria-controls="{{ $uid }}-panel">
         <span class="dot"></span>
-        <span>Tema</span>
+        <span>{{ $modeLocked ? 'Warna' : 'Tema' }}</span>
         <span class="chevron" aria-hidden="true">&#9662;</span>
     </button>
 
@@ -47,12 +57,14 @@
             <button type="button" class="swatch sw-rose" data-accent="rose" aria-label="Tema warna rose" aria-pressed="false"></button>
         </div>
 
-        <div class="theme-dd-label">Mode</div>
+        @unless ($modeLocked)
+            <div class="theme-dd-label">Mode</div>
 
-        <div class="mode-seg">
-            <button type="button" data-mode="light" aria-pressed="false">Light</button>
-            <button type="button" data-mode="dark" aria-pressed="false">Dark</button>
-            <button type="button" data-mode="system" aria-pressed="false">Sistem</button>
-        </div>
+            <div class="mode-seg">
+                <button type="button" data-mode="light" aria-pressed="false">Light</button>
+                <button type="button" data-mode="dark" aria-pressed="false">Dark</button>
+                <button type="button" data-mode="system" aria-pressed="false">Sistem</button>
+            </div>
+        @endunless
     </div>
 </div>

@@ -39,6 +39,15 @@
  *    keluar layar (lebar panel 230px di sidebar 240px).
  *
  * Font TIDAK disentuh. Draft memakai Figtree hanya untuk preview-nya.
+ *
+ * 5. Mode bisa dikunci per halaman lewat `data-mode-locked` di tag
+ *    `<html>`. Halaman auth (`layouts/guest.blade.php`) mengunci
+ *    `light`: `resolveMode()` mengembalikan nilai kunci itu apa adanya,
+ *    jadi `apply()` tidak pernah menimpanya -- dan `data-mode` serta
+ *    `localStorage` tetap menyimpan preferensi asli, sehingga pengunjung
+ *    yang memilih dark mode tidak kehilangan pilihannya begitu login.
+ *    Script anti-FOUC di `<head>` menerapkan aturan yang sama, jadi
+ *    tidak ada kedip sebelum modul ini jalan.
  */
 
 const ACCENTS = ['teal', 'blue', 'green', 'purple', 'amber', 'rose'];
@@ -51,6 +60,18 @@ const DEFAULT_ACCENT = 'teal';
 const DEFAULT_MODE = 'system';
 
 const html = document.documentElement;
+
+/**
+ * Kunci mode dari `data-mode-locked`, atau `null` kalau halaman bebas.
+ *
+ * Nilai di luar `light`/`dark` diabaikan, sama seperti nilai
+ * `localStorage` yang tidak dikenal jatuh ke default: atribut itu
+ * datang dari markup server, jadi tetap harus divalidasi di sini.
+ */
+function lockedMode() {
+    const v = html.getAttribute('data-mode-locked');
+    return v === 'light' || v === 'dark' ? v : null;
+}
 
 function safeGet(key) {
     try {
@@ -69,6 +90,10 @@ function safeSet(key, value) {
 }
 
 function resolveMode(mode) {
+    const locked = lockedMode();
+    if (locked) {
+        return locked;
+    }
     if (mode === 'system') {
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }

@@ -244,6 +244,13 @@ class ThemeAuditDumpTest extends TestCase
             'publik-login-admin' => '/login/admin',
             'publik-login-superadmin' => '/login/superadmin',
             'publik-register' => '/register',
+            // Semua halaman auth pakai `layouts/guest`, jadi keduanya
+            // juga terkunci light. Sebelumnya keduanya tidak ikut
+            // diaudit, dan halaman lupa kata sandi tidak pernah
+            // sampai ke layar -- artinya tidak pernah ikut diuji
+            // kontrasnya di mode apa pun.
+            'publik-lupa-password' => '/forgot-password',
+            'publik-reset-password' => '/reset-password/token-audit',
         ] as $name => $url) {
             $this->dump($name, $url);
         }
